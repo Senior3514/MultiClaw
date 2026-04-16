@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PID_FILE="$ROOT/ops/multiclaw-web.pid"
 LOG_FILE="$ROOT/ops/multiclaw-web.log"
+STATE_FILE="$ROOT/ops/multiclaw-web.state.json"
 PORT="${1:-8813}"
 TS_IP="$(tailscale ip -4 | head -n1)"
 
@@ -19,6 +20,7 @@ fi
 
 nohup python3 "$ROOT/ops/server.py" "$TS_IP" "$PORT" >"$LOG_FILE" 2>&1 &
 echo $! > "$PID_FILE"
+printf '{\n  "host": "%s",\n  "port": %s,\n  "url": "http://%s:%s/"\n}\n' "$TS_IP" "$PORT" "$TS_IP" "$PORT" > "$STATE_FILE"
 sleep 2
 
 echo "MultiClaw web started"

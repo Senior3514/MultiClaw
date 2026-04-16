@@ -1,4 +1,5 @@
 generated/
 generated-live/
+.multiclaw/
 ops/*.log
 ops/*.pid

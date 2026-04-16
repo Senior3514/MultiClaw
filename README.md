@@ -46,8 +46,9 @@ It should become the best generator and orchestration layer on top of OpenClaw.
 
 ## Quick start
 
+### Generate a company package
+
 ```bash
-cd projects/multiclaw
 npm run example
 ```
 
@@ -61,6 +62,21 @@ You can also run the interactive flow:
 
 ```bash
 npm run init
+```
+
+### Configure and run the workspace
+
+```bash
+npm run setup
+npm run start
+```
+
+Useful runtime commands:
+
+```bash
+npm run dev
+npm run stop
+npm run status
 ```
 
 And the provider-routing skeleton demo:

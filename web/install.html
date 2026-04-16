@@ -73,16 +73,22 @@
           </article>
 
           <article class="panel panel-strong install-panel">
-            <div class="eyebrow">Install command</div>
-            <h2>Copy one command, then open the runtime.</h2>
-            <pre class="install-command" id="installCommand"></pre>
+            <div class="eyebrow">Step 1</div>
+            <h2>Install the base product first.</h2>
+            <pre class="install-command" id="baseInstallCommand"></pre>
             <div class="cta-row">
-              <button class="button-link primary button-reset" id="copyInstallCommand">Copy command</button>
+              <button class="button-link primary button-reset" id="copyBaseInstallCommand">Copy install</button>
               <a class="button-link secondary" href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">Open GitHub</a>
             </div>
             <div class="install-notes">
               <p id="platformNote">Ubuntu/VPS is the cleanest path right now.</p>
-              <p>The command clones or updates MultiClaw, installs dependencies, saves runtime config, persists your API key, and starts the runtime.</p>
+              <p>This installs MultiClaw itself, gives you the `multiclaw` command, and keeps the foundation simple.</p>
+            </div>
+            <div class="eyebrow">Step 2</div>
+            <h3>Then layer on provider and runtime choices.</h3>
+            <pre class="install-command" id="advancedInstallCommand"></pre>
+            <div class="cta-row">
+              <button class="button-link secondary button-reset" id="copyAdvancedInstallCommand">Copy advanced start</button>
             </div>
           </article>
         </section>

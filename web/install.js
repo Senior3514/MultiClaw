@@ -1,5 +1,7 @@
-const installCommandEl = document.getElementById('installCommand');
-const copyButton = document.getElementById('copyInstallCommand');
+const baseInstallCommandEl = document.getElementById('baseInstallCommand');
+const advancedInstallCommandEl = document.getElementById('advancedInstallCommand');
+const copyBaseButton = document.getElementById('copyBaseInstallCommand');
+const copyAdvancedButton = document.getElementById('copyAdvancedInstallCommand');
 const platformNoteEl = document.getElementById('platformNote');
 
 const state = {
@@ -18,7 +20,8 @@ const platformNotes = {
 
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
-  installCommandEl.textContent = `curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
+  baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash';
+  advancedInstallCommandEl.textContent = `multiclaw up ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
   platformNoteEl.textContent = platformNotes[state.platform];
 }
 
@@ -47,19 +50,30 @@ applyChoice('#providerChoices', '.provider-card', (element) => {
   state.apiKeyEnv = element.dataset.keyEnv;
 });
 
-copyButton.addEventListener('click', async () => {
+async function copyWithFeedback(button, text, successText) {
   try {
-    await navigator.clipboard.writeText(installCommandEl.textContent);
-    copyButton.textContent = 'Copied';
+    await navigator.clipboard.writeText(text);
+    button.textContent = successText;
     setTimeout(() => {
-      copyButton.textContent = 'Copy command';
+      button.textContent = button.dataset.defaultLabel;
     }, 1200);
   } catch {
-    copyButton.textContent = 'Copy failed';
+    button.textContent = 'Copy failed';
     setTimeout(() => {
-      copyButton.textContent = 'Copy command';
+      button.textContent = button.dataset.defaultLabel;
     }, 1200);
   }
+}
+
+copyBaseButton.dataset.defaultLabel = 'Copy install';
+copyAdvancedButton.dataset.defaultLabel = 'Copy advanced start';
+
+copyBaseButton.addEventListener('click', async () => {
+  await copyWithFeedback(copyBaseButton, baseInstallCommandEl.textContent, 'Copied');
+});
+
+copyAdvancedButton.addEventListener('click', async () => {
+  await copyWithFeedback(copyAdvancedButton, advancedInstallCommandEl.textContent, 'Copied');
 });
 
 renderCommand();

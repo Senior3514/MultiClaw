@@ -427,6 +427,7 @@ Usage:
   multiclaw help
   multiclaw init
   multiclaw init --demo
+  multiclaw configure
   multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
   multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
   multiclaw start [--port 8813]
@@ -436,6 +437,7 @@ Usage:
 
 Notes:
   - init generates a company package under ./generated/
+  - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
   - setup/up can also save the API key into ./.multiclaw/runtime.env
   - up is the one-command way to configure and start the runtime
@@ -450,7 +452,7 @@ async function main() {
     return;
   }
 
-  if (command === 'setup') {
+  if (command === 'configure' || command === 'setup') {
     await setupRuntime();
     return;
   }

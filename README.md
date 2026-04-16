@@ -70,7 +70,20 @@ npm run init
 ### Configure and run the workspace
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+```
+
+Then:
+
+```bash
+multiclaw configure
+multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+```
+
+Or, if you want to install and start in one go:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --start --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 
 Or after cloning locally:
@@ -79,7 +92,7 @@ Or after cloning locally:
 npm run up -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 
-This stores the runtime config and API key under `.multiclaw/` and starts the product.
+The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.
 
 If you want to separate config from start:
 

@@ -9,6 +9,7 @@ PROVIDER="openai"
 MODEL="gpt-5.4"
 API_KEY_ENV="OPENAI_API_KEY"
 API_KEY=""
+AUTO_START="0"
 
 usage() {
   cat <<'EOF'
@@ -26,6 +27,7 @@ Options:
   --model <name>          Model name (default: gpt-5.4)
   --api-key-env <name>    Env var name to persist (default: OPENAI_API_KEY)
   --api-key <value>       API key value to persist for runtime
+  --start                 Configure and start immediately after install
   --dir <path>            Install/update target directory (default: ~/MultiClaw)
   --help                  Show this help
 EOF
@@ -68,6 +70,10 @@ while [[ $# -gt 0 ]]; do
       API_KEY="$2"
       shift 2
       ;;
+    --start)
+      AUTO_START="1"
+      shift
+      ;;
     --dir)
       INSTALL_DIR="$2"
       shift 2
@@ -100,18 +106,35 @@ fi
 cd "$INSTALL_DIR"
 
 npm install
-
-CMD=(node ./bin/multiclaw.js up "--${BIND}" --port "$PORT" --provider "$PROVIDER" --model "$MODEL" --api-key-env "$API_KEY_ENV")
-if [[ -n "$API_KEY" ]]; then
-  CMD+=(--api-key "$API_KEY")
-fi
-
-echo "Starting MultiClaw with one command..."
-printf 'Command: '
-printf '%q ' "${CMD[@]}"
-printf '\n'
-"${CMD[@]}"
+npm link
 
 echo
-echo "Runtime status:"
-node ./bin/multiclaw.js status
+echo "MultiClaw installed successfully."
+echo "Command available: multiclaw"
+
+echo "Next steps:"
+echo "  1. multiclaw configure"
+echo "  2. multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
+
+auto_flags=0
+if [[ "$AUTO_START" == "1" || -n "$API_KEY" ]]; then
+  auto_flags=1
+fi
+
+if [[ "$auto_flags" == "1" ]]; then
+  CMD=(multiclaw up "--${BIND}" --port "$PORT" --provider "$PROVIDER" --model "$MODEL" --api-key-env "$API_KEY_ENV")
+  if [[ -n "$API_KEY" ]]; then
+    CMD+=(--api-key "$API_KEY")
+  fi
+
+  echo
+  echo "Starting MultiClaw now..."
+  printf 'Command: '
+  printf '%q ' "${CMD[@]}"
+  printf '\n'
+  "${CMD[@]}"
+
+  echo
+  echo "Runtime status:"
+  multiclaw status
+fi

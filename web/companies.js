@@ -20,6 +20,9 @@ function renderCompanyCard(company) {
       <div class="company-footer">
         <small>Generated: ${company.generatedAt}</small>
       </div>
+      <div class="cta-row">
+        <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>
+      </div>
     </article>
   `;
 }

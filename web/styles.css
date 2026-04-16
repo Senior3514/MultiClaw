@@ -179,6 +179,11 @@ p {
   border: 1px solid rgba(145, 163, 255, 0.12);
 }
 
+.hidden-link {
+  display: none;
+  margin-top: 12px;
+}
+
 .hero-graphic {
   position: relative;
   overflow: hidden;

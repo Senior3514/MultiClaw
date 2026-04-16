@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MultiClaw Company</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./companies.html">Companies</a>
+          <a href="./platform.html">Platform</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        <section class="panel section-block">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Generated company</div>
+              <h1 id="companyTitle">Loading company...</h1>
+            </div>
+          </div>
+          <div id="companyStatus" class="status-banner status-idle">Loading company data...</div>
+        </section>
+
+        <section class="grid-two">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Company profile</h3>
+              <span>Overview</span>
+            </div>
+            <div id="companyOverview" class="stack"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Routing posture</h3>
+              <span>Model layer</span>
+            </div>
+            <div id="companyRouting" class="stack"></div>
+          </div>
+        </section>
+
+        <section class="grid-two">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Org map</h3>
+              <span>Leads</span>
+            </div>
+            <div id="companyRoles" class="org-grid"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Mission board</h3>
+              <span>First cycle</span>
+            </div>
+            <div id="companyMissions" class="stack"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./company.js"></script>
+  </body>
+</html>

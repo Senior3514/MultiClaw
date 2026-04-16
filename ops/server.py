@@ -106,6 +106,18 @@ def list_companies():
     return companies
 
 
+def load_company(company_id: str):
+    company_file = GENERATED_ROOT / company_id / "company.json"
+    if not company_file.exists():
+        return None
+    company = json.loads(company_file.read_text(encoding="utf-8"))
+    company.setdefault("companyId", company_id)
+    if not company.get("generatedAt"):
+        mtime = datetime.fromtimestamp(company_file.stat().st_mtime, timezone.utc)
+        company["generatedAt"] = mtime.strftime("%Y-%m-%d %H:%M:%S UTC")
+    return company
+
+
 def generate_company(payload):
     project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
     description = payload.get("description", "A serious AI product.").strip()
@@ -190,6 +202,20 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(list_companies()).encode("utf-8"))
+            return
+        if self.path.startswith("/api/company/"):
+            company_id = self.path.split("/api/company/", 1)[1].strip()
+            company = load_company(company_id)
+            if company is not None:
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(company).encode("utf-8"))
+            else:
+                self.send_response(404)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "company not found"}).encode("utf-8"))
             return
         return super().do_GET()
 

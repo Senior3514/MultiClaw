@@ -66,6 +66,12 @@ function setStatus(message, kind = 'idle') {
   status.className = `status-banner status-${kind}`;
 }
 
+function setCompanyLink(companyId) {
+  const link = el('companyLink');
+  link.href = `./company.html?id=${encodeURIComponent(companyId)}`;
+  link.classList.remove('hidden-link');
+}
+
 function applyResult(data) {
   el('heroTitle').textContent = `${data.projectName}, powered by MultiClaw`;
   el('heroSubtitle').textContent = `${data.description} This company is designed as a ${data.archetype.toLowerCase()} with ${data.stage.toLowerCase()} urgency.`;
@@ -77,6 +83,7 @@ function applyResult(data) {
   el('missionBoard').innerHTML = renderMissions(data.missions);
   const stamp = new Date().toLocaleTimeString();
   setStatus(`Company generated successfully at ${stamp}. ID: ${data.companyId}`, 'success');
+  setCompanyLink(data.companyId);
 }
 
 async function generateCompany() {

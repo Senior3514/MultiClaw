@@ -152,6 +152,7 @@ Technical USP direction:
 - stay provider-flexible and access-flexible
 - expand company structure autonomously inside the runtime
 - keep protection and secure defaults inside the product DNA
+- operate proactively and optimize for quality, efficiency, and token awareness
 
 If you want to separate config from start:
 

@@ -41,8 +41,17 @@ const PRESETS = {
   },
 };
 
+const SETTINGS_KEY = 'multiclaw-settings';
 let currentStep = 1;
 const totalSteps = 3;
+
+function loadSettings() {
+  try {
+    return JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+  } catch {
+    return {};
+  }
+}
 
 function renderBrand(data) {
   const rows = [
@@ -215,6 +224,10 @@ el('generateBtn').addEventListener('click', generateCompany);
 document.querySelectorAll('[data-preset]').forEach((button) => {
   button.addEventListener('click', () => applyPreset(button.dataset.preset));
 });
+
+const savedSettings = loadSettings();
+if (savedSettings.defaultProductOrigin) el('productOrigin').value = savedSettings.defaultProductOrigin;
+if (savedSettings.defaultAutonomyMode) el('autonomyMode').value = savedSettings.defaultAutonomyMode;
 
 renderWizard();
 generateCompany();

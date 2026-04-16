@@ -29,6 +29,8 @@ The generated company exists behind the scenes to operate, maintain, and advance
 The product should reuse OpenClaw-like execution infrastructure while remaining model-agnostic.
 That means the experience layer can stay stable while routing work across many AI providers.
 
+It should also become portable across environments, so a user can run MultiClaw on their own machine, connect their own model, and use the product without depending on this specific VPS.
+
 ## Positioning
 
 - Open source core

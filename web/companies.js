@@ -1,3 +1,8 @@
+import { mountSession, requireAuth } from './auth.js';
+
+requireAuth();
+mountSession();
+
 const statusEl = document.getElementById('companiesStatus');
 const gridEl = document.getElementById('companiesGrid');
 

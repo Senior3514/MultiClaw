@@ -17,6 +17,18 @@ function setSession(email) {
   localStorage.setItem(SESSION_KEY, JSON.stringify({ email, signedInAt: new Date().toISOString() }));
 }
 
+export function getSession() {
+  try {
+    return JSON.parse(localStorage.getItem(SESSION_KEY) || 'null');
+  } catch {
+    return null;
+  }
+}
+
+export function clearSession() {
+  localStorage.removeItem(SESSION_KEY);
+}
+
 async function hashPassword(password) {
   const data = new TextEncoder().encode(password);
   const digest = await crypto.subtle.digest('SHA-256', data);
@@ -52,6 +64,38 @@ async function logIn(email, password) {
   if (!user) throw new Error('Invalid email or password.');
 
   setSession(email);
+}
+
+export function requireAuth() {
+  const session = getSession();
+  if (!session?.email) {
+    window.location.href = './login.html';
+    throw new Error('Authentication required');
+  }
+  return session;
+}
+
+export function mountSession() {
+  const sessionArea = document.getElementById('sessionArea');
+  if (!sessionArea) return;
+
+  const session = getSession();
+  if (!session?.email) {
+    sessionArea.innerHTML = '<a class="button-link secondary" href="./login.html">Log in</a>';
+    return;
+  }
+
+  sessionArea.innerHTML = `
+    <div class="session-chip">
+      <span>${session.email}</span>
+      <button id="logoutBtn" type="button">Log out</button>
+    </div>
+  `;
+
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    clearSession();
+    window.location.href = './login.html';
+  });
 }
 
 export function initAuthPage(mode) {

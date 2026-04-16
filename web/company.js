@@ -1,3 +1,8 @@
+import { mountSession, requireAuth } from './auth.js';
+
+requireAuth();
+mountSession();
+
 const params = new URLSearchParams(window.location.search);
 const companyId = params.get('id');
 

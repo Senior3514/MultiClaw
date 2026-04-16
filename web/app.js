@@ -1,3 +1,8 @@
+import { mountSession, requireAuth } from './auth.js';
+
+requireAuth();
+mountSession();
+
 const el = (id) => document.getElementById(id);
 
 const PRESETS = {

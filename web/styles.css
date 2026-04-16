@@ -72,6 +72,30 @@ body {
   flex-wrap: wrap;
 }
 
+.session-area {
+  margin-inline-start: auto;
+}
+
+.session-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.session-chip span {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.session-chip button {
+  padding: 8px 12px;
+  border-radius: 999px;
+}
+
 .site-nav a {
   color: var(--muted);
   padding: 10px 14px;

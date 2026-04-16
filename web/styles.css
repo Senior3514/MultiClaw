@@ -231,17 +231,23 @@ video {
   border-radius: 14px;
   padding: 0 18px;
   font-weight: 700;
+  transition: transform 180ms ease, filter 180ms ease, box-shadow 180ms ease;
 }
 
 .button-link.primary {
   color: white;
   background: linear-gradient(135deg, var(--primary), #3aa7ff);
+  box-shadow: 0 16px 40px rgba(76, 106, 255, 0.28);
 }
 
 .button-link.secondary {
   color: var(--text);
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.button-link:hover {
+  transform: translateY(-2px);
 }
 
 .hidden-link {
@@ -418,6 +424,75 @@ video {
 .company-footer {
   margin-top: 16px;
   color: var(--muted);
+}
+
+.premium-showcase {
+  align-items: stretch;
+}
+
+.terminal-panel,
+.premium-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.terminal-panel::after,
+.premium-card::after {
+  content: '';
+  position: absolute;
+  inset: auto -20% -40% auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(124, 92, 255, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+.terminal-window {
+  margin-top: 20px;
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  background: rgba(5, 8, 19, 0.82);
+  border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.terminal-line {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.terminal-line span {
+  color: var(--accent);
+  margin-right: 8px;
+}
+
+.terminal-line.muted {
+  color: var(--muted);
+}
+
+.terminal-line.accent {
+  color: #d7ceff;
+}
+
+.terminal-line.success {
+  color: #bff9ee;
+}
+
+.premium-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.premium-points span {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(145, 163, 255, 0.12);
+  color: var(--text);
 }
 
 .logic-card p,

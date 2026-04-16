@@ -100,6 +100,12 @@ curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/u
 
 The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.
 
+Ordered flow:
+1. Install the core product
+2. Configure the AI runtime
+3. Start the runtime
+4. Add networking, channels, and extra integrations later
+
 If you want to separate config from start:
 
 ```bash

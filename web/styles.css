@@ -533,6 +533,10 @@ video {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.operation-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .landing-cards .feature-card,
 .landing-section .logic-card,
 .landing-section .feature-card {
@@ -544,8 +548,21 @@ video {
 .terminal-panel,
 .landing-section .logic-card {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012)),
     var(--panel);
+}
+
+.operation-grid .logic-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.operation-grid .logic-card::after {
+  content: '';
+  position: absolute;
+  inset: auto 22px 0 22px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(124, 92, 255, 0), rgba(124, 92, 255, 0.72), rgba(40, 215, 185, 0));
 }
 
 .landing-section .section-heading {
@@ -1032,6 +1049,7 @@ button:hover {
   .hq-grid,
   .cards-grid,
   .logic-grid,
+  .operation-grid,
   .hero-metrics,
   .shell {
     grid-template-columns: 1fr;

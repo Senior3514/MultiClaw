@@ -30,6 +30,10 @@ body {
   color: var(--text);
 }
 
+body.auth-pending .site-shell {
+  visibility: hidden;
+}
+
 .site-shell {
   min-height: 100vh;
   min-width: 0;

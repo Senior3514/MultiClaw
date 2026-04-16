@@ -54,6 +54,7 @@ async function logIn(email, password) {
 }
 
 export async function requireAuth() {
+  document.body?.classList.add('auth-pending');
   const session = getSession();
   if (!session?.email) {
     window.location.href = './login.html';
@@ -63,11 +64,23 @@ export async function requireAuth() {
   try {
     const serverSession = await request('/api/auth/me');
     setLocalSession(serverSession.email);
+    document.body?.classList.remove('auth-pending');
     return serverSession;
   } catch {
     clearSession();
     window.location.href = './login.html';
     throw new Error('Authentication required');
+  }
+}
+
+export async function hasServerSession() {
+  try {
+    const serverSession = await request('/api/auth/me');
+    setLocalSession(serverSession.email);
+    return serverSession;
+  } catch {
+    clearSession();
+    return null;
   }
 }
 

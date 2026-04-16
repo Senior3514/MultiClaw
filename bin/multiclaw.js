@@ -16,6 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(__filename), '..');
 const runtimeDir = path.join(cwd, '.multiclaw');
 const runtimeConfigPath = path.join(runtimeDir, 'config.json');
+const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
 const pidPath = path.join(repoRoot, 'ops', 'multiclaw-web.pid');
 const statePath = path.join(repoRoot, 'ops', 'multiclaw-web.state.json');
 
@@ -205,6 +206,16 @@ async function saveRuntimeConfig(config) {
   await fs.writeFile(runtimeConfigPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
 }
 
+function shellEscapeSingle(value) {
+  return String(value).replace(/'/g, `'"'"'`);
+}
+
+async function saveRuntimeEnv(name, value) {
+  await mkdirp(runtimeDir);
+  const content = `${name}='${shellEscapeSingle(value)}'\n`;
+  await fs.writeFile(runtimeEnvPath, content, 'utf8');
+}
+
 async function collectInput() {
   if (isDemo) {
     return {
@@ -286,7 +297,8 @@ async function setupRuntime() {
   const providerFlag = getArgValue('--provider', existing.provider);
   const modelFlag = getArgValue('--model', existing.model);
   const apiKeyEnvFlag = getArgValue('--api-key-env', existing.apiKeyEnv);
-  const hasInlineConfig = modeFlag || argv.includes('--provider') || argv.some((arg) => arg.startsWith('--provider=')) || argv.includes('--model') || argv.some((arg) => arg.startsWith('--model=')) || argv.includes('--api-key-env') || argv.some((arg) => arg.startsWith('--api-key-env='));
+  const apiKeyValue = getArgValue('--api-key');
+  const hasInlineConfig = modeFlag || argv.includes('--provider') || argv.some((arg) => arg.startsWith('--provider=')) || argv.includes('--model') || argv.some((arg) => arg.startsWith('--model=')) || argv.includes('--api-key-env') || argv.some((arg) => arg.startsWith('--api-key-env=')) || argv.includes('--api-key') || argv.some((arg) => arg.startsWith('--api-key='));
 
   if (hasInlineConfig) {
     const config = {
@@ -297,6 +309,10 @@ async function setupRuntime() {
       apiKeyEnv: apiKeyEnvFlag,
     };
     await saveRuntimeConfig(config);
+    if (apiKeyValue) {
+      await saveRuntimeEnv(config.apiKeyEnv, apiKeyValue);
+      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
+    }
     console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
     console.log(JSON.stringify(config, null, 2));
     return;
@@ -315,8 +331,13 @@ async function setupRuntime() {
     const provider = await ask('Provider', existing.provider);
     const model = await ask('Model', existing.model);
     const apiKeyEnv = await ask('API key env var', existing.apiKeyEnv);
+    const apiKey = await ask('API key value (optional)', '');
     const config = { bind, port, provider, model, apiKeyEnv };
     await saveRuntimeConfig(config);
+    if (apiKey) {
+      await saveRuntimeEnv(config.apiKeyEnv, apiKey);
+      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
+    }
     console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
     console.log(JSON.stringify(config, null, 2));
   } finally {
@@ -361,6 +382,7 @@ async function upRuntime() {
   const providerFlag = getArgValue('--provider', existing.provider);
   const modelFlag = getArgValue('--model', existing.model);
   const apiKeyEnvFlag = getArgValue('--api-key-env', existing.apiKeyEnv);
+  const apiKeyValue = getArgValue('--api-key');
 
   const config = {
     bind: modeFlag || existing.bind,
@@ -371,6 +393,9 @@ async function upRuntime() {
   };
 
   await saveRuntimeConfig(config);
+  if (apiKeyValue) {
+    await saveRuntimeEnv(config.apiKeyEnv, apiKeyValue);
+  }
   await startRuntime(config.bind);
 }
 
@@ -390,6 +415,7 @@ async function printStatus() {
   console.log(`- model: ${config.model}`);
   console.log(`- api key env: ${config.apiKeyEnv}`);
   console.log(`- config: ${runtimeConfigPath}`);
+  console.log(`- runtime env: ${runtimeEnvPath}`);
   console.log(`- pid: ${running || 'not running'}`);
   console.log(`- url: ${url}`);
 }
@@ -401,8 +427,8 @@ Usage:
   multiclaw help
   multiclaw init
   multiclaw init --demo
-  multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY]
-  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY]
+  multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
+  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
   multiclaw start [--port 8813]
   multiclaw dev [--port 8813]
   multiclaw stop
@@ -411,6 +437,7 @@ Usage:
 Notes:
   - init generates a company package under ./generated/
   - setup creates a local runtime config under ./.multiclaw/config.json
+  - setup/up can also save the API key into ./.multiclaw/runtime.env
   - up is the one-command way to configure and start the runtime
   - start uses the configured bind mode (tailscale by default)
   - dev forces local bind on 127.0.0.1

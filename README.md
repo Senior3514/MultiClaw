@@ -70,13 +70,15 @@ npm run init
 ### Configure and run the workspace
 
 ```bash
-npm run up
+npm run up -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
+
+This stores the runtime config and API key under `.multiclaw/` and starts the product.
 
 If you want to separate config from start:
 
 ```bash
-npm run setup
+npm run setup -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
 npm run start
 ```
 

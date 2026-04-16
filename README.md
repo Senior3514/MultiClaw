@@ -138,6 +138,14 @@ Provider access direction:
 - router providers
 - local or self-hosted models
 
+Technical USP direction:
+- attach-and-run on top of what already exists
+- generate a living company, not a single assistant
+- communicate with agents from birth
+- run across web, CLI, and channel surfaces
+- stay provider-flexible and access-flexible
+- expand company structure autonomously inside the runtime
+
 If you want to separate config from start:
 
 ```bash

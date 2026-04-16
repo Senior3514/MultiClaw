@@ -60,6 +60,12 @@ function getFormData() {
   };
 }
 
+function setStatus(message, kind = 'idle') {
+  const status = el('generationStatus');
+  status.textContent = message;
+  status.className = `status-banner status-${kind}`;
+}
+
 function applyResult(data) {
   el('heroTitle').textContent = `${data.projectName}, powered by MultiClaw`;
   el('heroSubtitle').textContent = `${data.description} This company is designed as a ${data.archetype.toLowerCase()} with ${data.stage.toLowerCase()} urgency.`;
@@ -69,6 +75,8 @@ function applyResult(data) {
   el('routingCard').innerHTML = renderRouting(data.routing);
   el('orgGrid').innerHTML = renderOrg(data.roles);
   el('missionBoard').innerHTML = renderMissions(data.missions);
+  const stamp = new Date().toLocaleTimeString();
+  setStatus(`Company generated successfully at ${stamp}. ID: ${data.companyId}`, 'success');
 }
 
 async function generateCompany() {
@@ -76,6 +84,7 @@ async function generateCompany() {
   const original = button.textContent;
   button.textContent = 'Generating...';
   button.disabled = true;
+  setStatus('Generating company...', 'working');
 
   try {
     const response = await fetch('/api/generate', {
@@ -92,6 +101,7 @@ async function generateCompany() {
     applyResult(data);
   } catch (error) {
     console.error(error);
+    setStatus('Generation failed. Check the server log.', 'error');
     alert('Generation failed. Check the server log.');
   } finally {
     button.textContent = original;

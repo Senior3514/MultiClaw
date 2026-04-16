@@ -297,6 +297,35 @@ label span {
   color: var(--muted);
 }
 
+.status-banner {
+  margin-top: 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(145, 163, 255, 0.16);
+  width: fit-content;
+  max-width: 100%;
+}
+
+.status-idle {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+}
+
+.status-working {
+  background: rgba(124, 92, 255, 0.16);
+  color: #d7ceff;
+}
+
+.status-success {
+  background: rgba(40, 215, 185, 0.12);
+  color: #bff9ee;
+}
+
+.status-error {
+  background: rgba(255, 102, 139, 0.12);
+  color: #ffd3df;
+}
+
 .shell {
   display: grid;
   grid-template-columns: 360px minmax(0, 1fr);

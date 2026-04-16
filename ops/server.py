@@ -4,6 +4,7 @@ from http.cookies import SimpleCookie
 from pathlib import Path
 from datetime import datetime, timezone
 import hashlib
+import io
 import json
 import os
 import re
@@ -11,6 +12,7 @@ import secrets
 import sqlite3
 import sys
 import time
+import zipfile
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
 GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
@@ -460,6 +462,30 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if not self.require_session():
                 return
             self.send_json(200, list_companies())
+            return
+
+        if self.path.startswith("/api/company/") and self.path.endswith("/download"):
+            if not self.require_session():
+                return
+            company_id = self.path.split("/api/company/", 1)[1].split("/download", 1)[0].strip()
+            company_dir = GENERATED_ROOT / company_id
+            if not company_dir.exists() or not company_dir.is_dir():
+                self.send_json(404, {"error": "company not found"})
+                return
+
+            zip_buffer = io.BytesIO()
+            with zipfile.ZipFile(zip_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+                for file_path in sorted(company_dir.iterdir()):
+                    if file_path.is_file():
+                        archive.write(file_path, arcname=file_path.name)
+
+            payload = zip_buffer.getvalue()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/zip")
+            self.send_header("Content-Disposition", f'attachment; filename="{company_id}-pack.zip"')
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
             return
 
         if self.path.startswith("/api/company/") and "/artifact/" in self.path:

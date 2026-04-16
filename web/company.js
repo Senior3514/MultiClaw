@@ -16,6 +16,7 @@ const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
 const artifactsEl = document.getElementById('companyArtifacts');
+const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
 
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
@@ -115,6 +116,10 @@ async function loadCompany() {
   }
 
   try {
+    if (downloadCompanyPackBtn) {
+      downloadCompanyPackBtn.href = `/api/company/${encodeURIComponent(companyId)}/download`;
+    }
+
     const response = await fetch(`/api/company/${encodeURIComponent(companyId)}`);
     if (!response.ok) throw new Error(`Failed with status ${response.status}`);
     const company = await response.json();

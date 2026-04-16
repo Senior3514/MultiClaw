@@ -1475,6 +1475,10 @@ button:hover {
     padding-right: max(16px, env(safe-area-inset-right));
   }
 
+  .site-main {
+    gap: 16px;
+  }
+
   .site-header {
     padding-top: max(16px, env(safe-area-inset-top));
   }
@@ -1555,8 +1559,8 @@ button:hover {
 
   .section-heading h2,
   .section-heading h1 {
-    font-size: 30px;
-    line-height: 1.06;
+    font-size: 28px;
+    line-height: 1.08;
   }
 
   .panel,
@@ -1566,26 +1570,55 @@ button:hover {
   .route-card,
   .mission-card,
   .brand-row {
-    padding: 18px;
+    padding: 16px;
     border-radius: 20px;
   }
 
+  .feature-card p,
+  .logic-card p,
+  .route-card p,
+  .mission-card p,
+  .brand-row p {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
   .hero-graphic {
-    min-height: 280px;
+    min-height: 220px;
   }
 
   .graphic-core {
-    width: 180px;
-    height: 180px;
+    width: 156px;
+    height: 156px;
   }
 
   .graphic-core strong {
-    font-size: 22px;
+    font-size: 18px;
   }
 
+  .orbit-a {
+    width: 220px;
+    height: 220px;
+  }
+
+  .orbit-b {
+    width: 300px;
+    height: 300px;
+  }
+
+  .orbit-c {
+    width: 160px;
+    height: 160px;
+  }
+
+  .node-1 { top: 18px; }
+  .node-2 { right: 14px; }
+  .node-3 { bottom: 18px; }
+  .node-4 { left: 14px; }
+
   .graphic-node {
-    font-size: 12px;
-    padding: 8px 10px;
+    font-size: 11px;
+    padding: 7px 9px;
   }
 
   .landing-cards .feature-card,
@@ -1593,6 +1626,10 @@ button:hover {
   .premium-card,
   .terminal-panel {
     box-shadow: 0 20px 44px rgba(5, 8, 18, 0.28);
+  }
+
+  .cta-row {
+    margin-top: 18px;
   }
 
   .session-area,

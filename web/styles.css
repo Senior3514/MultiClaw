@@ -615,6 +615,67 @@ video {
   background: linear-gradient(90deg, rgba(124, 92, 255, 0), rgba(124, 92, 255, 0.72), rgba(40, 215, 185, 0));
 }
 
+.topology-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.topology-map {
+  position: relative;
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at center, rgba(124, 92, 255, 0.18), transparent 24%),
+    linear-gradient(180deg, rgba(12, 18, 36, 0.5), rgba(12, 18, 36, 0.12));
+  border-radius: 22px;
+  border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.topology-map::before,
+.topology-map::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.topology-map::before {
+  width: 210px;
+  height: 210px;
+}
+
+.topology-map::after {
+  width: 290px;
+  height: 290px;
+}
+
+.topology-core,
+.topology-node {
+  position: absolute;
+  padding: 12px 16px;
+  border-radius: 999px;
+  background: rgba(10, 14, 30, 0.92);
+  border: 1px solid rgba(145, 163, 255, 0.16);
+  box-shadow: 0 14px 30px rgba(5, 7, 16, 0.32);
+}
+
+.topology-core {
+  font-weight: 700;
+  background: linear-gradient(135deg, rgba(124, 92, 255, 0.28), rgba(47, 168, 255, 0.18));
+}
+
+.node-top { top: 32px; left: 50%; transform: translateX(-50%); }
+.node-right { top: 50%; right: 24px; transform: translateY(-50%); }
+.node-bottom { bottom: 32px; left: 50%; transform: translateX(-50%); }
+.node-left { top: 50%; left: 24px; transform: translateY(-50%); }
+
+.topology-caption {
+  color: var(--muted);
+}
+
 .landing-section .section-heading {
   justify-content: center;
   text-align: center;

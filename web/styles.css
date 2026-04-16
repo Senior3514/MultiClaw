@@ -178,15 +178,15 @@ body.auth-pending .site-shell {
   border-radius: 18px;
   display: grid;
   place-items: center;
-  font-size: 24px;
+  font-size: 0;
   font-weight: 900;
   letter-spacing: 0.04em;
-  color: white;
+  color: transparent;
   position: relative;
   isolation: isolate;
   overflow: hidden;
   background:
-    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.34), transparent 28%),
+    url('./avatar.svg') center/cover no-repeat,
     linear-gradient(145deg, #a688ff 0%, #6c5cff 40%, #2fa8ff 100%);
   border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow:
@@ -1253,9 +1253,9 @@ button:hover {
   }
 
   .hero-brand-mark {
-    width: 62px;
-    height: 62px;
-    font-size: 28px;
+    width: 68px;
+    height: 68px;
+    font-size: 0;
   }
 
   .brand-mark {
@@ -1314,6 +1314,12 @@ button:hover {
     padding-bottom: 2px;
   }
 
+  .landing-header .site-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow: visible;
+  }
+
   .site-nav a {
     flex: 0 0 auto;
     padding: 10px 14px;
@@ -1321,6 +1327,7 @@ button:hover {
     white-space: nowrap;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(145, 163, 255, 0.08);
+    text-align: center;
   }
 
   .button-link,

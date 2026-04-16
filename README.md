@@ -73,3 +73,12 @@ Given a short product brief, MultiClaw should generate:
 ## North star
 
 "Turn one product into a full AI company in minutes."
+
+## Standard
+
+MultiClaw should aim to be:
+- secure by default
+- fast in practice
+- reliable under real use
+- premium in feel
+- operational, not theatrical

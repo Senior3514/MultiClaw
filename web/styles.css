@@ -182,6 +182,30 @@ p {
   flex-wrap: wrap;
 }
 
+.hero-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.metric-card {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(145, 163, 255, 0.12);
+}
+
+.metric-card strong {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.metric-card span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .button-link {
   display: inline-flex;
   align-items: center;
@@ -266,6 +290,30 @@ p {
   color: var(--text);
 }
 
+.animated-panel {
+  animation: fadeUp 0.7s ease both;
+}
+
+.animated-orbit {
+  animation: spin 16s linear infinite;
+}
+
+.animated-orbit-slow {
+  animation: spin 24s linear infinite reverse;
+}
+
+.floating-core {
+  animation: floatY 4.6s ease-in-out infinite;
+}
+
+.floating-node {
+  animation: floatY 5.4s ease-in-out infinite;
+}
+
+.floating-node-delayed {
+  animation: floatY 6.1s ease-in-out infinite;
+}
+
 .node-1 { top: 32px; left: 50%; transform: translateX(-50%); }
 .node-2 { top: 50%; right: 28px; transform: translateY(-50%); }
 .node-3 { bottom: 32px; left: 50%; transform: translateX(-50%); }
@@ -303,6 +351,29 @@ p {
 .logic-card,
 .feature-card {
   background: rgba(12, 18, 36, 0.88);
+}
+
+.hover-lift {
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  border-color: rgba(145, 163, 255, 0.24);
+}
+
+.gradient-panel {
+  background:
+    radial-gradient(circle at top right, rgba(124, 92, 255, 0.16), transparent 36%),
+    radial-gradient(circle at bottom left, rgba(40, 215, 185, 0.09), transparent 30%),
+    var(--panel);
+}
+
+.cta-panel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
 }
 
 .logic-card strong,
@@ -502,6 +573,27 @@ button:hover {
   gap: 14px;
 }
 
+@keyframes spin {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes floatY {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .auth-main {
   display: grid;
   place-items: center;
@@ -518,7 +610,13 @@ button:hover {
   .hq-grid,
   .cards-grid,
   .logic-grid,
+  .hero-metrics,
   .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-panel {
+    display: grid;
     grid-template-columns: 1fr;
   }
 

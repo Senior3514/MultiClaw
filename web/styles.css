@@ -806,10 +806,6 @@ button:hover {
 }
 
 @media (max-width: 480px) {
-  .site-nav {
-    grid-template-columns: 1fr;
-  }
-
   .hero-copy h1,
   .hero h2 {
     font-size: 28px;
@@ -820,6 +816,11 @@ button:hover {
     height: 46px;
     font-size: 20px;
   }
+
+  .site-nav a {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
 }
 
 @media (max-width: 720px) {
@@ -827,16 +828,37 @@ button:hover {
   .site-main,
   .sidebar,
   .main {
-    padding: 18px;
+    padding: 16px;
+  }
+
+  .site-header {
+    gap: 12px;
+  }
+
+  .brand-inline {
+    gap: 10px;
+  }
+
+  .brand-inline strong {
+    font-size: 16px;
   }
 
   .site-nav {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 2px;
   }
 
-  .site-nav a,
+  .site-nav a {
+    flex: 0 0 auto;
+    padding: 8px 12px;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
   .button-link,
   .wizard-actions button,
   .preset-btn {

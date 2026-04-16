@@ -21,6 +21,11 @@ A user describes what they built, what they need, and what outcomes they want. M
 OpenClaw gives powerful agent infrastructure.
 MultiClaw sits on top of it and turns raw capability into an instantly deployable operating company.
 
+## Platform direction
+
+The product should reuse OpenClaw-like execution infrastructure while remaining model-agnostic.
+That means the experience layer can stay stable while routing work across many AI providers.
+
 ## Positioning
 
 - Open source core

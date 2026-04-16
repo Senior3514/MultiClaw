@@ -76,6 +76,7 @@ curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/i
 Then:
 
 ```bash
+multiclaw walkthrough
 multiclaw guide
 multiclaw configure
 multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY

@@ -113,9 +113,10 @@ echo "MultiClaw installed successfully."
 echo "Command available: multiclaw"
 
 echo "Next steps:"
-echo "  1. multiclaw guide"
-echo "  2. multiclaw configure"
-echo "  3. multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
+echo "  1. multiclaw walkthrough"
+echo "  2. multiclaw guide"
+echo "  3. multiclaw configure"
+echo "  4. multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
 
 auto_flags=0
 if [[ "$AUTO_START" == "1" || -n "$API_KEY" ]]; then

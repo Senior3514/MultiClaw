@@ -439,12 +439,31 @@ function printGuide() {
 `);
 }
 
+function printWalkthrough() {
+  console.log(`MultiClaw walkthrough
+
+Base install:
+  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+
+Then:
+  multiclaw walkthrough
+  multiclaw configure
+  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+  multiclaw status
+  multiclaw stop
+
+Uninstall:
+  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+`);
+}
+
 function printHelp() {
   console.log(`MultiClaw
 
 Usage:
   multiclaw help
   multiclaw guide
+  multiclaw walkthrough
   multiclaw init
   multiclaw init --demo
   multiclaw configure
@@ -457,6 +476,7 @@ Usage:
 
 Notes:
   - guide prints the clean step-by-step setup flow
+  - walkthrough prints the full command walkthrough
   - init generates a company package under ./generated/
   - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
@@ -475,6 +495,11 @@ async function main() {
 
   if (command === 'guide') {
     printGuide();
+    return;
+  }
+
+  if (command === 'walkthrough') {
+    printWalkthrough();
     return;
   }
 

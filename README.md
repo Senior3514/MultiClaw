@@ -31,6 +31,8 @@ That means the experience layer can stay stable while routing work across many A
 
 It should also become portable across environments, so a user can run MultiClaw on their own machine, connect their own model, and use the product without depending on this specific VPS.
 
+Over time it should also become channel-agnostic and access-flexible, with support for communication surfaces, private networking, VPN-style access, and stronger identity layers where needed.
+
 ## Positioning
 
 - Open source core

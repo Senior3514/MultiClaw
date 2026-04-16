@@ -111,6 +111,11 @@ Configuration categories:
 - Access and networking
 - Channels and integrations
 
+Primary channel direction:
+- web
+- Telegram
+- later Discord and Slack
+
 If you want to separate config from start:
 
 ```bash

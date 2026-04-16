@@ -732,6 +732,14 @@ video {
     linear-gradient(180deg, rgba(13, 18, 38, 0.98), rgba(9, 13, 28, 0.94));
 }
 
+.mission-control-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), transparent 12%, transparent 88%, rgba(255,255,255,0.02));
+  pointer-events: none;
+}
+
 .mission-grid {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
@@ -790,6 +798,26 @@ video {
 .mission-module.accent-green::after { background: #2ed7bd; }
 .mission-module.accent-pink::after { background: #ff6ab7; }
 .mission-module.accent-gold::after { background: #ffbf4d; }
+
+.mission-ticker {
+  display: flex;
+  gap: 28px;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(145, 163, 255, 0.12);
+  background: rgba(8, 11, 23, 0.82);
+  color: var(--muted);
+}
+
+.mission-ticker span {
+  flex: 0 0 auto;
+  animation: tickerScroll 18s linear infinite;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 12px;
+}
 
 .landing-section .section-heading {
   justify-content: center;
@@ -1192,6 +1220,11 @@ button:hover {
       0 16px 34px rgba(76, 106, 255, 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
+}
+
+@keyframes tickerScroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-24px); }
 }
 
 .auth-main {

@@ -269,7 +269,27 @@ def load_company(company_id: str):
     company.setdefault("productOrigin", "Existing product")
     company.setdefault("autonomyMode", "Operator-assisted")
     company.setdefault("nextSteps", build_next_steps(company.get("projectName", company_id)))
+    company.setdefault(
+        "companySoul",
+        build_company_soul(
+            company.get("projectName", company_id),
+            company.get("description", "A serious AI product."),
+            company.get("tone", "Sharp, premium, operational"),
+            company.get("autonomyMode", "Operator-assisted"),
+            company.get("archetype", "saas-product"),
+        ),
+    )
     return company
+
+
+def build_company_soul(project_name: str, description: str, tone: str, autonomy_mode: str, archetype: str):
+    return {
+        "identity": f"{project_name} should feel like a living company, not a disposable assistant shell.",
+        "promise": f"Operate {project_name} with deep context, coherent leadership, and visible operational intent.",
+        "style": tone,
+        "autonomy": autonomy_mode,
+        "archetype": archetype,
+    }
 
 
 def generate_company(payload):
@@ -290,6 +310,7 @@ def generate_company(payload):
     next_steps = build_next_steps(project_name)
     slug = slugify(project_name)
     generated_at = now_utc()
+    company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
 
     result = {
         "projectName": project_name,
@@ -306,6 +327,7 @@ def generate_company(payload):
         "roles": roles,
         "routing": routing,
         "missions": missions,
+        "companySoul": company_soul,
         "nextSteps": next_steps,
         "departmentsCount": 5,
         "rolesCount": len(roles),
@@ -344,6 +366,15 @@ def generate_company(payload):
         f"- Audience: {audience}\n"
         f"- Tone: {tone}\n"
         f"- Generated at: {generated_at}\n",
+        encoding="utf-8",
+    )
+    (output_dir / "SOUL.md").write_text(
+        f"# {project_name} Soul\n\n"
+        f"- Identity: {company_soul['identity']}\n"
+        f"- Promise: {company_soul['promise']}\n"
+        f"- Style: {company_soul['style']}\n"
+        f"- Autonomy: {company_soul['autonomy']}\n"
+        f"- Archetype: {company_soul['archetype']}\n",
         encoding="utf-8",
     )
     (output_dir / "NEXT-STEPS.md").write_text(

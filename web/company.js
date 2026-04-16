@@ -9,6 +9,7 @@ const companyId = params.get('id');
 const titleEl = document.getElementById('companyTitle');
 const statusEl = document.getElementById('companyStatus');
 const overviewEl = document.getElementById('companyOverview');
+const soulEl = document.getElementById('companySoul');
 const routingEl = document.getElementById('companyRouting');
 const topologyEl = document.getElementById('companyTopology');
 const rolesEl = document.getElementById('companyRoles');
@@ -27,6 +28,16 @@ function renderRows(rows) {
       <small>${label}</small>
       <strong>${value}</strong>
       <p>Generated company metadata.</p>
+    </div>
+  `).join('');
+}
+
+function renderSoul(soul) {
+  return Object.entries(soul || {}).map(([label, value]) => `
+    <div class="brand-row">
+      <small>${label}</small>
+      <strong>${value}</strong>
+      <p>Generated company identity and operating style.</p>
     </div>
   `).join('');
 }
@@ -121,6 +132,7 @@ async function loadCompany() {
       ['Stage', company.stage],
       ['Generated', company.generatedAt],
     ]);
+    soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);
     topologyEl.innerHTML = renderTopology(company.roles);
     rolesEl.innerHTML = renderRoles(company.roles);

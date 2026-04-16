@@ -50,14 +50,14 @@ async function loadRecentCompanies() {
     const companies = await response.json();
 
     if (!companies.length) {
-      recentCompaniesEl.innerHTML = '<div class="route-card"><strong>No companies yet</strong><p>Generate the first one from the generator.</p></div>';
+      recentCompaniesEl.innerHTML = '<div class="route-card"><strong>No companies yet</strong><p>Generate the first one from the generator.</p><div class="cta-row"><a class="button-link primary" href="./generator.html">Generate first company</a></div></div>';
       return;
     }
 
     recentCompaniesEl.innerHTML = companies.slice(0, 3).map(renderCompany).join('');
   } catch (error) {
     console.error(error);
-    recentCompaniesEl.innerHTML = '<div class="route-card"><strong>Failed to load companies</strong><p>Try again shortly.</p></div>';
+    recentCompaniesEl.innerHTML = '<div class="route-card"><strong>Failed to load companies</strong><p>Try again shortly.</p><div class="cta-row"><a class="button-link secondary" href="./companies.html">Open companies</a></div></div>';
   }
 }
 

@@ -70,6 +70,12 @@ npm run init
 ### Configure and run the workspace
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+```
+
+Or the lower-level install-only path:
+
+```bash
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
 ```
 

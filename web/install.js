@@ -22,7 +22,7 @@ const platformNotes = {
 
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
-  baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash';
+  baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
   advancedInstallCommandEl.textContent = `multiclaw up ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
   uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   platformNoteEl.textContent = platformNotes[state.platform];

@@ -58,6 +58,12 @@ You can also run the interactive flow:
 npm run init
 ```
 
+And the provider-routing skeleton demo:
+
+```bash
+npm run demo:router
+```
+
 ## MVP outcome
 
 Given a short product brief, MultiClaw should generate:

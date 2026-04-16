@@ -9,7 +9,9 @@
   },
   "scripts": {
     "init": "node ./bin/multiclaw.js init",
-    "example": "node ./bin/multiclaw.js init --demo"
+    "example": "node ./bin/multiclaw.js init --demo",
+    "demo:router": "node ./src/demo/router-demo.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"

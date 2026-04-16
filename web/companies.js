@@ -5,6 +5,10 @@ mountSession();
 
 const statusEl = document.getElementById('companiesStatus');
 const gridEl = document.getElementById('companiesGrid');
+const searchEl = document.getElementById('companiesSearch');
+const productOriginEl = document.getElementById('companiesProductOrigin');
+const autonomyModeEl = document.getElementById('companiesAutonomyMode');
+let allCompanies = [];
 
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
@@ -20,6 +24,8 @@ function renderCompanyCard(company) {
       <div class="company-meta">
         <span>${company.archetype}</span>
         <span>${company.stage}</span>
+        <span>${company.productOrigin || 'Existing product'}</span>
+        <span>${company.autonomyMode || 'Operator-assisted'}</span>
         <span>${company.rolesCount} leads</span>
       </div>
       <div class="company-footer">
@@ -32,24 +38,54 @@ function renderCompanyCard(company) {
   `;
 }
 
+function applyFilters() {
+  const query = (searchEl.value || '').trim().toLowerCase();
+  const productOrigin = productOriginEl.value;
+  const autonomyMode = autonomyModeEl.value;
+
+  const filtered = allCompanies.filter((company) => {
+    const haystack = [company.projectName, company.description, company.companyId]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    const matchesQuery = !query || haystack.includes(query);
+    const matchesOrigin = !productOrigin || (company.productOrigin || 'Existing product') === productOrigin;
+    const matchesAutonomy = !autonomyMode || (company.autonomyMode || 'Operator-assisted') === autonomyMode;
+    return matchesQuery && matchesOrigin && matchesAutonomy;
+  });
+
+  if (!allCompanies.length) {
+    setStatus('No generated companies yet. Use the generator to create the first one.', 'idle');
+    gridEl.innerHTML = '';
+    return;
+  }
+
+  if (!filtered.length) {
+    setStatus('No companies matched the current filters.', 'idle');
+    gridEl.innerHTML = '';
+    return;
+  }
+
+  setStatus(`Showing ${filtered.length} of ${allCompanies.length} compan${filtered.length === 1 ? 'y' : 'ies'}.`, 'success');
+  gridEl.innerHTML = filtered.map(renderCompanyCard).join('');
+}
+
 async function loadCompanies() {
   try {
     const response = await fetch('/api/companies');
     if (!response.ok) throw new Error(`Failed with status ${response.status}`);
     const companies = await response.json();
-
-    if (!companies.length) {
-      setStatus('No generated companies yet. Use the generator to create the first one.', 'idle');
-      gridEl.innerHTML = '';
-      return;
-    }
-
-    setStatus(`Loaded ${companies.length} generated compan${companies.length === 1 ? 'y' : 'ies'}.`, 'success');
-    gridEl.innerHTML = companies.map(renderCompanyCard).join('');
+    allCompanies = companies;
+    applyFilters();
   } catch (error) {
     console.error(error);
     setStatus('Failed to load generated companies.', 'error');
   }
 }
+
+searchEl.addEventListener('input', applyFilters);
+productOriginEl.addEventListener('change', applyFilters);
+autonomyModeEl.addEventListener('change', applyFilters);
 
 loadCompanies();

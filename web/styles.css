@@ -484,6 +484,11 @@ label span {
   gap: 14px;
 }
 
+.companies-filters {
+  margin-top: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .preset-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -703,7 +708,8 @@ button:hover {
   .cta-row,
   .wizard-actions,
   .preset-grid,
-  .company-meta {
+  .company-meta,
+  .companies-filters {
     grid-template-columns: 1fr;
     flex-direction: column;
   }

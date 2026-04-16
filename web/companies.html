@@ -35,6 +35,31 @@
             </div>
           </div>
           <div id="companiesStatus" class="status-banner status-idle">Loading generated companies...</div>
+          <div class="form-panel companies-filters">
+            <label>
+              <span>Search</span>
+              <input id="companiesSearch" placeholder="Search by name, description, or ID" />
+            </label>
+            <label>
+              <span>Product origin</span>
+              <select id="companiesProductOrigin">
+                <option value="">All</option>
+                <option>Existing product</option>
+                <option>Homegrown app</option>
+                <option>New product idea</option>
+                <option>Internal tool</option>
+              </select>
+            </label>
+            <label>
+              <span>Autonomy mode</span>
+              <select id="companiesAutonomyMode">
+                <option value="">All</option>
+                <option>Advisory</option>
+                <option>Operator-assisted</option>
+                <option>Full autonomous</option>
+              </select>
+            </label>
+          </div>
         </section>
 
         <section id="companiesGrid" class="cards-grid"></section>

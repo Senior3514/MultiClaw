@@ -123,6 +123,12 @@ Claw family direction:
 - OpenClaw
 - MultiClaw as the umbrella orchestration layer
 
+Core product direction:
+- attach to what already exists
+- generate the company shape around it
+- communicate with agents from birth
+- operate proactively and reactively inside the company
+
 If you want to separate config from start:
 
 ```bash

@@ -5,6 +5,7 @@ const copyAdvancedButton = document.getElementById('copyAdvancedInstallCommand')
 const uninstallCommandEl = document.getElementById('uninstallCommand');
 const copyUninstallButton = document.getElementById('copyUninstallCommand');
 const platformNoteEl = document.getElementById('platformNote');
+const bindModeNoteEl = document.getElementById('bindModeNote');
 
 const state = {
   platform: 'ubuntu',
@@ -20,12 +21,18 @@ const platformNotes = {
   windows: 'Windows should use WSL for the cleanest current runtime experience.',
 };
 
+const bindModeNotes = {
+  local: 'Local mode is optimized toward a simpler single-user product flow on your own machine.',
+  tailscale: 'Tailscale mode is optimized toward a protected workspace flow with cleaner private access.',
+};
+
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
   baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
   advancedInstallCommandEl.textContent = `multiclaw up ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
   uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   platformNoteEl.textContent = platformNotes[state.platform];
+  bindModeNoteEl.textContent = bindModeNotes[state.bind];
 }
 
 function applyChoice(containerId, selector, onSelect) {

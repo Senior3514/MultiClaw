@@ -148,6 +148,7 @@ Technical USP direction:
 - attach-and-run on top of what already exists
 - generate a living company, not a single assistant
 - communicate with agents from birth
+- expose a clear primary operator layer to the user
 - run across web, CLI, and channel surfaces
 - keep meaningful CLI parity for end-to-end operation
 - stay provider-flexible and access-flexible

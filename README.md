@@ -64,6 +64,12 @@ And the provider-routing skeleton demo:
 npm run demo:router
 ```
 
+For the isolated tailscale-only product preview:
+
+```bash
+bash ./ops/start_tailscale_only.sh
+```
+
 ## MVP outcome
 
 Given a short product brief, MultiClaw should generate:

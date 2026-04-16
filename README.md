@@ -85,6 +85,7 @@ Useful runtime commands:
 npm run dev
 npm run stop
 npm run status
+npm run e2e:smoke
 ```
 
 And the provider-routing skeleton demo:

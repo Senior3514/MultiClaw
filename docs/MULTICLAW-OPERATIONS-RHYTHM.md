@@ -24,14 +24,14 @@ Ensure the MultiClaw product is maintained as a living system, not a static repo
 - no fake progress
 - every release should improve either usability, trust, speed, or product depth
 
-## MultiClaw → Pikachu handoff
+## Internal improvement handoff
 
 The MultiClaw internal company should continuously surface:
 - what was improved
 - what still feels weak
 - what the next highest-leverage improvement is
-- what can be verified by the master immediately
+- what can be verified immediately
 
-## Pikachu → Master handoff
+## Operator-facing handoff
 
-Pikachu should keep the master updated in plain language, without dumping internal noise.
+Operator-facing updates should stay in plain language, without dumping internal noise.

@@ -25,4 +25,4 @@ Ship meaningful improvements that move the product closer to a world-class open-
 
 ## Communication rule
 
-All meaningful progress, blockers, and high-leverage next moves should continue to flow upward through Pikachu.
+All meaningful progress, blockers, and high-leverage next moves should continue to flow upward through clean operator-facing reporting.

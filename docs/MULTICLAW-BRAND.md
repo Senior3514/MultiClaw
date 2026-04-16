@@ -14,7 +14,7 @@
 
 ## Secondary concept name
 
-**Company2Rent** can remain as an early concept line or example use case, but it is too narrow for the master product brand.
+**Company2Rent** can remain as an early concept line or example use case, but it is too narrow for the main product brand.
 
 ## One-line pitch
 

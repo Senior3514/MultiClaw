@@ -8,14 +8,13 @@ Its job is to maintain, improve, harden, and evolve the MultiClaw product contin
 ## Rule
 
 The MultiClaw company maintains MultiClaw.
-Pikachu remains the master-facing operator and communication bridge.
+A clean operator-facing surface should remain separate from backstage system work.
 
 ## Communication model
 
 - The MultiClaw AGI company works behind the scenes.
-- Pikachu remains the direct assistant to the master.
-- The company reports upward through structured updates to Pikachu.
-- Pikachu translates that into clear user-facing action and execution.
+- Internal work should surface through clean operator-facing summaries.
+- The product should translate backstage work into clear user-facing action and execution.
 
 ## Leadership roster
 
@@ -43,7 +42,7 @@ Owns open-source adoption, documentation quality, onboarding clarity, and future
 - Keep outputs compact
 - Prefer visible progress over vague strategy
 - Protect product integrity while moving fast
-- Route meaningful summaries through Pikachu
+- Route meaningful summaries through clean operator-facing surfaces
 
 ## Reporting format
 

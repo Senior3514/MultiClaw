@@ -39,6 +39,7 @@ Over time it should also become channel-agnostic and access-flexible, with suppo
 - Easy setup
 - Product-first, not toy-first
 - Built for real operation, not just demos
+- Privacy-safe public surface, with backstage details kept out of the product
 - Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, internal ops, and infrastructure targets like VPS environments
 
 ## MVP thesis

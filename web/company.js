@@ -10,6 +10,7 @@ const titleEl = document.getElementById('companyTitle');
 const statusEl = document.getElementById('companyStatus');
 const overviewEl = document.getElementById('companyOverview');
 const routingEl = document.getElementById('companyRouting');
+const topologyEl = document.getElementById('companyTopology');
 const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
@@ -38,6 +39,19 @@ function renderRouting(profile) {
       <p>Current default routing choice for this capability.</p>
     </div>
   `).join('');
+}
+
+function renderTopology(roles) {
+  const labels = roles.slice(0, 4).map((role) => role.title);
+  const [top = 'Leadership', right = 'Growth', bottom = 'Operations', left = 'Trust'] = labels;
+
+  return `
+    <div class="topology-core">Primary operator</div>
+    <div class="topology-node node-top">${top}</div>
+    <div class="topology-node node-right">${right}</div>
+    <div class="topology-node node-bottom">${bottom}</div>
+    <div class="topology-node node-left">${left}</div>
+  `;
 }
 
 function renderRoles(roles) {
@@ -108,6 +122,7 @@ async function loadCompany() {
       ['Generated', company.generatedAt],
     ]);
     routingEl.innerHTML = renderRouting(company.routing);
+    topologyEl.innerHTML = renderTopology(company.roles);
     rolesEl.innerHTML = renderRoles(company.roles);
     missionsEl.innerHTML = renderMissions(company.missions);
     nextStepsEl.innerHTML = renderNextSteps(company.nextSteps || []);

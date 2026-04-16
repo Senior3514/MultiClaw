@@ -5,6 +5,9 @@ mountSession();
 
 const titleEl = document.getElementById('dashboardTitle');
 const recentCompaniesEl = document.getElementById('recentCompanies');
+const statsCompaniesEl = document.getElementById('statsCompanies');
+const statsUsersEl = document.getElementById('statsUsers');
+const statsArtifactsEl = document.getElementById('statsArtifacts');
 const session = getSession();
 
 if (session?.email) {
@@ -22,6 +25,22 @@ function renderCompany(company) {
       </div>
     </div>
   `;
+}
+
+async function loadStats() {
+  try {
+    const response = await fetch('/api/stats');
+    if (!response.ok) throw new Error(`Failed with status ${response.status}`);
+    const stats = await response.json();
+    statsCompaniesEl.textContent = stats.companies;
+    statsUsersEl.textContent = stats.users;
+    statsArtifactsEl.textContent = stats.artifacts;
+  } catch (error) {
+    console.error(error);
+    statsCompaniesEl.textContent = '-';
+    statsUsersEl.textContent = '-';
+    statsArtifactsEl.textContent = '-';
+  }
 }
 
 async function loadRecentCompanies() {
@@ -42,4 +61,5 @@ async function loadRecentCompanies() {
   }
 }
 
+loadStats();
 loadRecentCompanies();

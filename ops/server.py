@@ -215,6 +215,20 @@ def list_companies():
     return companies
 
 
+def build_stats():
+    companies = list_companies()
+    users = get_users()
+    artifacts = 0
+    for company in companies:
+        company_dir = GENERATED_ROOT / company["companyId"]
+        artifacts += len([path for path in company_dir.iterdir() if path.is_file()]) if company_dir.exists() else 0
+    return {
+        "companies": len(companies),
+        "users": len(users),
+        "artifacts": artifacts,
+    }
+
+
 def load_company(company_id: str):
     company_file = GENERATED_ROOT / company_id / "company.json"
     if not company_file.exists():
@@ -360,6 +374,12 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 self.send_json(401, {"error": "not authenticated"})
             else:
                 self.send_json(200, session)
+            return
+
+        if self.path == "/api/stats":
+            if not self.require_session():
+                return
+            self.send_json(200, build_stats())
             return
 
         if self.path == "/api/companies":

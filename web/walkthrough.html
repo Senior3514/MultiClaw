@@ -40,36 +40,43 @@
         <section class="logic-grid operation-grid">
           <div class="logic-card hover-lift">
             <strong>1. Bootstrap</strong>
-            <pre class="install-command">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+            <pre class="install-command" id="cmdBootstrap">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdBootstrap">Copy</button></div>
           </div>
           <div class="logic-card hover-lift">
             <strong>2. Configure</strong>
-            <pre class="install-command">multiclaw configure</pre>
+            <pre class="install-command" id="cmdConfigure">multiclaw configure</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdConfigure">Copy</button></div>
           </div>
           <div class="logic-card hover-lift">
             <strong>3. Start</strong>
-            <pre class="install-command">multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY</pre>
+            <pre class="install-command" id="cmdStart">multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdStart">Copy</button></div>
           </div>
           <div class="logic-card hover-lift">
             <strong>4. Verify</strong>
-            <pre class="install-command">multiclaw status</pre>
+            <pre class="install-command" id="cmdVerify">multiclaw status</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdVerify">Copy</button></div>
           </div>
         </section>
 
         <section class="grid-two install-grid">
           <article class="panel install-panel">
             <div class="eyebrow">Helpful commands</div>
-            <pre class="install-command">multiclaw walkthrough
+            <pre class="install-command" id="cmdHelpful">multiclaw walkthrough
 multiclaw guide
 multiclaw stop</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdHelpful">Copy</button></div>
           </article>
           <article class="panel panel-strong install-panel">
             <div class="eyebrow">If you need to remove it</div>
-            <pre class="install-command">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash</pre>
+            <pre class="install-command" id="cmdUninstall">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdUninstall">Copy</button></div>
           </article>
         </section>
       </main>
     </div>
     <script type="module" src="./public-shell.js"></script>
+    <script type="module" src="./walkthrough.js"></script>
   </body>
 </html>

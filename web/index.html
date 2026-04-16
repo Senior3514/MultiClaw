@@ -20,10 +20,11 @@
           <a href="./index.html">Home</a>
           <a href="./install.html">Install</a>
           <a href="./walkthrough.html">Walkthrough</a>
-          <a href="./signup.html">Sign up</a>
-          <a href="./login.html">Log in</a>
+          <a data-auth-dashboard href="./signup.html">Sign up</a>
+          <a data-auth-dashboard href="./login.html">Log in</a>
           <a href="./platform.html">Platform</a>
         </nav>
+        <div id="sessionArea" class="session-area"></div>
       </header>
 
       <main class="site-main">
@@ -208,6 +209,7 @@
         </section>
       </main>
     </div>
+    <script type="module" src="./public-shell.js"></script>
     <script type="module" src="./index.js"></script>
   </body>
 </html>

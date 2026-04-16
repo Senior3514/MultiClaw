@@ -16,6 +16,15 @@ export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
+export async function logOut() {
+  try {
+    await request('/api/auth/logout', {});
+  } catch {
+    // no-op
+  }
+  clearSession();
+}
+
 function setStatus(message, kind = 'idle') {
   const status = document.getElementById('authStatus');
   if (!status) return;
@@ -102,12 +111,7 @@ export function mountSession() {
   `;
 
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    try {
-      await request('/api/auth/logout', {});
-    } catch {
-      // no-op
-    }
-    clearSession();
+    await logOut();
     window.location.href = './login.html';
   });
 }

@@ -1,14 +1,139 @@
 #!/usr/bin/env python3
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from pathlib import Path
+import json
+import re
 import sys
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
+GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 
 
-class NoCacheHandler(SimpleHTTPRequestHandler):
+def slugify(value: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower())
+    slug = re.sub(r"^-+|-+$", "", slug)
+    return slug or "multiclaw-project"
+
+
+def infer_archetype(business_model: str, description: str) -> str:
+    text = f"{business_model} {description}".lower()
+    if "marketplace" in text:
+        return "Marketplace company"
+    if "ecommerce" in text or "e-commerce" in text or "shop" in text:
+        return "E-commerce company"
+    if "content" in text or "media" in text:
+        return "Content company"
+    if "lead" in text or "service" in text:
+        return "Revenue ops company"
+    return "Product operating company"
+
+
+def build_roles(archetype: str):
+    common = [
+        {"title": "Operator", "scope": "Runs priorities, execution rhythm, and the company pulse."},
+        {"title": "CTO / Systems Lead", "scope": "Owns architecture, infrastructure, model routing, and technical integrity."},
+        {"title": "Product Lead", "scope": "Owns roadmap, workflows, user value, and scope decisions."},
+        {"title": "Growth Lead", "scope": "Owns messaging, acquisition, activation, and conversion loops."},
+        {"title": "QA / Reliability Lead", "scope": "Owns trust, quality, monitoring, and resilience."},
+    ]
+
+    if archetype == "Revenue ops company":
+        common.extend([
+            {"title": "Sales Ops Lead", "scope": "Owns lead intake, qualification, and routing."},
+            {"title": "Follow-up Lead", "scope": "Owns reminders, reactivation, and close support."},
+        ])
+    elif archetype == "Marketplace company":
+        common.extend([
+            {"title": "Supply Lead", "scope": "Owns supply-side quality, onboarding, and health."},
+            {"title": "Demand Lead", "scope": "Owns buyer funnel, matching, and demand health."},
+        ])
+    else:
+        common.extend([
+            {"title": "Support Lead", "scope": "Owns user issues, feedback loops, and support quality."},
+            {"title": "Research Lead", "scope": "Owns strategic discovery and deeper market learning."},
+        ])
+
+    return common
+
+
+def build_routing(description: str):
+    text = description.lower()
+    if "premium" in text or "high-ticket" in text:
+        return {
+            "chat": "Anthropic / OpenAI",
+            "reasoning": "OpenAI / Anthropic",
+            "speed": "Groq",
+            "privacy": "Ollama / Local fallback",
+        }
+
+    return {
+        "chat": "OpenAI / OpenRouter",
+        "reasoning": "Anthropic / OpenAI",
+        "speed": "Groq",
+        "privacy": "Ollama / Local fallback",
+    }
+
+
+def build_missions(project_name: str, top_goals: str):
+    return [
+        f"Turn {project_name} into a fully operational AI company, not just a product shell.",
+        f"Win the first week around: {top_goals}.",
+        "Stand up one reliable daily execution loop with visible outcomes.",
+        "Keep communication compact, ownership clear, and blockers explicit.",
+    ]
+
+
+def generate_company(payload):
+    project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
+    description = payload.get("description", "A serious AI product.").strip()
+    audience = payload.get("audience", "Builders").strip()
+    business_model = payload.get("businessModel", "SaaS").strip()
+    stage = payload.get("stage", "MVP").strip()
+    top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
+    tone = payload.get("tone", "Sharp, premium, operational").strip()
+
+    archetype = infer_archetype(business_model, description)
+    roles = build_roles(archetype)
+    routing = build_routing(description)
+    missions = build_missions(project_name, top_goals)
+    slug = slugify(project_name)
+
+    result = {
+        "projectName": project_name,
+        "description": description,
+        "audience": audience,
+        "businessModel": business_model,
+        "stage": stage,
+        "tone": tone,
+        "topGoals": top_goals,
+        "archetype": archetype,
+        "roles": roles,
+        "routing": routing,
+        "missions": missions,
+        "departmentsCount": 5,
+        "rolesCount": len(roles),
+    }
+
+    output_dir = GENERATED_ROOT / slug
+    output_dir.mkdir(parents=True, exist_ok=True)
+    (output_dir / "company.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
+    (output_dir / "README.md").write_text(
+        f"# {project_name}\n\n"
+        f"Generated by MultiClaw.\n\n"
+        f"- Archetype: {archetype}\n"
+        f"- Audience: {audience}\n"
+        f"- Business model: {business_model}\n"
+        f"- Stage: {stage}\n",
+        encoding="utf-8",
+    )
+
+    result["outputPath"] = str(output_dir)
+    return result
+
+
+class MultiClawHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=str(WEB_ROOT), **kwargs)
 
@@ -18,8 +143,40 @@ class NoCacheHandler(SimpleHTTPRequestHandler):
         self.send_header("Expires", "0")
         super().end_headers()
 
+    def do_GET(self):
+        if self.path == "/api/health":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "ok"}).encode("utf-8"))
+            return
+        return super().do_GET()
+
+    def do_POST(self):
+        if self.path != "/api/generate":
+            self.send_response(404)
+            self.end_headers()
+            return
+
+        content_length = int(self.headers.get("Content-Length", "0"))
+        raw = self.rfile.read(content_length)
+
+        try:
+            payload = json.loads(raw.decode("utf-8") or "{}")
+            result = generate_company(payload)
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps(result).encode("utf-8"))
+        except Exception as exc:
+            self.send_response(500)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"error": str(exc)}).encode("utf-8"))
+
 
 if __name__ == "__main__":
-    server = HTTPServer((HOST, PORT), NoCacheHandler)
+    GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
+    server = ThreadingHTTPServer((HOST, PORT), MultiClawHandler)
     print(f"Serving MultiClaw on http://{HOST}:{PORT}")
     server.serve_forever()

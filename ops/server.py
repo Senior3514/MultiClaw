@@ -8,6 +8,7 @@ import json
 import re
 import secrets
 import sys
+import time
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
 GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
@@ -17,10 +18,23 @@ SESSIONS_FILE = AUTH_ROOT / "sessions.json"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
+RATE_LIMITS = {}
 
 
 def now_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def allow_rate(key: str, limit: int, window_seconds: int):
+    now = time.time()
+    entries = RATE_LIMITS.get(key, [])
+    entries = [stamp for stamp in entries if now - stamp < window_seconds]
+    if len(entries) >= limit:
+        RATE_LIMITS[key] = entries
+        return False
+    entries.append(now)
+    RATE_LIMITS[key] = entries
+    return True
 
 
 def slugify(value: str) -> str:
@@ -404,6 +418,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/api/auth/signup":
+            if not allow_rate(f"signup:{self.client_address[0]}", 10, 300):
+                self.send_json(429, {"error": "too many signup attempts"})
+                return
             try:
                 payload = self.read_json_body()
                 email = payload.get("email", "").strip().lower()
@@ -424,6 +441,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/login":
+            if not allow_rate(f"login:{self.client_address[0]}", 15, 300):
+                self.send_json(429, {"error": "too many login attempts"})
+                return
             try:
                 payload = self.read_json_body()
                 email = payload.get("email", "").strip().lower()
@@ -446,6 +466,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
         if self.path == "/api/generate":
             if not self.require_session():
+                return
+            if not allow_rate(f"generate:{self.client_address[0]}", 30, 60):
+                self.send_json(429, {"error": "too many generation requests"})
                 return
             try:
                 payload = self.read_json_body()

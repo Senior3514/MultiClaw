@@ -86,6 +86,15 @@ def build_missions(project_name: str, top_goals: str):
     ]
 
 
+def build_next_steps(project_name: str):
+    return [
+        f"Review the generated structure for {project_name}.",
+        "Confirm the highest-priority operating loop.",
+        "Activate the first real workflow worth running daily.",
+        "Promote the strongest outputs into reusable company templates.",
+    ]
+
+
 def list_companies():
     companies = []
     for company_dir in sorted(GENERATED_ROOT.iterdir(), key=lambda p: p.stat().st_mtime, reverse=True):
@@ -115,6 +124,7 @@ def load_company(company_id: str):
     if not company.get("generatedAt"):
         mtime = datetime.fromtimestamp(company_file.stat().st_mtime, timezone.utc)
         company["generatedAt"] = mtime.strftime("%Y-%m-%d %H:%M:%S UTC")
+    company.setdefault("nextSteps", build_next_steps(company.get("projectName", company_id)))
     return company
 
 
@@ -131,6 +141,7 @@ def generate_company(payload):
     roles = build_roles(archetype)
     routing = build_routing(description)
     missions = build_missions(project_name, top_goals)
+    next_steps = build_next_steps(project_name)
     slug = slugify(project_name)
 
     generated_at = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
@@ -148,6 +159,7 @@ def generate_company(payload):
         "roles": roles,
         "routing": routing,
         "missions": missions,
+        "nextSteps": next_steps,
         "departmentsCount": 5,
         "rolesCount": len(roles),
         "generatedAt": generated_at,
@@ -173,6 +185,18 @@ def generate_company(payload):
     )
     (output_dir / "MISSION-001.md").write_text(
         "# Mission 001\n\n" + "\n".join([f"- {mission}" for mission in missions]),
+        encoding="utf-8",
+    )
+    (output_dir / "COMPANY.md").write_text(
+        f"# {project_name} Company\n\n"
+        f"- Archetype: {archetype}\n"
+        f"- Audience: {audience}\n"
+        f"- Tone: {tone}\n"
+        f"- Generated at: {generated_at}\n",
+        encoding="utf-8",
+    )
+    (output_dir / "NEXT-STEPS.md").write_text(
+        "# Next Steps\n\n" + "\n".join([f"- {step}" for step in next_steps]),
         encoding="utf-8",
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")
@@ -202,6 +226,24 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(list_companies()).encode("utf-8"))
+            return
+        if self.path.startswith("/api/company/") and self.path.endswith("/artifacts"):
+            company_id = self.path.split("/api/company/", 1)[1].split("/artifacts", 1)[0].strip()
+            company_dir = GENERATED_ROOT / company_id
+            if company_dir.exists():
+                artifacts = []
+                for file_path in sorted(company_dir.iterdir()):
+                    if file_path.is_file():
+                        artifacts.append({"name": file_path.name, "size": file_path.stat().st_size})
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(artifacts).encode("utf-8"))
+            else:
+                self.send_response(404)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "company not found"}).encode("utf-8"))
             return
         if self.path.startswith("/api/company/"):
             company_id = self.path.split("/api/company/", 1)[1].strip()

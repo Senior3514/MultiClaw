@@ -7,6 +7,8 @@ const overviewEl = document.getElementById('companyOverview');
 const routingEl = document.getElementById('companyRouting');
 const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
+const nextStepsEl = document.getElementById('companyNextSteps');
+const artifactsEl = document.getElementById('companyArtifacts');
 
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
@@ -52,6 +54,26 @@ function renderMissions(missions) {
   `).join('');
 }
 
+function renderNextSteps(steps) {
+  return steps.map((step, index) => `
+    <div class="mission-card">
+      <small>Step ${index + 1}</small>
+      <strong>${step}</strong>
+      <p>Recommended next move to activate the company further.</p>
+    </div>
+  `).join('');
+}
+
+function renderArtifacts(artifacts) {
+  return artifacts.map((artifact) => `
+    <div class="route-card">
+      <small>${artifact.size} bytes</small>
+      <strong>${artifact.name}</strong>
+      <p>Generated artifact saved by the backend for this company.</p>
+    </div>
+  `).join('');
+}
+
 async function loadCompany() {
   if (!companyId) {
     titleEl.textContent = 'Missing company ID';
@@ -63,6 +85,8 @@ async function loadCompany() {
     const response = await fetch(`/api/company/${encodeURIComponent(companyId)}`);
     if (!response.ok) throw new Error(`Failed with status ${response.status}`);
     const company = await response.json();
+    const artifactsResponse = await fetch(`/api/company/${encodeURIComponent(companyId)}/artifacts`);
+    const artifacts = artifactsResponse.ok ? await artifactsResponse.json() : [];
 
     titleEl.textContent = company.projectName;
     setStatus(`Loaded company ${company.companyId}.`, 'success');
@@ -78,6 +102,8 @@ async function loadCompany() {
     routingEl.innerHTML = renderRouting(company.routing);
     rolesEl.innerHTML = renderRoles(company.roles);
     missionsEl.innerHTML = renderMissions(company.missions);
+    nextStepsEl.innerHTML = renderNextSteps(company.nextSteps || []);
+    artifactsEl.innerHTML = renderArtifacts(artifacts);
   } catch (error) {
     console.error(error);
     titleEl.textContent = companyId;

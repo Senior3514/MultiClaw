@@ -117,6 +117,15 @@ body.auth-pending .site-shell {
   font-size: 14px;
 }
 
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2ed7bd;
+  box-shadow: 0 0 0 0 rgba(46, 215, 189, 0.42);
+  animation: pulseDot 2.8s ease-out infinite;
+}
+
 .session-chip button {
   padding: 8px 12px;
   border-radius: 999px;

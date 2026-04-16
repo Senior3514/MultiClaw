@@ -105,6 +105,7 @@ export function mountSession() {
 
   sessionArea.innerHTML = `
     <div class="session-chip">
+      <span class="status-dot"></span>
       <span>${session.email}</span>
       <button id="logoutBtn" type="button">Log out</button>
     </div>

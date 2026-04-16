@@ -227,6 +227,26 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(list_companies()).encode("utf-8"))
             return
+        if self.path.startswith("/api/company/") and "/artifact/" in self.path:
+            company_id = self.path.split("/api/company/", 1)[1].split("/artifact/", 1)[0].strip()
+            artifact_name = self.path.rsplit("/artifact/", 1)[1].strip()
+            safe_name = Path(artifact_name).name
+            artifact_file = GENERATED_ROOT / company_id / safe_name
+            if artifact_file.exists() and artifact_file.is_file():
+                self.send_response(200)
+                if artifact_file.suffix.lower() == ".json":
+                    self.send_header("Content-Type", "application/json")
+                else:
+                    self.send_header("Content-Type", "text/plain; charset=utf-8")
+                self.send_header("Content-Disposition", f'attachment; filename="{safe_name}"')
+                self.end_headers()
+                self.wfile.write(artifact_file.read_bytes())
+            else:
+                self.send_response(404)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": "artifact not found"}).encode("utf-8"))
+            return
         if self.path.startswith("/api/company/") and self.path.endswith("/artifacts"):
             company_id = self.path.split("/api/company/", 1)[1].split("/artifacts", 1)[0].strip()
             company_dir = GENERATED_ROOT / company_id

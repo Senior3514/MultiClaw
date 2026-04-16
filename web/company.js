@@ -75,6 +75,9 @@ function renderArtifacts(artifacts) {
       <small>${artifact.size} bytes</small>
       <strong>${artifact.name}</strong>
       <p>Generated artifact saved by the backend for this company.</p>
+      <div class="cta-row">
+        <a class="button-link secondary" href="/api/company/${encodeURIComponent(companyId)}/artifact/${encodeURIComponent(artifact.name)}">Download</a>
+      </div>
     </div>
   `).join('');
 }

@@ -73,6 +73,11 @@ body.auth-pending .site-shell {
   color: var(--text);
 }
 
+.brand-inline strong {
+  font-size: 18px;
+  letter-spacing: 0.01em;
+}
+
 .site-nav {
   display: flex;
   gap: 12px;
@@ -117,13 +122,21 @@ body.auth-pending .site-shell {
 .brand-mark {
   width: 54px;
   height: 54px;
-  border-radius: 16px;
+  border-radius: 18px;
   display: grid;
   place-items: center;
   font-size: 24px;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--primary), #3aa7ff);
-  box-shadow: var(--shadow);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  color: white;
+  background:
+    radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.32), transparent 28%),
+    linear-gradient(145deg, #9c7bff 0%, #6c5cff 42%, #2fa8ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.35),
+    0 12px 28px rgba(76, 106, 255, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .eyebrow {
@@ -131,6 +144,20 @@ body.auth-pending .site-shell {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.14em;
+}
+
+.site-header,
+.panel,
+.panel-strong,
+.logic-card,
+.feature-card,
+.stat,
+.hq-card,
+.role-card,
+.mission-card,
+.brand-row,
+.route-card {
+  backdrop-filter: blur(18px);
 }
 
 h1, h2, h3, h4, p, strong {

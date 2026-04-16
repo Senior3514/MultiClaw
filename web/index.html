@@ -7,158 +7,91 @@
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="shell">
-      <aside class="sidebar">
-        <div class="brand-block">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
           <div class="brand-mark">M</div>
           <div>
             <div class="eyebrow">AI organization foundry</div>
-            <h1>MultiClaw</h1>
-            <p>Turn a product into a living AI company.</p>
+            <strong>MultiClaw</strong>
           </div>
-        </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./platform.html">Platform</a>
+        </nav>
+      </header>
 
-        <div class="panel form-panel">
-          <div class="panel-head">
+      <main class="site-main">
+        <section class="landing-hero panel">
+          <div class="hero-copy">
+            <div class="eyebrow">Build the company behind your product</div>
+            <h1>MultiClaw turns a product into a living AI company.</h1>
+            <p>
+              Describe what you are building. MultiClaw generates the organization, mission system,
+              operating structure, and command center behind it.
+            </p>
+            <div class="cta-row">
+              <a class="button-link primary" href="./generator.html">Open generator</a>
+              <a class="button-link secondary" href="./platform.html">Explore platform</a>
+            </div>
+          </div>
+          <div class="hero-graphic panel-strong">
+            <div class="graphic-orbit orbit-a"></div>
+            <div class="graphic-orbit orbit-b"></div>
+            <div class="graphic-core">
+              <span>MultiClaw HQ</span>
+              <strong>Company Birth</strong>
+            </div>
+            <div class="graphic-node node-1">Leadership</div>
+            <div class="graphic-node node-2">Routing</div>
+            <div class="graphic-node node-3">Ops</div>
+            <div class="graphic-node node-4">Growth</div>
+          </div>
+        </section>
+
+        <section class="cards-grid">
+          <article class="panel feature-card">
+            <div class="eyebrow">01</div>
             <h2>Founder intake</h2>
-            <span>Step 1</span>
-          </div>
-
-          <label>
-            <span>Project name</span>
-            <input id="projectName" value="PulseBoard" />
-          </label>
-
-          <label>
-            <span>What are you building?</span>
-            <textarea id="description">A premium AI operating layer for high-ticket service businesses.</textarea>
-          </label>
-
-          <label>
-            <span>Target users</span>
-            <input id="audience" value="High-ticket service businesses" />
-          </label>
-
-          <label>
-            <span>Business model</span>
-            <input id="businessModel" value="SaaS with optional services" />
-          </label>
-
-          <label>
-            <span>Current stage</span>
-            <select id="stage">
-              <option>MVP</option>
-              <option selected>Growth</option>
-              <option>Scale</option>
-            </select>
-          </label>
-
-          <label>
-            <span>Top goals</span>
-            <input id="topGoals" value="Ship faster, close customers, run like a company" />
-          </label>
-
-          <label>
-            <span>Preferred tone</span>
-            <input id="tone" value="Sharp, premium, operational" />
-          </label>
-
-          <div class="actions">
-            <button id="generateBtn">Generate company</button>
-          </div>
-        </div>
-      </aside>
-
-      <main class="main">
-        <section class="hero panel">
-          <div>
-            <div class="eyebrow">Company birth</div>
-            <h2 id="heroTitle">PulseBoard, powered by MultiClaw</h2>
-            <p id="heroSubtitle">A living AI company generated around your product, ready to operate.</p>
-          </div>
-          <div class="hero-stats">
-            <div class="stat">
-              <span>Departments</span>
-              <strong id="departmentsCount">5</strong>
-            </div>
-            <div class="stat">
-              <span>Core leads</span>
-              <strong id="rolesCount">7</strong>
-            </div>
-            <div class="stat">
-              <span>Runtime mode</span>
-              <strong>OpenClaw substrate</strong>
-            </div>
-          </div>
+            <p>A guided flow that turns raw context into structure, identity, and clear company shape.</p>
+          </article>
+          <article class="panel feature-card">
+            <div class="eyebrow">02</div>
+            <h2>Company generation</h2>
+            <p>Generate leads, departments, missions, routing defaults, and usable operating output.</p>
+          </article>
+          <article class="panel feature-card">
+            <div class="eyebrow">03</div>
+            <h2>Command center</h2>
+            <p>Give founders a clean, premium surface to command the organization behind the product.</p>
+          </article>
         </section>
 
-        <section class="grid-two">
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Brand and promise</h3>
-              <span>Generated</span>
+        <section class="panel section-block">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Why it matters</div>
+              <h2>MultiClaw is not another assistant.</h2>
             </div>
-            <div id="brandCard" class="stack"></div>
           </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Provider routing</h3>
-              <span>Model layer</span>
+          <div class="logic-grid">
+            <div class="logic-card">
+              <strong>Agents are not enough</strong>
+              <p>Most founders do not need raw agent infrastructure. They need an operating company.</p>
             </div>
-            <div id="routingCard" class="stack"></div>
-          </div>
-        </section>
-
-        <section class="grid-two">
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Organization map</h3>
-              <span>Live structure</span>
+            <div class="logic-card">
+              <strong>Structure creates leverage</strong>
+              <p>Clear ownership, routing, and rhythm create real execution capacity.</p>
             </div>
-            <div id="orgGrid" class="org-grid"></div>
-          </div>
-
-          <div class="panel">
-            <div class="panel-head">
-              <h3>Mission board</h3>
-              <span>Week 1</span>
-            </div>
-            <div id="missionBoard" class="stack"></div>
-          </div>
-        </section>
-
-        <section class="panel hq-panel">
-          <div class="panel-head">
-            <h3>Command center</h3>
-            <span>Preview</span>
-          </div>
-          <div class="hq-grid">
-            <div class="hq-card">
-              <span>Primary status</span>
-              <strong>Company ready</strong>
-              <p>The generated company has structure, routing policy, and first mission output.</p>
-            </div>
-            <div class="hq-card">
-              <span>Security posture</span>
-              <strong>Secure by default</strong>
-              <p>Project isolation, provider routing, and policy-aware execution are core rules.</p>
-            </div>
-            <div class="hq-card">
-              <span>Speed posture</span>
-              <strong>Fast setup</strong>
-              <p>The product is designed for low-friction generation and fast first value.</p>
-            </div>
-            <div class="hq-card">
-              <span>Next activation</span>
-              <strong>Wire live runtime</strong>
-              <p>Connect generated companies to live sessions, tools, dashboards, and channels.</p>
+            <div class="logic-card">
+              <strong>Product, not theater</strong>
+              <p>The generated result must feel alive, useful, secure, and under control.</p>
             </div>
           </div>
         </section>
       </main>
     </div>
-
-    <script type="module" src="./app.js"></script>
   </body>
 </html>

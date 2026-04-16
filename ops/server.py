@@ -102,6 +102,7 @@ def generate_company(payload):
 
     result = {
         "projectName": project_name,
+        "companyId": slug,
         "description": description,
         "audience": audience,
         "businessModel": business_model,
@@ -129,7 +130,6 @@ def generate_company(payload):
         encoding="utf-8",
     )
 
-    result["outputPath"] = str(output_dir)
     return result
 
 

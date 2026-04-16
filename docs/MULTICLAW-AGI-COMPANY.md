@@ -56,3 +56,5 @@ Every internal team update should be reducible to:
 ## Product mission
 
 Turn MultiClaw into the most compelling open-source AI organization product in the world.
+
+Make it feel like a user can instantly obtain their own high-privilege, behind-the-scenes AI company around a product, with real operational value and real trust.

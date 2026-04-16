@@ -19,7 +19,10 @@ A user describes what they built, what they need, and what outcomes they want. M
 ## Core idea
 
 OpenClaw gives powerful agent infrastructure.
-MultiClaw sits on top of it and turns raw capability into an instantly deployable operating company.
+MultiClaw takes that kind of capability and turns it into an original, user-owned, instantly deployable AI company.
+
+The user stays high-privilege.
+The generated company exists behind the scenes to operate, maintain, and advance the product according to the creator's requirements, boundaries, and standards.
 
 ## Platform direction
 

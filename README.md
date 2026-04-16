@@ -70,6 +70,12 @@ npm run init
 ### Configure and run the workspace
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
+```
+
+Or after cloning locally:
+
+```bash
 npm run up -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 

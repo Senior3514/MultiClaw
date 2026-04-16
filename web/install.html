@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Install MultiClaw</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./install.html">Install</a>
+          <a href="./signup.html">Sign up</a>
+          <a href="./login.html">Log in</a>
+          <a href="./platform.html">Platform</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        <section class="panel section-block landing-section">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">One-command install</div>
+              <h1>Install MultiClaw like a real product.</h1>
+              <p>Pick a platform, pick a provider, copy one command, and bring the runtime up.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-two install-grid">
+          <article class="panel install-panel">
+            <div class="eyebrow">Platform</div>
+            <div class="choice-grid" id="platformChoices">
+              <button class="choice-card selected" data-platform="ubuntu">Ubuntu / VPS</button>
+              <button class="choice-card" data-platform="macos">macOS</button>
+              <button class="choice-card" data-platform="windows">Windows (WSL)</button>
+            </div>
+
+            <div class="eyebrow install-subtitle">Bind mode</div>
+            <div class="choice-grid" id="bindChoices">
+              <button class="choice-card selected" data-bind="tailscale">Tailscale</button>
+              <button class="choice-card" data-bind="local">Local only</button>
+            </div>
+
+            <div class="eyebrow install-subtitle">Provider</div>
+            <div class="provider-grid" id="providerChoices">
+              <button class="provider-card selected" data-provider="openai" data-model="gpt-5.4" data-key-env="OPENAI_API_KEY">
+                <strong>OpenAI</strong>
+                <span>Best current default</span>
+              </button>
+              <button class="provider-card" data-provider="anthropic" data-model="claude-sonnet-4-5" data-key-env="ANTHROPIC_API_KEY">
+                <strong>Anthropic</strong>
+                <span>Claude-based runtime</span>
+              </button>
+              <button class="provider-card" data-provider="google" data-model="gemini-2.5-pro" data-key-env="GOOGLE_API_KEY">
+                <strong>Google</strong>
+                <span>Gemini-based runtime</span>
+              </button>
+              <button class="provider-card" data-provider="openrouter" data-model="openai/gpt-5.4" data-key-env="OPENROUTER_API_KEY">
+                <strong>OpenRouter</strong>
+                <span>Provider-flexible routing</span>
+              </button>
+            </div>
+          </article>
+
+          <article class="panel panel-strong install-panel">
+            <div class="eyebrow">Install command</div>
+            <h2>Copy one command, then open the runtime.</h2>
+            <pre class="install-command" id="installCommand"></pre>
+            <div class="cta-row">
+              <button class="button-link primary button-reset" id="copyInstallCommand">Copy command</button>
+              <a class="button-link secondary" href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">Open GitHub</a>
+            </div>
+            <div class="install-notes">
+              <p id="platformNote">Ubuntu/VPS is the cleanest path right now.</p>
+              <p>The command clones or updates MultiClaw, installs dependencies, saves runtime config, persists your API key, and starts the runtime.</p>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+    <script type="module" src="./install.js"></script>
+  </body>
+</html>

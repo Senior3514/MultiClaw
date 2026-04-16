@@ -247,6 +247,12 @@ video {
   flex-wrap: wrap;
 }
 
+.button-reset {
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
 .hero-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -806,6 +812,71 @@ button:hover {
   width: min(560px, 100%);
 }
 
+.install-grid {
+  align-items: start;
+}
+
+.install-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.install-subtitle {
+  margin-top: 8px;
+}
+
+.choice-grid,
+.provider-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.choice-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.provider-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.choice-card,
+.provider-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border-radius: 18px;
+  padding: 16px;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+}
+
+.choice-card.selected,
+.provider-card.selected {
+  border-color: rgba(124, 92, 255, 0.78);
+  background: rgba(124, 92, 255, 0.12);
+  box-shadow: 0 16px 36px rgba(44, 54, 120, 0.28);
+}
+
+.install-command {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 18px;
+  background: rgba(5, 8, 19, 0.84);
+  border: 1px solid rgba(145, 163, 255, 0.12);
+  padding: 18px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.install-notes {
+  display: grid;
+  gap: 10px;
+}
+
 @media (max-width: 1180px) {
   .landing-hero,
   .grid-two,
@@ -868,6 +939,11 @@ button:hover {
 }
 
 @media (max-width: 720px) {
+  .install-grid,
+  .provider-grid,
+  .choice-grid {
+    grid-template-columns: 1fr;
+  }
   .site-header,
   .site-main,
   .sidebar,

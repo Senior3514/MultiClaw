@@ -1,0 +1,117 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_URL="https://github.com/Senior3514/MultiClaw.git"
+INSTALL_DIR="${HOME}/MultiClaw"
+BIND="tailscale"
+PORT="8813"
+PROVIDER="openai"
+MODEL="gpt-5.4"
+API_KEY_ENV="OPENAI_API_KEY"
+API_KEY=""
+
+usage() {
+  cat <<'EOF'
+MultiClaw install
+
+Usage:
+  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- \
+    --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
+
+Options:
+  --tailscale             Bind on Tailscale (default)
+  --local                 Bind on 127.0.0.1
+  --port <port>           Runtime port (default: 8813)
+  --provider <name>       Provider name (default: openai)
+  --model <name>          Model name (default: gpt-5.4)
+  --api-key-env <name>    Env var name to persist (default: OPENAI_API_KEY)
+  --api-key <value>       API key value to persist for runtime
+  --dir <path>            Install/update target directory (default: ~/MultiClaw)
+  --help                  Show this help
+EOF
+}
+
+need_cmd() {
+  if ! command -v "$1" >/dev/null 2>&1; then
+    echo "Missing required command: $1" >&2
+    exit 1
+  fi
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --tailscale)
+      BIND="tailscale"
+      shift
+      ;;
+    --local)
+      BIND="local"
+      shift
+      ;;
+    --port)
+      PORT="$2"
+      shift 2
+      ;;
+    --provider)
+      PROVIDER="$2"
+      shift 2
+      ;;
+    --model)
+      MODEL="$2"
+      shift 2
+      ;;
+    --api-key-env)
+      API_KEY_ENV="$2"
+      shift 2
+      ;;
+    --api-key)
+      API_KEY="$2"
+      shift 2
+      ;;
+    --dir)
+      INSTALL_DIR="$2"
+      shift 2
+      ;;
+    --help|-h)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown argument: $1" >&2
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+need_cmd git
+need_cmd node
+need_cmd npm
+need_cmd python3
+
+if [[ -d "$INSTALL_DIR/.git" ]]; then
+  echo "Updating existing MultiClaw install at $INSTALL_DIR"
+  git -C "$INSTALL_DIR" pull --ff-only
+else
+  echo "Cloning MultiClaw into $INSTALL_DIR"
+  git clone "$REPO_URL" "$INSTALL_DIR"
+fi
+
+cd "$INSTALL_DIR"
+
+npm install
+
+CMD=(node ./bin/multiclaw.js up "--${BIND}" --port "$PORT" --provider "$PROVIDER" --model "$MODEL" --api-key-env "$API_KEY_ENV")
+if [[ -n "$API_KEY" ]]; then
+  CMD+=(--api-key "$API_KEY")
+fi
+
+echo "Starting MultiClaw with one command..."
+printf 'Command: '
+printf '%q ' "${CMD[@]}"
+printf '\n'
+"${CMD[@]}"
+
+echo
+echo "Runtime status:"
+node ./bin/multiclaw.js status

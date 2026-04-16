@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MultiClaw Dashboard</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./dashboard.html">Dashboard</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./companies.html">Companies</a>
+          <a href="./platform.html">Platform</a>
+        </nav>
+        <div id="sessionArea" class="session-area"></div>
+      </header>
+
+      <main class="site-main">
+        <section class="panel landing-hero">
+          <div class="hero-copy">
+            <div class="eyebrow">Workspace</div>
+            <h1 id="dashboardTitle">Welcome to your MultiClaw dashboard.</h1>
+            <p>
+              Create companies, browse generated outputs, and keep moving from product idea to operating system.
+            </p>
+            <div class="cta-row">
+              <a class="button-link primary" href="./generator.html">Generate a company</a>
+              <a class="button-link secondary" href="./companies.html">Browse companies</a>
+            </div>
+          </div>
+          <div class="panel-strong stack">
+            <div class="route-card">
+              <small>Current mode</small>
+              <strong>Protected workspace</strong>
+              <p>Session-aware preview for testing a real user flow.</p>
+            </div>
+            <div class="route-card">
+              <small>Next milestone</small>
+              <strong>Real auth backend</strong>
+              <p>Current flow is ready to be upgraded later to Supabase Auth or equivalent.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="grid-two">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Quick actions</h3>
+              <span>Start here</span>
+            </div>
+            <div class="stack">
+              <a class="button-link secondary" href="./generator.html">Open company generator</a>
+              <a class="button-link secondary" href="./companies.html">Open generated companies</a>
+              <a class="button-link secondary" href="./platform.html">Review platform direction</a>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recent companies</h3>
+              <span>Generated</span>
+            </div>
+            <div id="recentCompanies" class="stack"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./dashboard.js"></script>
+  </body>
+</html>

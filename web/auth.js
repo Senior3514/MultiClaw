@@ -112,14 +112,14 @@ export function initAuthPage(mode) {
     try {
       if (mode === 'signup') {
         await signUp(emailInput.value.trim().toLowerCase(), passwordInput.value, confirmInput.value);
-        setStatus('Account created successfully. Redirecting to the generator...', 'success');
+        setStatus('Account created successfully. Redirecting to the dashboard...', 'success');
       } else {
         await logIn(emailInput.value.trim().toLowerCase(), passwordInput.value);
-        setStatus('Logged in successfully. Redirecting to the generator...', 'success');
+        setStatus('Logged in successfully. Redirecting to the dashboard...', 'success');
       }
 
       setTimeout(() => {
-        window.location.href = './generator.html';
+        window.location.href = './dashboard.html';
       }, 600);
     } catch (error) {
       console.error(error);

@@ -116,6 +116,12 @@ Primary channel direction:
 - Telegram
 - later Discord and Slack
 
+Claw family direction:
+- NanoClaw
+- MicroClaw
+- OpenClaw
+- MultiClaw as the umbrella orchestration layer
+
 If you want to separate config from start:
 
 ```bash

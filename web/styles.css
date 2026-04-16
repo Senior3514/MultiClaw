@@ -586,6 +586,7 @@ video {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.surface-grid,
 .operation-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
@@ -643,6 +644,22 @@ video {
   inset: auto 22px 0 22px;
   height: 2px;
   background: linear-gradient(90deg, rgba(124, 92, 255, 0), rgba(124, 92, 255, 0.72), rgba(40, 215, 185, 0));
+}
+
+.surface-grid {
+  display: grid;
+  gap: 20px;
+}
+
+.loop-panel {
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.18), transparent 34%),
+    radial-gradient(circle at bottom right, rgba(40, 215, 185, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(14, 20, 43, 0.98), rgba(10, 14, 30, 0.9));
+}
+
+.loop-actions {
+  justify-content: center;
 }
 
 .topology-panel {
@@ -1190,6 +1207,7 @@ button:hover {
   .hq-grid,
   .cards-grid,
   .logic-grid,
+  .surface-grid,
   .operation-grid,
   .hero-metrics,
   .shell {

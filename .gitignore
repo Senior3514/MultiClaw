@@ -1,1 +1,3 @@
 generated/
+ops/*.log
+ops/*.pid

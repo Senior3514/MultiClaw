@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 import re
 import secrets
 import sqlite3
@@ -19,6 +20,8 @@ HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
 RATE_LIMITS = {}
+AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
+SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
 
 
 def now_utc():
@@ -406,6 +409,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         return json.loads(raw.decode("utf-8") or "{}")
 
     def get_session(self):
+        if AUTH_MODE == "single-user":
+            return "single-user", SINGLE_USER_SESSION
         cookie_header = self.headers.get("Cookie")
         if not cookie_header:
             return None, None
@@ -507,6 +512,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/api/auth/signup":
+            if AUTH_MODE == "single-user":
+                self.send_json(200, SINGLE_USER_SESSION)
+                return
             if not allow_rate(f"signup:{self.client_address[0]}", 10, 300):
                 self.send_json(429, {"error": "too many signup attempts"})
                 return
@@ -530,6 +538,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/login":
+            if AUTH_MODE == "single-user":
+                self.send_json(200, SINGLE_USER_SESSION)
+                return
             if not allow_rate(f"login:{self.client_address[0]}", 15, 300):
                 self.send_json(429, {"error": "too many login attempts"})
                 return
@@ -547,6 +558,9 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/logout":
+            if AUTH_MODE == "single-user":
+                self.send_json(200, {"ok": True})
+                return
             token, _ = self.get_session()
             if token:
                 delete_session(token)

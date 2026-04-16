@@ -107,6 +107,7 @@ curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/u
 ```
 
 The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.
+For local mode, MultiClaw now defaults toward a simpler single-user flow instead of forcing preview-style account friction.
 
 Ordered flow:
 1. Install the core product

@@ -116,7 +116,13 @@ export function mountSession() {
   });
 }
 
-export function initAuthPage(mode) {
+export async function initAuthPage(mode) {
+  const existing = await hasServerSession();
+  if (existing?.email) {
+    window.location.href = './dashboard.html';
+    return;
+  }
+
   const actionButton = document.getElementById('authAction');
   const emailInput = document.getElementById('email');
   const passwordInput = document.getElementById('password');

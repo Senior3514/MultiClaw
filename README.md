@@ -106,6 +106,11 @@ Ordered flow:
 3. Start the runtime
 4. Add networking, channels, and extra integrations later
 
+Configuration categories:
+- Core runtime
+- Access and networking
+- Channels and integrations
+
 If you want to separate config from start:
 
 ```bash

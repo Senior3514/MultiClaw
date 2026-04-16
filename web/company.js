@@ -11,6 +11,7 @@ const statusEl = document.getElementById('companyStatus');
 const overviewEl = document.getElementById('companyOverview');
 const soulEl = document.getElementById('companySoul');
 const routingEl = document.getElementById('companyRouting');
+const contactSurfacesEl = document.getElementById('companyContactSurfaces');
 const topologyEl = document.getElementById('companyTopology');
 const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
@@ -49,6 +50,17 @@ function renderRouting(profile) {
       <small>${label}</small>
       <strong>${value}</strong>
       <p>Current default routing choice for this capability.</p>
+    </div>
+  `).join('');
+}
+
+function renderContactSurfaces(surfaces) {
+  return (surfaces || []).map((surface) => `
+    <div class="route-card">
+      <small>${surface.status}</small>
+      <strong>${surface.name}</strong>
+      <p>${surface.purpose}</p>
+      <small>${surface.substrate}</small>
     </div>
   `).join('');
 }
@@ -139,6 +151,7 @@ async function loadCompany() {
     ]);
     soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);
+    contactSurfacesEl.innerHTML = renderContactSurfaces(company.contactSurfaces);
     topologyEl.innerHTML = renderTopology(company.roles);
     rolesEl.innerHTML = renderRoles(company.roles);
     missionsEl.innerHTML = renderMissions(company.missions);

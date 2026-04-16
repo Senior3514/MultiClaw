@@ -216,6 +216,29 @@ def build_missions(project_name: str, top_goals: str):
     ]
 
 
+def build_contact_surfaces():
+    return [
+        {
+            "name": "Web workspace",
+            "status": "Live now",
+            "purpose": "Operate the company, inspect outputs, and steer the first cycle through the main product UI.",
+            "substrate": "MultiClaw surface over OpenClaw-style runtime",
+        },
+        {
+            "name": "CLI",
+            "status": "Live now",
+            "purpose": "Install, configure, start, stop, verify, and operate the runtime without depending on the web UI.",
+            "substrate": "MultiClaw command layer over the existing substrate",
+        },
+        {
+            "name": "Telegram and future channels",
+            "status": "Substrate-ready",
+            "purpose": "Route communication through proven transport infrastructure instead of rebuilding messaging from scratch.",
+            "substrate": "OpenClaw and NanoClaw communication foundations",
+        },
+    ]
+
+
 def build_next_steps(project_name: str):
     return [
         f"Review the generated structure for {project_name}.",
@@ -284,6 +307,7 @@ def load_company(company_id: str):
             company.get("archetype", "saas-product"),
         ),
     )
+    company.setdefault("contactSurfaces", build_contact_surfaces())
     return company
 
 
@@ -313,6 +337,7 @@ def generate_company(payload):
     routing = build_routing(description)
     missions = build_missions(project_name, top_goals)
     next_steps = build_next_steps(project_name)
+    contact_surfaces = build_contact_surfaces()
     slug = slugify(project_name)
     generated_at = now_utc()
     company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
@@ -333,6 +358,7 @@ def generate_company(payload):
         "routing": routing,
         "missions": missions,
         "companySoul": company_soul,
+        "contactSurfaces": contact_surfaces,
         "nextSteps": next_steps,
         "departmentsCount": 5,
         "rolesCount": len(roles),
@@ -384,6 +410,13 @@ def generate_company(payload):
     )
     (output_dir / "NEXT-STEPS.md").write_text(
         "# Next Steps\n\n" + "\n".join([f"- {step}" for step in next_steps]),
+        encoding="utf-8",
+    )
+    (output_dir / "CONTACT-SURFACES.md").write_text(
+        "# Contact Surfaces\n\n" + "\n".join([
+            f"- {surface['name']} ({surface['status']}): {surface['purpose']} | Substrate: {surface['substrate']}"
+            for surface in contact_surfaces
+        ]),
         encoding="utf-8",
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")

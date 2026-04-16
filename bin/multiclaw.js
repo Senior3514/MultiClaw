@@ -420,11 +420,31 @@ async function printStatus() {
   console.log(`- url: ${url}`);
 }
 
+function printGuide() {
+  console.log(`MultiClaw guide
+
+1. Install the base product
+   curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+
+2. Open the guided runtime setup
+   multiclaw configure
+
+3. Start the runtime
+   multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+
+4. Check status
+   multiclaw status
+
+5. Open the URL and continue in the product UI
+`);
+}
+
 function printHelp() {
   console.log(`MultiClaw
 
 Usage:
   multiclaw help
+  multiclaw guide
   multiclaw init
   multiclaw init --demo
   multiclaw configure
@@ -436,6 +456,7 @@ Usage:
   multiclaw status
 
 Notes:
+  - guide prints the clean step-by-step setup flow
   - init generates a company package under ./generated/
   - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
@@ -449,6 +470,11 @@ Notes:
 async function main() {
   if (command === 'help' || command === '--help' || command === '-h') {
     printHelp();
+    return;
+  }
+
+  if (command === 'guide') {
+    printGuide();
     return;
   }
 

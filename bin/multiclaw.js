@@ -185,6 +185,9 @@ function defaultRuntimeConfig() {
   return {
     bind: 'tailscale',
     port: 8813,
+    provider: 'openai',
+    model: 'gpt-5.4',
+    apiKeyEnv: 'OPENAI_API_KEY',
   };
 }
 
@@ -280,9 +283,19 @@ async function setupRuntime() {
   const existing = await loadRuntimeConfig();
   const modeFlag = argv.includes('--local') ? 'local' : argv.includes('--tailscale') ? 'tailscale' : null;
   const portFlag = Number(getArgValue('--port', existing.port)) || existing.port;
+  const providerFlag = getArgValue('--provider', existing.provider);
+  const modelFlag = getArgValue('--model', existing.model);
+  const apiKeyEnvFlag = getArgValue('--api-key-env', existing.apiKeyEnv);
+  const hasInlineConfig = modeFlag || argv.includes('--provider') || argv.some((arg) => arg.startsWith('--provider=')) || argv.includes('--model') || argv.some((arg) => arg.startsWith('--model=')) || argv.includes('--api-key-env') || argv.some((arg) => arg.startsWith('--api-key-env='));
 
-  if (modeFlag) {
-    const config = { bind: modeFlag, port: portFlag };
+  if (hasInlineConfig) {
+    const config = {
+      bind: modeFlag || existing.bind,
+      port: portFlag,
+      provider: providerFlag,
+      model: modelFlag,
+      apiKeyEnv: apiKeyEnvFlag,
+    };
     await saveRuntimeConfig(config);
     console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
     console.log(JSON.stringify(config, null, 2));
@@ -299,7 +312,10 @@ async function setupRuntime() {
     const bindAnswer = (await ask('Bind mode (tailscale/local)', existing.bind)).toLowerCase();
     const bind = bindAnswer === 'local' ? 'local' : 'tailscale';
     const port = Number(await ask('Port', String(existing.port))) || existing.port;
-    const config = { bind, port };
+    const provider = await ask('Provider', existing.provider);
+    const model = await ask('Model', existing.model);
+    const apiKeyEnv = await ask('API key env var', existing.apiKeyEnv);
+    const config = { bind, port, provider, model, apiKeyEnv };
     await saveRuntimeConfig(config);
     console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
     console.log(JSON.stringify(config, null, 2));
@@ -350,6 +366,9 @@ async function printStatus() {
   console.log('MultiClaw runtime status');
   console.log(`- bind: ${bind}`);
   console.log(`- port: ${port}`);
+  console.log(`- provider: ${config.provider}`);
+  console.log(`- model: ${config.model}`);
+  console.log(`- api key env: ${config.apiKeyEnv}`);
   console.log(`- config: ${runtimeConfigPath}`);
   console.log(`- pid: ${running || 'not running'}`);
   console.log(`- url: ${url}`);
@@ -362,7 +381,7 @@ Usage:
   multiclaw help
   multiclaw init
   multiclaw init --demo
-  multiclaw setup [--tailscale|--local] [--port 8813]
+  multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY]
   multiclaw start [--port 8813]
   multiclaw dev [--port 8813]
   multiclaw stop

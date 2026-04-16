@@ -71,6 +71,12 @@ npm run setup
 npm run start
 ```
 
+You can also configure provider details directly:
+
+```bash
+node ./bin/multiclaw.js setup --tailscale --port 8813 --provider openai --model gpt-5.4 --api-key-env OPENAI_API_KEY
+```
+
 Useful runtime commands:
 
 ```bash

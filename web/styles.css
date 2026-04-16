@@ -213,6 +213,27 @@ video {
   max-width: 860px;
 }
 
+.landing-copy {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+}
+
+.landing-copy p {
+  margin-inline: auto;
+}
+
+.landing-copy .cta-row,
+.landing-copy .hero-metrics {
+  justify-content: center;
+}
+
+.landing-copy .hero-metrics {
+  width: min(100%, 720px);
+  margin-inline: auto;
+}
+
 .hero-copy p {
   font-size: 18px;
   color: var(--muted);
@@ -384,6 +405,21 @@ video {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.landing-cards .feature-card,
+.landing-section .logic-card,
+.landing-section .feature-card {
+  text-align: center;
+}
+
+.landing-section .section-heading {
+  justify-content: center;
+  text-align: center;
+}
+
+.landing-section .section-heading > div {
+  max-width: 760px;
+}
+
 .grid-two {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
@@ -425,6 +461,14 @@ video {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+}
+
+.landing-cta {
+  text-align: center;
+}
+
+.landing-cta > div:first-child {
+  max-width: 720px;
 }
 
 .logic-card strong,

@@ -457,6 +457,26 @@ Uninstall:
 `);
 }
 
+function printDoctor() {
+  const checks = [
+    ['git', ['--version']],
+    ['node', ['--version']],
+    ['npm', ['--version']],
+    ['python3', ['--version']],
+  ];
+
+  console.log('MultiClaw doctor');
+  for (const [commandName, args] of checks) {
+    const result = spawnSync(commandName, args, { encoding: 'utf8' });
+    const ok = result.status === 0;
+    const output = (result.stdout || result.stderr || '').trim().split(/\r?\n/)[0] || 'not available';
+    console.log(`- ${commandName}: ${ok ? 'ok' : 'missing'} (${output})`);
+  }
+
+  const tailscale = spawnSync('tailscale', ['status'], { encoding: 'utf8' });
+  console.log(`- tailscale: ${tailscale.status === 0 ? 'available' : 'not available or not connected'}`);
+}
+
 function printHelp() {
   console.log(`MultiClaw
 
@@ -464,6 +484,7 @@ Usage:
   multiclaw help
   multiclaw guide
   multiclaw walkthrough
+  multiclaw doctor
   multiclaw init
   multiclaw init --demo
   multiclaw configure
@@ -477,6 +498,7 @@ Usage:
 Notes:
   - guide prints the clean step-by-step setup flow
   - walkthrough prints the full command walkthrough
+  - doctor checks the local environment for the core runtime prerequisites
   - init generates a company package under ./generated/
   - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
@@ -500,6 +522,11 @@ async function main() {
 
   if (command === 'walkthrough') {
     printWalkthrough();
+    return;
+  }
+
+  if (command === 'doctor') {
+    printDoctor();
     return;
   }
 

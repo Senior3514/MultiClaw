@@ -82,6 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/i
 Then:
 
 ```bash
+multiclaw doctor
 multiclaw walkthrough
 multiclaw guide
 multiclaw configure

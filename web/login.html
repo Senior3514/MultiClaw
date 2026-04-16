@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MultiClaw Log In</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./login.html">Log in</a>
+          <a href="./signup.html">Sign up</a>
+        </nav>
+      </header>
+
+      <main class="site-main auth-main">
+        <section class="panel auth-panel">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Welcome back</div>
+              <h1>Log in to your MultiClaw preview</h1>
+            </div>
+          </div>
+
+          <div id="authStatus" class="status-banner status-idle">Use a local test account created in this isolated preview.</div>
+
+          <div class="form-panel">
+            <label>
+              <span>Email</span>
+              <input id="email" type="email" placeholder="founder@example.com" />
+            </label>
+            <label>
+              <span>Password</span>
+              <input id="password" type="password" placeholder="Enter password" />
+            </label>
+            <button id="authAction">Log in</button>
+          </div>
+
+          <div class="cta-row">
+            <a class="button-link secondary" href="./signup.html">Need an account? Sign up</a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module">
+      import { initAuthPage } from './auth.js';
+      initAuthPage('login');
+    </script>
+  </body>
+</html>

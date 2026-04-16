@@ -1,5 +1,35 @@
 const el = (id) => document.getElementById(id);
 
+const PRESETS = {
+  saas: {
+    projectName: 'FlowPilot',
+    description: 'A premium AI workflow platform for software teams.',
+    audience: 'Software teams',
+    businessModel: 'SaaS',
+    stage: 'Growth',
+    topGoals: 'Ship faster, onboard users, retain customers',
+    tone: 'Sharp, premium, operational',
+  },
+  revenue: {
+    projectName: 'CloseForge',
+    description: 'An AI revenue operations layer for high-ticket service businesses.',
+    audience: 'High-ticket service businesses',
+    businessModel: 'SaaS with optional services',
+    stage: 'Growth',
+    topGoals: 'Close customers, recover leads, run like a company',
+    tone: 'Sharp, confident, premium',
+  },
+  marketplace: {
+    projectName: 'MatchGrid',
+    description: 'A premium marketplace that coordinates supply, demand, and operations with AI.',
+    audience: 'Marketplace operators',
+    businessModel: 'Marketplace',
+    stage: 'MVP',
+    topGoals: 'Validate matching, grow liquidity, tighten operations',
+    tone: 'Structured, premium, decisive',
+  },
+};
+
 function renderBrand(data) {
   const rows = [
     ['Project', data.projectName],
@@ -86,6 +116,20 @@ function applyResult(data) {
   setCompanyLink(data.companyId);
 }
 
+function applyPreset(name) {
+  const preset = PRESETS[name];
+  if (!preset) return;
+
+  el('projectName').value = preset.projectName;
+  el('description').value = preset.description;
+  el('audience').value = preset.audience;
+  el('businessModel').value = preset.businessModel;
+  el('stage').value = preset.stage;
+  el('topGoals').value = preset.topGoals;
+  el('tone').value = preset.tone;
+  setStatus(`Preset loaded: ${preset.projectName}`, 'idle');
+}
+
 async function generateCompany() {
   const button = el('generateBtn');
   const original = button.textContent;
@@ -117,4 +161,7 @@ async function generateCompany() {
 }
 
 el('generateBtn').addEventListener('click', generateCompany);
+document.querySelectorAll('[data-preset]').forEach((button) => {
+  button.addEventListener('click', () => applyPreset(button.dataset.preset));
+});
 generateCompany();

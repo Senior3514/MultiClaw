@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MultiClaw Walkthrough</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./install.html">Install</a>
+          <a href="./walkthrough.html">Walkthrough</a>
+          <a href="./signup.html">Sign up</a>
+          <a href="./login.html">Log in</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        <section class="panel section-block landing-section">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Walkthrough</div>
+              <h1>One clean path from install to running product.</h1>
+              <p>Install MultiClaw, configure the runtime, start it, verify it, and keep a clear next step at every stage.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="logic-grid operation-grid">
+          <div class="logic-card hover-lift">
+            <strong>1. Bootstrap</strong>
+            <pre class="install-command">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+          </div>
+          <div class="logic-card hover-lift">
+            <strong>2. Configure</strong>
+            <pre class="install-command">multiclaw configure</pre>
+          </div>
+          <div class="logic-card hover-lift">
+            <strong>3. Start</strong>
+            <pre class="install-command">multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY</pre>
+          </div>
+          <div class="logic-card hover-lift">
+            <strong>4. Verify</strong>
+            <pre class="install-command">multiclaw status</pre>
+          </div>
+        </section>
+
+        <section class="grid-two install-grid">
+          <article class="panel install-panel">
+            <div class="eyebrow">Helpful commands</div>
+            <pre class="install-command">multiclaw walkthrough
+multiclaw guide
+multiclaw stop</pre>
+          </article>
+          <article class="panel panel-strong install-panel">
+            <div class="eyebrow">If you need to remove it</div>
+            <pre class="install-command">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash</pre>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

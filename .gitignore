@@ -3,3 +3,4 @@ generated-live/
 .multiclaw/
 ops/*.log
 ops/*.pid
+ops/*.state.json

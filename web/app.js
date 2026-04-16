@@ -125,8 +125,11 @@ function setStatus(message, kind = 'idle') {
 
 function setCompanyLink(companyId) {
   const link = el('companyLink');
+  const download = el('downloadPackLink');
   link.href = `./company.html?id=${encodeURIComponent(companyId)}`;
   link.classList.remove('hidden-link');
+  download.href = `/api/company/${encodeURIComponent(companyId)}/download`;
+  download.classList.remove('hidden-link');
 }
 
 function applyResult(data) {
@@ -230,4 +233,3 @@ if (savedSettings.defaultProductOrigin) el('productOrigin').value = savedSetting
 if (savedSettings.defaultAutonomyMode) el('autonomyMode').value = savedSettings.defaultAutonomyMode;
 
 renderWizard();
-generateCompany();

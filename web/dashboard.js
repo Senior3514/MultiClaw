@@ -8,6 +8,12 @@ const recentCompaniesEl = document.getElementById('recentCompanies');
 const statsCompaniesEl = document.getElementById('statsCompanies');
 const statsUsersEl = document.getElementById('statsUsers');
 const statsArtifactsEl = document.getElementById('statsArtifacts');
+const missionWorkspaceStateEl = document.getElementById('missionWorkspaceState');
+const missionWorkspaceCopyEl = document.getElementById('missionWorkspaceCopy');
+const missionCompaniesStateEl = document.getElementById('missionCompaniesState');
+const missionCompaniesCopyEl = document.getElementById('missionCompaniesCopy');
+const missionArtifactsStateEl = document.getElementById('missionArtifactsState');
+const missionArtifactsCopyEl = document.getElementById('missionArtifactsCopy');
 const session = getSession();
 
 if (session?.email) {
@@ -35,6 +41,13 @@ async function loadStats() {
     statsCompaniesEl.textContent = stats.companies;
     statsUsersEl.textContent = stats.users;
     statsArtifactsEl.textContent = stats.artifacts;
+
+    if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
+    if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Session-aware preview active with a protected workspace flow.';
+    if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} generated compan${stats.companies === 1 ? 'y' : 'ies'}`;
+    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is becoming visible through dashboard, topology, and contact surfaces.';
+    if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `${stats.artifacts} artifacts live`;
+    if (missionArtifactsCopyEl) missionArtifactsCopyEl.textContent = 'Generated outputs are accumulating as tangible proof that the product is doing real work.';
   } catch (error) {
     console.error(error);
     statsCompaniesEl.textContent = '-';

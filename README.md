@@ -37,7 +37,7 @@ It should also become portable across environments, so a user can run MultiClaw 
 - Easy setup
 - Product-first, not toy-first
 - Built for real operation, not just demos
-- Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, and internal ops
+- Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, internal ops, and infrastructure targets like VPS environments
 
 ## MVP thesis
 

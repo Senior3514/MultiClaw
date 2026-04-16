@@ -126,6 +126,8 @@ body.auth-pending .site-shell {
   padding: 10px 14px;
   border-radius: 12px;
   font-size: 15px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(145, 163, 255, 0.06);
 }
 
 .landing-header {
@@ -600,6 +602,33 @@ video {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012)),
     var(--panel);
+}
+
+.landing-cards .feature-card:nth-child(1) {
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012)),
+    var(--panel);
+}
+
+.landing-cards .feature-card:nth-child(2) {
+  background:
+    radial-gradient(circle at top right, rgba(47, 168, 255, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012)),
+    var(--panel);
+}
+
+.landing-cards .feature-card:nth-child(3) {
+  background:
+    radial-gradient(circle at bottom left, rgba(40, 215, 185, 0.1), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.012)),
+    var(--panel);
+}
+
+.landing-section .logic-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01)),
+    rgba(12, 18, 36, 0.9);
 }
 
 .operation-grid .logic-card {
@@ -1258,9 +1287,11 @@ button:hover {
 
   .site-nav a {
     flex: 0 0 auto;
-    padding: 8px 12px;
+    padding: 10px 14px;
     font-size: 14px;
     white-space: nowrap;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(145, 163, 255, 0.08);
   }
 
   .button-link,
@@ -1280,11 +1311,28 @@ button:hover {
   }
 
   .hero-copy h1 {
-    font-size: 34px;
+    font-size: 36px;
+  }
+
+  .section-heading h2,
+  .section-heading h1 {
+    font-size: 30px;
+    line-height: 1.06;
+  }
+
+  .panel,
+  .panel-strong,
+  .logic-card,
+  .feature-card,
+  .route-card,
+  .mission-card,
+  .brand-row {
+    padding: 18px;
+    border-radius: 20px;
   }
 
   .hero-graphic {
-    min-height: 240px;
+    min-height: 280px;
   }
 
   .graphic-core {
@@ -1299,6 +1347,13 @@ button:hover {
   .graphic-node {
     font-size: 12px;
     padding: 8px 10px;
+  }
+
+  .landing-cards .feature-card,
+  .landing-section .logic-card,
+  .premium-card,
+  .terminal-panel {
+    box-shadow: 0 20px 44px rgba(5, 8, 18, 0.28);
   }
 
   .session-area,

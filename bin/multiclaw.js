@@ -354,6 +354,26 @@ async function startRuntime(forceBind = null) {
   runScript('start_tailscale_only.sh', [port]);
 }
 
+async function upRuntime() {
+  const existing = await loadRuntimeConfig();
+  const modeFlag = argv.includes('--local') ? 'local' : argv.includes('--tailscale') ? 'tailscale' : null;
+  const portFlag = Number(getArgValue('--port', existing.port)) || existing.port;
+  const providerFlag = getArgValue('--provider', existing.provider);
+  const modelFlag = getArgValue('--model', existing.model);
+  const apiKeyEnvFlag = getArgValue('--api-key-env', existing.apiKeyEnv);
+
+  const config = {
+    bind: modeFlag || existing.bind,
+    port: portFlag,
+    provider: providerFlag,
+    model: modelFlag,
+    apiKeyEnv: apiKeyEnvFlag,
+  };
+
+  await saveRuntimeConfig(config);
+  await startRuntime(config.bind);
+}
+
 async function printStatus() {
   const config = await loadRuntimeConfig();
   const running = await fs.readFile(pidPath, 'utf8').then((value) => value.trim()).catch(() => null);
@@ -382,6 +402,7 @@ Usage:
   multiclaw init
   multiclaw init --demo
   multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY]
+  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY]
   multiclaw start [--port 8813]
   multiclaw dev [--port 8813]
   multiclaw stop
@@ -390,6 +411,7 @@ Usage:
 Notes:
   - init generates a company package under ./generated/
   - setup creates a local runtime config under ./.multiclaw/config.json
+  - up is the one-command way to configure and start the runtime
   - start uses the configured bind mode (tailscale by default)
   - dev forces local bind on 127.0.0.1
 `);
@@ -403,6 +425,11 @@ async function main() {
 
   if (command === 'setup') {
     await setupRuntime();
+    return;
+  }
+
+  if (command === 'up') {
+    await upRuntime();
     return;
   }
 

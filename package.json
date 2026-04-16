@@ -11,6 +11,7 @@
     "init": "node ./bin/multiclaw.js init",
     "example": "node ./bin/multiclaw.js init --demo",
     "setup": "node ./bin/multiclaw.js setup",
+    "up": "node ./bin/multiclaw.js up",
     "start": "node ./bin/multiclaw.js start",
     "dev": "node ./bin/multiclaw.js dev",
     "stop": "node ./bin/multiclaw.js stop",

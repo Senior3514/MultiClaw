@@ -70,6 +70,12 @@ npm run init
 ### Configure and run the workspace
 
 ```bash
+npm run up
+```
+
+If you want to separate config from start:
+
+```bash
 npm run setup
 npm run start
 ```

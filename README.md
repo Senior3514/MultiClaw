@@ -149,6 +149,7 @@ Technical USP direction:
 - generate a living company, not a single assistant
 - communicate with agents from birth
 - run across web, CLI, and channel surfaces
+- keep meaningful CLI parity for end-to-end operation
 - stay provider-flexible and access-flexible
 - expand company structure autonomously inside the runtime
 - keep protection and secure defaults inside the product DNA

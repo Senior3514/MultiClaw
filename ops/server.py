@@ -7,14 +7,14 @@ import hashlib
 import json
 import re
 import secrets
+import sqlite3
 import sys
 import time
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
 GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
 AUTH_ROOT = GENERATED_ROOT / ".auth"
-USERS_FILE = AUTH_ROOT / "users.json"
-SESSIONS_FILE = AUTH_ROOT / "sessions.json"
+DB_PATH = AUTH_ROOT / "multiclaw.db"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
@@ -63,20 +63,48 @@ def hash_password(password: str, salt_hex: str) -> str:
     return digest.hex()
 
 
+def get_db():
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    with get_db() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                email TEXT PRIMARY KEY,
+                salt TEXT NOT NULL,
+                password_hash TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS sessions (
+                token TEXT PRIMARY KEY,
+                email TEXT NOT NULL,
+                created_at TEXT NOT NULL
+            )
+            """
+        )
+
+
 def get_users():
-    return read_json(USERS_FILE, [])
-
-
-def save_users(users):
-    write_json(USERS_FILE, users)
+    with get_db() as conn:
+        rows = conn.execute("SELECT email, salt, password_hash, created_at FROM users ORDER BY created_at DESC").fetchall()
+    return [
+        {"email": row["email"], "salt": row["salt"], "passwordHash": row["password_hash"], "createdAt": row["created_at"]}
+        for row in rows
+    ]
 
 
 def get_sessions():
-    return read_json(SESSIONS_FILE, {})
-
-
-def save_sessions(sessions):
-    write_json(SESSIONS_FILE, sessions)
+    with get_db() as conn:
+        rows = conn.execute("SELECT token, email, created_at FROM sessions").fetchall()
+    return {row["token"]: {"email": row["email"], "createdAt": row["created_at"]} for row in rows}
 
 
 def create_user(email: str, password: str):
@@ -85,13 +113,11 @@ def create_user(email: str, password: str):
         raise ValueError("Account already exists for this email.")
 
     salt_hex = secrets.token_hex(16)
-    users.append({
-        "email": email,
-        "salt": salt_hex,
-        "passwordHash": hash_password(password, salt_hex),
-        "createdAt": now_utc(),
-    })
-    save_users(users)
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO users (email, salt, password_hash, created_at) VALUES (?, ?, ?, ?)",
+            (email, salt_hex, hash_password(password, salt_hex), now_utc()),
+        )
 
 
 def verify_user(email: str, password: str):
@@ -103,18 +129,18 @@ def verify_user(email: str, password: str):
 
 
 def create_session(email: str):
-    sessions = get_sessions()
     token = secrets.token_urlsafe(32)
-    sessions[token] = {"email": email, "createdAt": now_utc()}
-    save_sessions(sessions)
+    with get_db() as conn:
+        conn.execute(
+            "INSERT INTO sessions (token, email, created_at) VALUES (?, ?, ?)",
+            (token, email, now_utc()),
+        )
     return token
 
 
 def delete_session(token: str):
-    sessions = get_sessions()
-    if token in sessions:
-        del sessions[token]
-        save_sessions(sessions)
+    with get_db() as conn:
+        conn.execute("DELETE FROM sessions WHERE token = ?", (token,))
 
 
 def infer_archetype(business_model: str, description: str) -> str:
@@ -516,10 +542,7 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 if __name__ == "__main__":
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
     AUTH_ROOT.mkdir(parents=True, exist_ok=True)
-    if not USERS_FILE.exists():
-        write_json(USERS_FILE, [])
-    if not SESSIONS_FILE.exists():
-        write_json(SESSIONS_FILE, {})
+    init_db()
     server = ThreadingHTTPServer((HOST, PORT), MultiClawHandler)
     print(f"Serving MultiClaw on http://{HOST}:{PORT}")
     server.serve_forever()

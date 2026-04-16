@@ -95,5 +95,5 @@ MultiClaw should aim to be:
 - secure by default
 - fast in practice
 - reliable under real use
-- premium in feel
+- instantly compelling
 - operational, not theatrical

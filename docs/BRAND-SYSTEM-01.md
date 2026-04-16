@@ -50,4 +50,4 @@ Branding should be visible across:
 
 ## Standard
 
-The brand should feel expensive, modern, and unmistakably MultiClaw.
+The brand should create instant curiosity, clear differentiation, and unmistakably MultiClaw energy.

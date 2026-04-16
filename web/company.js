@@ -1,6 +1,6 @@
 import { mountSession, requireAuth } from './auth.js';
 
-requireAuth();
+await requireAuth();
 mountSession();
 
 const params = new URLSearchParams(window.location.search);

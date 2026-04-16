@@ -1,6 +1,6 @@
 import { mountSession, requireAuth } from './auth.js';
 
-requireAuth();
+await requireAuth();
 mountSession();
 
 const statusEl = document.getElementById('companiesStatus');

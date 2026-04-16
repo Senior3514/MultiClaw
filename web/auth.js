@@ -1,19 +1,6 @@
-const USERS_KEY = 'multiclaw-users';
 const SESSION_KEY = 'multiclaw-session';
 
-function getUsers() {
-  try {
-    return JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
-  } catch {
-    return [];
-  }
-}
-
-function setUsers(users) {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
-}
-
-function setSession(email) {
+function setLocalSession(email) {
   localStorage.setItem(SESSION_KEY, JSON.stringify({ email, signedInAt: new Date().toISOString() }));
 }
 
@@ -29,16 +16,26 @@ export function clearSession() {
   localStorage.removeItem(SESSION_KEY);
 }
 
-async function hashPassword(password) {
-  const data = new TextEncoder().encode(password);
-  const digest = await crypto.subtle.digest('SHA-256', data);
-  return Array.from(new Uint8Array(digest)).map((b) => b.toString(16).padStart(2, '0')).join('');
-}
-
 function setStatus(message, kind = 'idle') {
   const status = document.getElementById('authStatus');
+  if (!status) return;
   status.textContent = message;
   status.className = `status-banner status-${kind}`;
+}
+
+async function request(path, payload = null) {
+  const response = await fetch(path, {
+    method: payload ? 'POST' : 'GET',
+    headers: payload ? { 'Content-Type': 'application/json' } : undefined,
+    body: payload ? JSON.stringify(payload) : undefined,
+    credentials: 'same-origin',
+  });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.error || `Request failed with status ${response.status}`);
+  }
+  return data;
 }
 
 async function signUp(email, password, confirmPassword) {
@@ -46,33 +43,32 @@ async function signUp(email, password, confirmPassword) {
   if (password.length < 8) throw new Error('Password must be at least 8 characters.');
   if (password !== confirmPassword) throw new Error('Passwords do not match.');
 
-  const users = getUsers();
-  if (users.some((user) => user.email === email)) throw new Error('Account already exists for this email.');
-
-  const passwordHash = await hashPassword(password);
-  users.push({ email, passwordHash, createdAt: new Date().toISOString() });
-  setUsers(users);
-  setSession(email);
+  const data = await request('/api/auth/signup', { email, password });
+  setLocalSession(data.email);
 }
 
 async function logIn(email, password) {
   if (!email || !password) throw new Error('Email and password are required.');
-
-  const users = getUsers();
-  const passwordHash = await hashPassword(password);
-  const user = users.find((entry) => entry.email === email && entry.passwordHash === passwordHash);
-  if (!user) throw new Error('Invalid email or password.');
-
-  setSession(email);
+  const data = await request('/api/auth/login', { email, password });
+  setLocalSession(data.email);
 }
 
-export function requireAuth() {
+export async function requireAuth() {
   const session = getSession();
   if (!session?.email) {
     window.location.href = './login.html';
     throw new Error('Authentication required');
   }
-  return session;
+
+  try {
+    const serverSession = await request('/api/auth/me');
+    setLocalSession(serverSession.email);
+    return serverSession;
+  } catch {
+    clearSession();
+    window.location.href = './login.html';
+    throw new Error('Authentication required');
+  }
 }
 
 export function mountSession() {
@@ -92,7 +88,12 @@ export function mountSession() {
     </div>
   `;
 
-  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+    try {
+      await request('/api/auth/logout', {});
+    } catch {
+      // no-op
+    }
     clearSession();
     window.location.href = './login.html';
   });

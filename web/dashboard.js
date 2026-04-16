@@ -1,6 +1,6 @@
 import { getSession, mountSession, requireAuth } from './auth.js';
 
-requireAuth();
+await requireAuth();
 mountSession();
 
 const titleEl = document.getElementById('dashboardTitle');

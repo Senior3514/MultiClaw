@@ -1,0 +1,17 @@
+{
+  "name": "multiclaw",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Generate a full AI company around any product.",
+  "bin": {
+    "multiclaw": "./bin/multiclaw.js"
+  },
+  "scripts": {
+    "init": "node ./bin/multiclaw.js init",
+    "example": "node ./bin/multiclaw.js init --demo"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

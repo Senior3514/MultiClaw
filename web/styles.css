@@ -282,6 +282,26 @@ p {
   margin-bottom: 10px;
 }
 
+.company-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.company-meta span {
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.company-footer {
+  margin-top: 16px;
+  color: var(--muted);
+}
+
 .logic-card p,
 .feature-card p,
 .hero p,

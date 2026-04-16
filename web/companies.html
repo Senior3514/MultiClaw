@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MultiClaw Companies</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand-inline" href="./index.html">
+          <div class="brand-mark">M</div>
+          <div>
+            <div class="eyebrow">AI organization foundry</div>
+            <strong>MultiClaw</strong>
+          </div>
+        </a>
+        <nav class="site-nav">
+          <a href="./index.html">Home</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./companies.html">Companies</a>
+          <a href="./platform.html">Platform</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        <section class="panel section-block">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Generated companies</div>
+              <h1>Browse the companies created by MultiClaw.</h1>
+            </div>
+          </div>
+          <div id="companiesStatus" class="status-banner status-idle">Loading generated companies...</div>
+        </section>
+
+        <section id="companiesGrid" class="cards-grid"></section>
+      </main>
+    </div>
+
+    <script type="module" src="./companies.js"></script>
+  </body>
+</html>

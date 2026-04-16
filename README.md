@@ -129,6 +129,12 @@ Core product direction:
 - communicate with agents from birth
 - operate proactively and reactively inside the company
 
+Provider access direction:
+- direct API keys
+- account-connected or subscription-backed provider access where applicable
+- router providers
+- local or self-hosted models
+
 If you want to separate config from start:
 
 ```bash

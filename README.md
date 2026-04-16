@@ -92,6 +92,12 @@ Or after cloning locally:
 npm run up -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 
+Uninstall:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+```
+
 The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.
 
 If you want to separate config from start:

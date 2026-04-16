@@ -2,6 +2,8 @@ const baseInstallCommandEl = document.getElementById('baseInstallCommand');
 const advancedInstallCommandEl = document.getElementById('advancedInstallCommand');
 const copyBaseButton = document.getElementById('copyBaseInstallCommand');
 const copyAdvancedButton = document.getElementById('copyAdvancedInstallCommand');
+const uninstallCommandEl = document.getElementById('uninstallCommand');
+const copyUninstallButton = document.getElementById('copyUninstallCommand');
 const platformNoteEl = document.getElementById('platformNote');
 
 const state = {
@@ -22,6 +24,7 @@ function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
   baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash';
   advancedInstallCommandEl.textContent = `multiclaw up ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
+  uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   platformNoteEl.textContent = platformNotes[state.platform];
 }
 
@@ -67,6 +70,7 @@ async function copyWithFeedback(button, text, successText) {
 
 copyBaseButton.dataset.defaultLabel = 'Copy install';
 copyAdvancedButton.dataset.defaultLabel = 'Copy advanced start';
+copyUninstallButton.dataset.defaultLabel = 'Copy uninstall';
 
 copyBaseButton.addEventListener('click', async () => {
   await copyWithFeedback(copyBaseButton, baseInstallCommandEl.textContent, 'Copied');
@@ -74,6 +78,10 @@ copyBaseButton.addEventListener('click', async () => {
 
 copyAdvancedButton.addEventListener('click', async () => {
   await copyWithFeedback(copyAdvancedButton, advancedInstallCommandEl.textContent, 'Copied');
+});
+
+copyUninstallButton.addEventListener('click', async () => {
+  await copyWithFeedback(copyUninstallButton, uninstallCommandEl.textContent, 'Copied');
 });
 
 renderCommand();

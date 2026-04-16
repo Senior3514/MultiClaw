@@ -1,0 +1,11 @@
+{
+  "productOrigin": "Existing product",
+  "autonomyMode": "Operator-assisted",
+  "projectName": "FlowPilot",
+  "description": "An existing product that needs stronger internal structure, routing, and execution.",
+  "audience": "Software teams",
+  "businessModel": "SaaS",
+  "stage": "Growth",
+  "topGoals": "Improve onboarding, improve retention, improve release quality",
+  "tone": "Clean, decisive, technical"
+}

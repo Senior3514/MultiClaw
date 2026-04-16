@@ -151,6 +151,7 @@ Technical USP direction:
 - run across web, CLI, and channel surfaces
 - stay provider-flexible and access-flexible
 - expand company structure autonomously inside the runtime
+- keep protection and secure defaults inside the product DNA
 
 If you want to separate config from start:
 

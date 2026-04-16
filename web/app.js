@@ -35,6 +35,9 @@ const PRESETS = {
   },
 };
 
+let currentStep = 1;
+const totalSteps = 3;
+
 function renderBrand(data) {
   const rows = [
     ['Project', data.projectName],
@@ -135,6 +138,21 @@ function applyPreset(name) {
   setStatus(`Preset loaded: ${preset.projectName}`, 'idle');
 }
 
+function renderWizard() {
+  document.querySelectorAll('.wizard-step').forEach((step) => {
+    step.classList.toggle('active', Number(step.dataset.step) === currentStep);
+  });
+
+  document.querySelectorAll('.wizard-dot').forEach((dot, index) => {
+    dot.classList.toggle('active', index + 1 <= currentStep);
+  });
+
+  el('stepLabel').textContent = `Step ${currentStep} of ${totalSteps}`;
+  el('backBtn').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
+  el('nextBtn').classList.toggle('hidden-link', currentStep === totalSteps);
+  el('generateBtn').classList.toggle('hidden-link', currentStep !== totalSteps);
+}
+
 async function generateCompany() {
   const button = el('generateBtn');
   const original = button.textContent;
@@ -147,26 +165,44 @@ async function generateCompany() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(getFormData()),
+      credentials: 'same-origin',
     });
 
     if (!response.ok) {
-      throw new Error(`Generation failed with status ${response.status}`);
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || `Generation failed with status ${response.status}`);
     }
 
     const data = await response.json();
     applyResult(data);
   } catch (error) {
     console.error(error);
-    setStatus('Generation failed. Check the server log.', 'error');
-    alert('Generation failed. Check the server log.');
+    setStatus(error.message || 'Generation failed. Check the server log.', 'error');
+    alert(error.message || 'Generation failed. Check the server log.');
   } finally {
     button.textContent = original;
     button.disabled = false;
   }
 }
 
+el('nextBtn').addEventListener('click', () => {
+  if (currentStep < totalSteps) {
+    currentStep += 1;
+    renderWizard();
+  }
+});
+
+el('backBtn').addEventListener('click', () => {
+  if (currentStep > 1) {
+    currentStep -= 1;
+    renderWizard();
+  }
+});
+
 el('generateBtn').addEventListener('click', generateCompany);
 document.querySelectorAll('[data-preset]').forEach((button) => {
   button.addEventListener('click', () => applyPreset(button.dataset.preset));
 });
+
+renderWizard();
 generateCompany();

@@ -39,56 +39,65 @@
           <div class="panel form-panel">
             <div class="panel-head">
               <h2>Founder intake</h2>
-              <span>Step 1</span>
+              <span id="stepLabel">Step 1 of 3</span>
             </div>
 
-            <div class="preset-grid">
-              <button class="preset-btn" type="button" data-preset="saas">SaaS</button>
-              <button class="preset-btn" type="button" data-preset="revenue">Revenue Ops</button>
-              <button class="preset-btn" type="button" data-preset="marketplace">Marketplace</button>
+            <div class="wizard-progress">
+              <div class="wizard-dot active"></div>
+              <div class="wizard-dot"></div>
+              <div class="wizard-dot"></div>
             </div>
 
-            <label>
-              <span>Project name</span>
-              <input id="projectName" value="PulseBoard" />
-            </label>
+            <div class="wizard-step active" data-step="1">
+              <div class="preset-grid">
+                <button class="preset-btn" type="button" data-preset="saas">SaaS</button>
+                <button class="preset-btn" type="button" data-preset="revenue">Revenue Ops</button>
+                <button class="preset-btn" type="button" data-preset="marketplace">Marketplace</button>
+              </div>
+              <label>
+                <span>Project name</span>
+                <input id="projectName" value="PulseBoard" />
+              </label>
+              <label>
+                <span>What are you building?</span>
+                <textarea id="description">A premium AI operating layer for high-ticket service businesses.</textarea>
+              </label>
+            </div>
 
-            <label>
-              <span>What are you building?</span>
-              <textarea id="description">A premium AI operating layer for high-ticket service businesses.</textarea>
-            </label>
+            <div class="wizard-step" data-step="2">
+              <label>
+                <span>Target users</span>
+                <input id="audience" value="High-ticket service businesses" />
+              </label>
+              <label>
+                <span>Business model</span>
+                <input id="businessModel" value="SaaS with optional services" />
+              </label>
+              <label>
+                <span>Current stage</span>
+                <select id="stage">
+                  <option>MVP</option>
+                  <option selected>Growth</option>
+                  <option>Scale</option>
+                </select>
+              </label>
+            </div>
 
-            <label>
-              <span>Target users</span>
-              <input id="audience" value="High-ticket service businesses" />
-            </label>
+            <div class="wizard-step" data-step="3">
+              <label>
+                <span>Top goals</span>
+                <input id="topGoals" value="Ship faster, close customers, run like a company" />
+              </label>
+              <label>
+                <span>Preferred tone</span>
+                <input id="tone" value="Sharp, premium, operational" />
+              </label>
+            </div>
 
-            <label>
-              <span>Business model</span>
-              <input id="businessModel" value="SaaS with optional services" />
-            </label>
-
-            <label>
-              <span>Current stage</span>
-              <select id="stage">
-                <option>MVP</option>
-                <option selected>Growth</option>
-                <option>Scale</option>
-              </select>
-            </label>
-
-            <label>
-              <span>Top goals</span>
-              <input id="topGoals" value="Ship faster, close customers, run like a company" />
-            </label>
-
-            <label>
-              <span>Preferred tone</span>
-              <input id="tone" value="Sharp, premium, operational" />
-            </label>
-
-            <div class="actions">
-              <button id="generateBtn">Generate company</button>
+            <div class="wizard-actions">
+              <button id="backBtn" type="button" class="preset-btn">Back</button>
+              <button id="nextBtn" type="button">Next</button>
+              <button id="generateBtn" type="button" class="hidden-link">Generate company</button>
             </div>
           </div>
         </aside>

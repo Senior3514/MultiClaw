@@ -496,6 +496,37 @@ label span {
   border: 1px solid rgba(145, 163, 255, 0.12);
 }
 
+.wizard-progress {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.wizard-dot {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.wizard-dot.active {
+  background: linear-gradient(135deg, var(--primary), #3aa7ff);
+}
+
+.wizard-step {
+  display: none;
+  gap: 14px;
+}
+
+.wizard-step.active {
+  display: grid;
+}
+
+.wizard-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
 label {
   display: grid;
   gap: 8px;

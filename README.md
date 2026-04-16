@@ -129,6 +129,8 @@ Core product direction:
 - generate the company shape around it
 - communicate with agents from birth
 - operate proactively and reactively inside the company
+- study the environment and expand the company structure when needed
+- report upward through clean company hierarchy instead of raw orchestration noise
 
 Provider access direction:
 - direct API keys

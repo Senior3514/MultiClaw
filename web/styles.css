@@ -1781,39 +1781,39 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 230px;
-    width: min(100%, 320px);
+    min-height: 270px;
+    width: min(100%, 360px);
     aspect-ratio: 1 / 1;
-    padding: 10px;
+    padding: 12px;
   }
 
   .graphic-core {
-    width: 144px;
-    height: 144px;
+    width: 160px;
+    height: 160px;
   }
 
   .graphic-avatar {
-    width: 68px;
-    height: 68px;
+    width: 76px;
+    height: 76px;
   }
 
   .graphic-core strong {
-    font-size: 16px;
+    font-size: 18px;
   }
 
   .orbit-a {
-    width: 148px;
-    height: 148px;
+    width: 162px;
+    height: 162px;
   }
 
   .orbit-b {
-    width: 190px;
-    height: 190px;
+    width: 208px;
+    height: 208px;
   }
 
   .orbit-c {
-    width: 102px;
-    height: 102px;
+    width: 114px;
+    height: 114px;
   }
 
   .graphic-node {

@@ -21,6 +21,8 @@ A user describes what they built, what they need, and what outcomes they want. M
 OpenClaw gives powerful agent infrastructure.
 MultiClaw takes that kind of capability and turns it into an original, user-owned, instantly deployable AI company.
 
+The simplest way to think about it is this: OpenClaw can feel like one powerful personal AI operator. MultiClaw should feel just as simple to start, but instead of one assistant it can generate one or more deep-context AI companies or AI arms around the exact products, repos, machines, or operating domains you care about.
+
 We do not need to clone the substrate experience. We reuse proven foundations, then take the company layer, operator layer, and product experience in our own direction.
 
 The user stays high-privilege.

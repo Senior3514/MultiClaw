@@ -56,12 +56,6 @@ It should become the best generator and orchestration layer on top of OpenClaw.
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 ```
 
-Or the lower-level install-only path:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
-```
-
 Then continue from inside the product.
 
 Quick start after install:
@@ -125,19 +119,6 @@ Technical direction:
 - keep protection and secure defaults inside the product DNA
 - operate proactively and optimize for quality, efficiency, and token awareness
 
-If you want to separate config from start:
-
-```bash
-npm run setup -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
-npm run start
-```
-
-You can also configure provider details directly:
-
-```bash
-node ./bin/multiclaw.js setup --tailscale --port 8813 --provider openai --model gpt-5.4 --api-key-env OPENAI_API_KEY
-```
-
 Inside the installed product, MultiClaw should guide the rest of the runtime, verification, and steering flow naturally.
 
 Generate a local example company:
@@ -152,11 +133,6 @@ Run the interactive initializer:
 npm run init
 ```
 
-For the isolated tailscale-only product preview:
-
-```bash
-bash ./ops/start_tailscale_only.sh
-```
 
 ## MVP outcome
 

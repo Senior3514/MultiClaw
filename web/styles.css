@@ -344,13 +344,18 @@ video {
   background: var(--panel-strong);
 }
 
+.landing-page .site-main > section {
+  width: min(100%, 1120px);
+  margin-inline: auto;
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 28px;
+  gap: 24px;
   align-items: center;
   justify-items: center;
-  padding-block: 28px;
+  padding-block: 24px;
 }
 
 .hero-copy h1 {
@@ -365,7 +370,7 @@ video {
   align-content: center;
   justify-items: center;
   text-align: center;
-  width: min(100%, 980px);
+  width: min(100%, 920px);
 }
 
 .landing-copy p {
@@ -462,8 +467,8 @@ video {
 .hero-graphic {
   position: relative;
   overflow: hidden;
-  min-height: clamp(400px, 62vw, 680px);
-  width: min(100%, 680px);
+  min-height: clamp(420px, 60vw, 700px);
+  width: min(100%, 720px);
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
@@ -1158,6 +1163,12 @@ video {
 .stack small,
 label span {
   color: var(--muted);
+}
+
+.landing-page .feature-card h2,
+.landing-page .logic-card strong,
+.landing-page .section-heading h2 {
+  letter-spacing: -0.02em;
 }
 
 .status-banner {

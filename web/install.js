@@ -29,7 +29,9 @@ const bindModeNotes = {
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
   baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
-  advancedInstallCommandEl.textContent = `multiclaw up ${bindFlag} --provider ${state.provider} --model ${state.model} --api-key-env ${state.apiKeyEnv} --api-key YOUR_KEY`;
+  if (advancedInstallCommandEl) {
+    advancedInstallCommandEl.textContent = `Continue inside MultiClaw after install. Bind: ${state.bind}. Provider: ${state.provider}.`;
+  }
   uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   platformNoteEl.textContent = platformNotes[state.platform];
   bindModeNoteEl.textContent = bindModeNotes[state.bind];
@@ -76,16 +78,18 @@ async function copyWithFeedback(button, text, successText) {
 }
 
 copyBaseButton.dataset.defaultLabel = 'Copy install';
-copyAdvancedButton.dataset.defaultLabel = 'Copy advanced start';
+if (copyAdvancedButton) copyAdvancedButton.dataset.defaultLabel = 'Copy advanced start';
 copyUninstallButton.dataset.defaultLabel = 'Copy uninstall';
 
 copyBaseButton.addEventListener('click', async () => {
   await copyWithFeedback(copyBaseButton, baseInstallCommandEl.textContent, 'Copied');
 });
 
-copyAdvancedButton.addEventListener('click', async () => {
-  await copyWithFeedback(copyAdvancedButton, advancedInstallCommandEl.textContent, 'Copied');
-});
+if (copyAdvancedButton && advancedInstallCommandEl) {
+  copyAdvancedButton.addEventListener('click', async () => {
+    await copyWithFeedback(copyAdvancedButton, advancedInstallCommandEl.textContent, 'Copied');
+  });
+}
 
 copyUninstallButton.addEventListener('click', async () => {
   await copyWithFeedback(copyUninstallButton, uninstallCommandEl.textContent, 'Copied');

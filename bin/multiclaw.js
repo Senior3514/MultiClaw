@@ -399,7 +399,7 @@ async function upRuntime() {
   await startRuntime(config.bind);
 }
 
-async function printStatus() {
+async function getRuntimeSnapshot() {
   const config = await loadRuntimeConfig();
   const running = await fs.readFile(pidPath, 'utf8').then((value) => value.trim()).catch(() => null);
   const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
@@ -412,6 +412,13 @@ async function printStatus() {
     ? spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', healthUrl], { encoding: 'utf8' })
     : null;
 
+  return { config, running, bind, host, port, url, health };
+}
+
+async function printStatus() {
+  const snapshot = await getRuntimeSnapshot();
+  const { config, running, bind, port, url, health } = snapshot;
+
   console.log('MultiClaw runtime status');
   console.log(`- bind: ${bind}`);
   console.log(`- port: ${port}`);
@@ -423,6 +430,30 @@ async function printStatus() {
   console.log(`- pid: ${running || 'not running'}`);
   console.log(`- url: ${url}`);
   console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
+}
+
+async function verifyRuntime() {
+  await printDoctor();
+  console.log('');
+  await printStatus();
+  console.log('');
+
+  const snapshot = await getRuntimeSnapshot();
+  if (!snapshot.running) {
+    console.log('MultiClaw verify');
+    console.log('- smoke: skipped (runtime not started)');
+    return;
+  }
+
+  console.log('MultiClaw verify');
+  const smoke = spawnSync('bash', [path.join(repoRoot, 'scripts', 'e2e-smoke.sh'), snapshot.url.replace(/\/$/, '')], {
+    cwd: repoRoot,
+    stdio: 'inherit',
+  });
+
+  if (smoke.status !== 0) {
+    process.exitCode = smoke.status || 1;
+  }
 }
 
 function printGuide() {
@@ -532,6 +563,7 @@ Usage:
   multiclaw guide
   multiclaw walkthrough
   multiclaw doctor
+  multiclaw verify
   multiclaw init
   multiclaw init --demo
   multiclaw configure
@@ -546,6 +578,7 @@ Notes:
   - guide prints the clean step-by-step setup flow
   - walkthrough prints the full command walkthrough
   - doctor checks the local environment for the core runtime prerequisites
+  - verify runs doctor, status, and the end-to-end smoke flow when the runtime is up
   - init generates a company package under ./generated/
   - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
@@ -574,6 +607,11 @@ async function main() {
 
   if (command === 'doctor') {
     await printDoctor();
+    return;
+  }
+
+  if (command === 'verify') {
+    await verifyRuntime();
     return;
   }
 

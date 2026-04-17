@@ -135,6 +135,48 @@ def update_company_execution_state(company_id: str, company=None):
     return state
 
 
+def run_company_cycle(company_id: str, company=None):
+    company = company or load_company(company_id)
+    if company is None:
+        return None
+
+    events = load_company_events(company_id)
+    cycle_number = sum(1 for event in events if event.get("kind") == "execution-cycle") + 1
+    state = read_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", None) or build_execution_state(company, events)
+    focus = state.get("focus") or (company.get("nextSteps") or company.get("missions") or ["Await first operator instruction."])[0]
+    mission = (company.get("missions") or ["No mission declared yet."])[0]
+    next_step = (company.get("nextSteps") or ["No next step declared yet."])[0]
+    artifact_name = f"CYCLE-{cycle_number:03}.md"
+    cycle_time = now_utc()
+
+    (GENERATED_ROOT / company_id / artifact_name).write_text(
+        f"# Execution Cycle {cycle_number}\n\n"
+        f"- Company: {company.get('projectName', company_id)}\n"
+        f"- Cycle: {cycle_number}\n"
+        f"- Generated at: {cycle_time}\n"
+        f"- Focus: {focus}\n"
+        f"- Primary mission: {mission}\n"
+        f"- Recommended next action: {next_step}\n",
+        encoding="utf-8",
+    )
+
+    append_company_event(
+        company_id,
+        "execution-cycle",
+        f"Execution cycle {cycle_number}",
+        f"Advanced the company around: {focus}",
+        {"cycleNumber": cycle_number, "artifact": artifact_name, "focus": focus},
+    )
+    state = update_company_execution_state(company_id, company)
+    return {
+        "cycleNumber": cycle_number,
+        "artifact": artifact_name,
+        "focus": focus,
+        "status": state.get("status") if state else "active",
+        "summary": state.get("summary") if state else "Execution cycle completed.",
+    }
+
+
 def hash_password(password: str, salt_hex: str) -> str:
     salt = bytes.fromhex(salt_hex)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200_000)
@@ -844,6 +886,21 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if token:
                 delete_session(token)
             self.send_json(200, {"ok": True}, f"{SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax")
+            return
+
+        if self.path.startswith("/api/company/") and self.path.endswith("/cycle"):
+            if not self.require_session():
+                return
+            try:
+                company_id = self.path.split("/api/company/", 1)[1].split("/cycle", 1)[0].strip()
+                company = load_company(company_id)
+                if company is None:
+                    self.send_json(404, {"error": "company not found"})
+                    return
+                result = run_company_cycle(company_id, company)
+                self.send_json(200, result)
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/ask"):

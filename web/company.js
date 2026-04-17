@@ -22,6 +22,8 @@ const eventsEl = document.getElementById('companyEvents');
 const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
 const refineCompanyBtn = document.getElementById('refineCompanyBtn');
+const runCompanyCycleBtn = document.getElementById('runCompanyCycleBtn');
+const companyCycleResult = document.getElementById('companyCycleResult');
 const companyAskInput = document.getElementById('companyAskInput');
 const companyAskBtn = document.getElementById('companyAskBtn');
 const companyAskResult = document.getElementById('companyAskResult');
@@ -195,6 +197,46 @@ function renderAskResult(result) {
   `;
 }
 
+function renderCycleResult(result) {
+  return `
+    <div class="mission-card">
+      <small>Cycle ${result.cycleNumber}</small>
+      <strong>${result.focus}</strong>
+      <p>${result.summary} Artifact: ${result.artifact}</p>
+    </div>
+  `;
+}
+
+async function runCompanyCycle() {
+  if (!runCompanyCycleBtn) return;
+
+  runCompanyCycleBtn.disabled = true;
+  if (companyCycleResult) {
+    companyCycleResult.innerHTML = '<div class="route-card"><strong>Running cycle...</strong><p>Advancing the company execution loop.</p></div>';
+  }
+
+  try {
+    const response = await fetch(`/api/company/${encodeURIComponent(companyId)}/cycle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Failed with status ${response.status}`);
+    if (companyCycleResult) {
+      companyCycleResult.innerHTML = renderCycleResult(result);
+    }
+    await loadCompany();
+  } catch (error) {
+    console.error(error);
+    if (companyCycleResult) {
+      companyCycleResult.innerHTML = '<div class="route-card"><strong>Cycle failed</strong><p>The company could not advance this execution cycle.</p></div>';
+    }
+  } finally {
+    runCompanyCycleBtn.disabled = false;
+  }
+}
+
 async function askCompany() {
   const prompt = companyAskInput?.value?.trim();
   if (!prompt) return;
@@ -272,6 +314,7 @@ async function loadCompany() {
   }
 }
 
+runCompanyCycleBtn?.addEventListener('click', runCompanyCycle);
 companyAskBtn?.addEventListener('click', askCompany);
 companyAskInput?.addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {

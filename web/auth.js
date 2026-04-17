@@ -1,4 +1,39 @@
 const SESSION_KEY = 'multiclaw-session';
+const THEME_KEY = 'multiclaw-theme';
+
+function getStoredTheme() {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored === 'light' || stored === 'dark') return stored;
+  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+}
+
+export function applyTheme(theme = getStoredTheme()) {
+  document.body?.classList.toggle('light-theme', theme === 'light');
+  localStorage.setItem(THEME_KEY, theme);
+  document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    button.textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
+  });
+}
+
+export function toggleTheme() {
+  applyTheme(document.body?.classList.contains('light-theme') ? 'dark' : 'light');
+}
+
+export function bindThemeToggles(scope = document) {
+  scope.querySelectorAll('[data-theme-toggle]').forEach((button) => {
+    button.onclick = () => toggleTheme();
+  });
+  applyTheme();
+}
+
+export function mountThemeToggleOnly() {
+  const sessionArea = document.getElementById('sessionArea');
+  if (!sessionArea || sessionArea.children.length) return;
+  sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button></div>';
+  bindThemeToggles(sessionArea);
+}
+
+applyTheme();
 
 function setLocalSession(email) {
   localStorage.setItem(SESSION_KEY, JSON.stringify({ email, signedInAt: new Date().toISOString() }));
@@ -99,7 +134,8 @@ export function mountSession() {
 
   const session = getSession();
   if (!session?.email) {
-    sessionArea.innerHTML = '<a class="button-link secondary" href="./login.html">Log in</a>';
+    sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./login.html">Log in</a></div>';
+    bindThemeToggles(sessionArea);
     return;
   }
 
@@ -107,9 +143,12 @@ export function mountSession() {
     <div class="session-chip">
       <span class="status-dot"></span>
       <span>${session.email}</span>
+      <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
       <button id="logoutBtn" type="button">Log out</button>
     </div>
   `;
+
+  bindThemeToggles(sessionArea);
 
   document.getElementById('logoutBtn')?.addEventListener('click', async () => {
     await logOut();

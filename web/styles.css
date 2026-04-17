@@ -36,6 +36,21 @@ body {
   color: var(--text);
 }
 
+body.light-theme {
+  --bg: #f6fbfb;
+  --panel: rgba(255, 255, 255, 0.88);
+  --panel-strong: rgba(245, 252, 251, 0.96);
+  --line: rgba(86, 212, 209, 0.18);
+  --text: #112127;
+  --muted: #56727b;
+  background:
+    radial-gradient(circle at top left, rgba(243, 74, 120, 0.12), transparent 30%),
+    radial-gradient(circle at top right, rgba(86, 212, 209, 0.12), transparent 26%),
+    radial-gradient(circle at 50% 0%, rgba(247, 215, 160, 0.18), transparent 22%),
+    linear-gradient(180deg, #f8fcfc 0%, #eef7f7 100%);
+  color: var(--text);
+}
+
 body.auth-pending .site-shell {
   visibility: hidden;
 }
@@ -59,6 +74,12 @@ body.auth-pending .site-shell {
   position: sticky;
   top: 0;
   z-index: 10;
+}
+
+body.light-theme .site-header {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 250, 250, 0.84)),
+    rgba(246, 251, 251, 0.82);
 }
 
 .site-main {
@@ -1448,6 +1469,19 @@ button:hover {
   padding: 18px;
   font-size: 14px;
   line-height: 1.6;
+}
+
+body.light-theme .install-command,
+body.light-theme .choice-card,
+body.light-theme .provider-card,
+body.light-theme .metric-card,
+body.light-theme .logic-card,
+body.light-theme .feature-card,
+body.light-theme .route-card,
+body.light-theme .panel,
+body.light-theme .panel-strong {
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--text);
 }
 
 .install-notes {

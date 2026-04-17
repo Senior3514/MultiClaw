@@ -1,4 +1,4 @@
-import { hasServerSession } from './auth.js';
+import { hasServerSession, mountThemeToggleOnly } from './auth.js';
 
 const tryGeneratorBtn = document.getElementById('tryGeneratorBtn');
 const openWorkspaceBtn = document.getElementById('openWorkspaceBtn');
@@ -54,6 +54,7 @@ document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) 
 });
 
 renderHomeInstallCommand();
+mountThemeToggleOnly();
 
 const session = await hasServerSession();
 

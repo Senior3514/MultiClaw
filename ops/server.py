@@ -277,6 +277,15 @@ def build_contact_surfaces():
     ]
 
 
+def parse_existing_assets(raw_value: str):
+    assets = []
+    for line in (raw_value or "").splitlines():
+        line = line.strip()
+        if line:
+            assets.append(line)
+    return assets
+
+
 def build_company_reply(company, prompt: str):
     prompt = (prompt or "").strip()
     prompt_lower = prompt.lower()
@@ -409,6 +418,7 @@ def generate_company(payload):
     tone = payload.get("tone", "Sharp, premium, operational").strip()
     role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
     custom_roles = payload.get("customRoles", "")
+    existing_assets = parse_existing_assets(payload.get("existingAssets", ""))
 
     archetype = infer_archetype(business_model, description)
     roles = build_roles(archetype, role_template, custom_roles)
@@ -432,6 +442,7 @@ def generate_company(payload):
         "tone": tone,
         "roleTemplate": role_template,
         "customRoles": custom_roles,
+        "existingAssets": existing_assets,
         "topGoals": top_goals,
         "archetype": archetype,
         "roles": roles,
@@ -490,6 +501,10 @@ def generate_company(payload):
     )
     (output_dir / "NEXT-STEPS.md").write_text(
         "# Next Steps\n\n" + "\n".join([f"- {step}" for step in next_steps]),
+        encoding="utf-8",
+    )
+    (output_dir / "EXISTING-ASSETS.md").write_text(
+        "# Existing Assets\n\n" + ("\n".join([f"- {asset}" for asset in existing_assets]) if existing_assets else "- None provided yet."),
         encoding="utf-8",
     )
     (output_dir / "CONTACT-SURFACES.md").write_text(

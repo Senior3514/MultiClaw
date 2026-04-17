@@ -11,6 +11,7 @@ const PRESETS = {
     autonomyMode: 'Operator-assisted',
     projectName: 'FlowPilot',
     description: 'A premium AI workflow platform for software teams.',
+    existingAssets: '',
     audience: 'Software teams',
     businessModel: 'SaaS',
     stage: 'Growth',
@@ -24,6 +25,7 @@ const PRESETS = {
     autonomyMode: 'Full autonomous',
     projectName: 'CloseForge',
     description: 'An AI revenue operations layer for high-ticket service businesses.',
+    existingAssets: 'CRM\nFollow-up system',
     audience: 'High-ticket service businesses',
     businessModel: 'SaaS with optional services',
     stage: 'Growth',
@@ -37,6 +39,7 @@ const PRESETS = {
     autonomyMode: 'Operator-assisted',
     projectName: 'MatchGrid',
     description: 'A premium marketplace that coordinates supply, demand, and operations with AI.',
+    existingAssets: '',
     audience: 'Marketplace operators',
     businessModel: 'Marketplace',
     stage: 'MVP',
@@ -115,6 +118,7 @@ function getFormData() {
     autonomyMode: el('autonomyMode').value,
     projectName: el('projectName').value.trim() || 'Untitled Project',
     description: el('description').value.trim(),
+    existingAssets: el('existingAssets').value.trim(),
     audience: el('audience').value.trim(),
     businessModel: el('businessModel').value.trim(),
     stage: el('stage').value,
@@ -162,6 +166,7 @@ function applyPreset(name) {
   el('autonomyMode').value = preset.autonomyMode;
   el('projectName').value = preset.projectName;
   el('description').value = preset.description;
+  if (typeof preset.existingAssets === 'string') el('existingAssets').value = preset.existingAssets;
   el('audience').value = preset.audience;
   el('businessModel').value = preset.businessModel;
   el('stage').value = preset.stage;

@@ -9,6 +9,7 @@ const companyId = params.get('id');
 const titleEl = document.getElementById('companyTitle');
 const statusEl = document.getElementById('companyStatus');
 const overviewEl = document.getElementById('companyOverview');
+const assetsEl = document.getElementById('companyAssets');
 const soulEl = document.getElementById('companySoul');
 const routingEl = document.getElementById('companyRouting');
 const contactSurfacesEl = document.getElementById('companyContactSurfaces');
@@ -33,6 +34,16 @@ function renderRows(rows) {
       <small>${label}</small>
       <strong>${value}</strong>
       <p>Generated company metadata.</p>
+    </div>
+  `).join('');
+}
+
+function renderAssets(assets) {
+  const list = assets?.length ? assets : ['No attached claws or systems declared yet.'];
+  return list.map((asset) => `
+    <div class="route-card">
+      <strong>${asset}</strong>
+      <p>Imported into the company context as an existing claw, system, or asset.</p>
     </div>
   `).join('');
 }
@@ -186,6 +197,7 @@ async function loadCompany() {
       ['Stage', company.stage],
       ['Generated', company.generatedAt],
     ]);
+    assetsEl.innerHTML = renderAssets(company.existingAssets);
     soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);
     contactSurfacesEl.innerHTML = renderContactSurfaces(company.contactSurfaces);

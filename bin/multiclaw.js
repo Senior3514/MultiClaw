@@ -227,7 +227,7 @@ async function collectInput() {
       stage: 'MVP',
       topGoals: 'ship MVP, prove value, close first users',
       tone: 'sharp, premium, operational',
-      techStack: 'TypeScript, Node.js, OpenClaw, web dashboard',
+      techStack: 'TypeScript, Node.js, MultiClaw runtime, web dashboard',
       channels: 'web, Telegram, email',
       riskSensitivity: 'high',
     };

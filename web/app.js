@@ -51,6 +51,8 @@ const PRESETS = {
 };
 
 const SETTINGS_KEY = 'multiclaw-settings';
+const params = new URLSearchParams(window.location.search);
+const companyIdToRefine = params.get('companyId');
 let currentStep = 1;
 const totalSteps = 3;
 
@@ -177,6 +179,35 @@ function applyPreset(name) {
   setStatus(`Preset loaded: ${preset.projectName}`, 'idle');
 }
 
+function fillForm(data) {
+  if (data.productOrigin) el('productOrigin').value = data.productOrigin;
+  if (data.autonomyMode) el('autonomyMode').value = data.autonomyMode;
+  if (data.projectName) el('projectName').value = data.projectName;
+  if (data.description) el('description').value = data.description;
+  if (Array.isArray(data.existingAssets)) el('existingAssets').value = data.existingAssets.join('\n');
+  if (data.audience) el('audience').value = data.audience;
+  if (data.businessModel) el('businessModel').value = data.businessModel;
+  if (data.stage) el('stage').value = data.stage;
+  if (data.topGoals) el('topGoals').value = data.topGoals;
+  if (data.tone) el('tone').value = data.tone;
+  if (data.roleTemplate) el('roleTemplate').value = data.roleTemplate;
+  if (typeof data.customRoles === 'string') el('customRoles').value = data.customRoles;
+}
+
+async function loadCompanyForRefinement() {
+  if (!companyIdToRefine) return;
+  try {
+    const response = await fetch(`/api/company/${encodeURIComponent(companyIdToRefine)}`);
+    if (!response.ok) throw new Error(`Failed with status ${response.status}`);
+    const company = await response.json();
+    fillForm(company);
+    setStatus(`Loaded ${company.projectName} for refinement.`, 'idle');
+  } catch (error) {
+    console.error(error);
+    setStatus('Could not load company for refinement.', 'error');
+  }
+}
+
 function renderWizard() {
   document.querySelectorAll('.wizard-step').forEach((step) => {
     step.classList.toggle('active', Number(step.dataset.step) === currentStep);
@@ -248,3 +279,4 @@ if (savedSettings.defaultProductOrigin) el('productOrigin').value = savedSetting
 if (savedSettings.defaultAutonomyMode) el('autonomyMode').value = savedSettings.defaultAutonomyMode;
 
 renderWizard();
+await loadCompanyForRefinement();

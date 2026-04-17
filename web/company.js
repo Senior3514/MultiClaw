@@ -19,6 +19,7 @@ const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
 const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
+const refineCompanyBtn = document.getElementById('refineCompanyBtn');
 const companyAskInput = document.getElementById('companyAskInput');
 const companyAskBtn = document.getElementById('companyAskBtn');
 const companyAskResult = document.getElementById('companyAskResult');
@@ -178,6 +179,9 @@ async function loadCompany() {
   try {
     if (downloadCompanyPackBtn) {
       downloadCompanyPackBtn.href = `/api/company/${encodeURIComponent(companyId)}/download`;
+    }
+    if (refineCompanyBtn) {
+      refineCompanyBtn.href = `./generator.html?companyId=${encodeURIComponent(companyId)}`;
     }
 
     const response = await fetch(`/api/company/${encodeURIComponent(companyId)}`);

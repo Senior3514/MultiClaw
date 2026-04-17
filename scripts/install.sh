@@ -141,6 +141,6 @@ if [[ "$auto_flags" == "1" ]]; then
   "${CMD[@]}"
 
   echo
-  echo "Runtime status:"
-  multiclaw status
+  echo "Runtime verification:"
+  multiclaw verify
 fi

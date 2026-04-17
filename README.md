@@ -99,7 +99,7 @@ Or with OpenRouter:
 multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
 ```
 
-Or, if you want to install and start in one go:
+Or, if you want to install, start, and verify in one go:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --start --provider openai --model gpt-5.4 --api-key YOUR_KEY

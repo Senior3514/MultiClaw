@@ -93,7 +93,7 @@ auto_start() {
   printf '%q ' "${CMD[@]}"
   printf '\n'
   "${CMD[@]}"
-  multiclaw status
+  multiclaw verify
 }
 
 if [[ "$START_NOW" == "1" ]]; then

@@ -1,6 +1,7 @@
 generated/
 generated-live/
 .multiclaw/
+.claude/
 ops/*.log
 ops/*.pid
 ops/*.state.json

@@ -19,7 +19,6 @@
         <nav class="site-nav">
           <a href="./index.html">Home</a>
           <a href="./install.html">Install</a>
-          <a href="./walkthrough.html">Walkthrough</a>
           <a href="./dashboard.html">Open workspace</a>
           <a href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">GitHub</a>
           <a href="./platform.html">Platform</a>
@@ -32,8 +31,8 @@
           <div class="section-heading">
             <div>
               <div class="eyebrow">One-command install</div>
-              <h1>Install MultiClaw like a real product.</h1>
-              <p>Copy one calm base command first. Layer provider, runtime, and extra surfaces after the base product is already in place.</p>
+              <h1>Install MultiClaw in one calm step.</h1>
+              <p>Use the base command first. Deeper setup happens after the product is already in place.</p>
             </div>
           </div>
         </section>
@@ -62,33 +61,9 @@
           </div>
         </section>
 
-        <section class="panel section-block landing-section">
-          <div class="section-heading">
-            <div>
-              <div class="eyebrow">Categories</div>
-              <h2>What gets configured when.</h2>
-              <p>The foundation stays simple. More advanced surfaces come in clearly separated groups.</p>
-            </div>
-          </div>
-          <div class="logic-grid steps-grid">
-            <div class="logic-card hover-lift">
-              <strong>Core runtime</strong>
-              <p>Provider, model, API key, and local or Tailscale bind.</p>
-            </div>
-            <div class="logic-card hover-lift">
-              <strong>Access and networking</strong>
-              <p>Private access, VPN surfaces, and later stronger identity controls.</p>
-            </div>
-            <div class="logic-card hover-lift">
-              <strong>Channels and integrations</strong>
-              <p>Telegram, Discord, Slack, and future integrations after the base runtime is working.</p>
-            </div>
-          </div>
-        </section>
-
         <section class="grid-two install-grid">
           <article class="panel install-panel">
-            <div class="eyebrow">Optional runtime choices</div>
+            <div class="eyebrow">Install target</div>
             <div class="choice-grid" id="platformChoices">
               <button class="choice-card selected" data-platform="ubuntu">Ubuntu / VPS</button>
               <button class="choice-card" data-platform="macos">macOS</button>
@@ -101,25 +76,7 @@
               <button class="choice-card" data-bind="local">Local only</button>
             </div>
 
-            <div class="eyebrow install-subtitle">Provider</div>
-            <div class="provider-grid" id="providerChoices">
-              <button class="provider-card selected" data-provider="openai" data-model="gpt-5.4" data-key-env="OPENAI_API_KEY">
-                <strong>OpenAI</strong>
-                <span>Best current default</span>
-              </button>
-              <button class="provider-card" data-provider="anthropic" data-model="claude-sonnet-4-5" data-key-env="ANTHROPIC_API_KEY">
-                <strong>Anthropic</strong>
-                <span>Claude-based runtime</span>
-              </button>
-              <button class="provider-card" data-provider="google" data-model="gemini-2.5-pro" data-key-env="GOOGLE_API_KEY">
-                <strong>Google</strong>
-                <span>Gemini-based runtime</span>
-              </button>
-              <button class="provider-card" data-provider="openrouter" data-model="openai/gpt-5.4" data-key-env="OPENROUTER_API_KEY">
-                <strong>OpenRouter</strong>
-                <span>Provider-flexible routing</span>
-              </button>
-            </div>
+            <p class="install-subtitle">Choose the machine style now. Configure provider and runtime later inside the product flow.</p>
           </article>
 
           <article class="panel panel-strong install-panel">
@@ -128,21 +85,19 @@
             <pre class="install-command" id="baseInstallCommand"></pre>
             <div class="cta-row">
               <button class="button-link primary button-reset" id="copyBaseInstallCommand">Copy install</button>
-              <a class="button-link secondary" href="./walkthrough.html">Open walkthrough</a>
+              <a class="button-link secondary" href="./dashboard.html">Open workspace</a>
               <a class="button-link secondary" href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">Open GitHub</a>
             </div>
             <div class="install-notes">
               <p id="platformNote">Ubuntu/VPS is the cleanest path right now.</p>
               <p id="bindModeNote">Local mode should feel simple and direct. Tailscale mode should feel protected and shareable.</p>
-              <p>This bootstraps MultiClaw from one file, gives you the `multiclaw` command, and keeps the foundation simple.</p>
-              <p>MultiClaw is a standalone product. It is not tied to our own VPS, and anyone should be able to take it from GitHub and run it on their own machine or VPS.</p>
+              <p>This gives you the base product and the `multiclaw` command with minimal friction.</p>
+              <p>MultiClaw is a standalone product. Anyone should be able to take it from GitHub and run it on their own machine or VPS.</p>
               <p>Default private install flow is single-user and should not force signup or email friction on your own VPS.</p>
-              <p>The provider and runtime choices on the left are optional follow-up decisions, not part of the first calm install step.</p>
-              <p>After install, run <code>multiclaw guide</code> or <code>multiclaw walkthrough</code>, then add provider/runtime choices cleanly.</p>
             </div>
             <div class="eyebrow">Step 2</div>
             <h3>Then continue inside MultiClaw.</h3>
-            <p class="install-note-strong">Provider, runtime, skills, and deeper options should be configured from the in-product flow after the base install, not exposed as public install commands.</p>
+            <p>Provider, runtime, skills, and deeper options should be configured after the base install, not exposed as public install commands.</p>
             <div class="eyebrow">Uninstall</div>
             <pre class="install-command" id="uninstallCommand"></pre>
             <div class="cta-row">

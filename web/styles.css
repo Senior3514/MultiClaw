@@ -617,7 +617,7 @@ video {
 .graphic-node {
   position: absolute;
   inset: 50% auto auto 50%;
-  padding: 10px 14px;
+  padding: 8px 12px;
   z-index: 4;
   border-radius: 999px;
   background: rgba(10, 24, 31, 0.94);
@@ -627,8 +627,29 @@ video {
   transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
+  white-space: nowrap;
 }
+
+.graphic-spark {
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  z-index: 2;
+  background: radial-gradient(circle, rgba(247, 215, 160, 0.95), rgba(86, 212, 209, 0.28) 58%, transparent 72%);
+  box-shadow: 0 0 18px rgba(86, 212, 209, 0.22);
+  transform: translate(-50%, -50%);
+  animation: sparkPulse 4.2s ease-in-out infinite;
+}
+
+.spark-1 { transform: translate(-50%, -50%) rotate(20deg) translateY(-178px); }
+.spark-2 { transform: translate(-50%, -50%) rotate(78deg) translateY(-184px); }
+.spark-3 { transform: translate(-50%, -50%) rotate(138deg) translateY(-176px); }
+.spark-4 { transform: translate(-50%, -50%) rotate(198deg) translateY(-182px); }
+.spark-5 { transform: translate(-50%, -50%) rotate(258deg) translateY(-178px); }
+.spark-6 { transform: translate(-50%, -50%) rotate(318deg) translateY(-184px); }
 
 .claw-dot {
   width: 26px;
@@ -1426,6 +1447,11 @@ button:hover {
   to { transform: translate(-50%, -50%) rotate(585deg) translateY(-150px) rotate(-585deg); }
 }
 
+@keyframes sparkPulse {
+  0%, 100% { opacity: 0.45; }
+  50% { opacity: 1; }
+}
+
 @keyframes pulseDot {
   0% {
     box-shadow: 0 0 0 0 rgba(46, 215, 189, 0.42);
@@ -1791,8 +1817,20 @@ body.light-theme .panel-strong {
   }
 
   .graphic-node {
-    font-size: 10px;
-    padding: 6px 8px;
+    font-size: 9px;
+    padding: 5px 7px;
+    gap: 5px;
+  }
+
+  .claw-dot {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+
+  .graphic-spark {
+    width: 8px;
+    height: 8px;
   }
 
   .landing-cards .feature-card,

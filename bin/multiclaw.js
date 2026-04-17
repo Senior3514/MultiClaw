@@ -543,16 +543,13 @@ function printGuide() {
   console.log(`MultiClaw guide
 
 1. Install the base product
-   curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 
-2. Open the guided runtime setup
-   multiclaw configure
+2. Start the runtime
+   multiclaw start
 
-3. Start the runtime
-   multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
-
-   Or with OpenRouter:
-   multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+3. Verify the runtime
+   multiclaw verify
 
 4. Check status
    multiclaw status
@@ -565,13 +562,11 @@ function printWalkthrough() {
   console.log(`MultiClaw walkthrough
 
 Base install:
-  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 
 Then:
-  multiclaw walkthrough
-  multiclaw configure
-  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
-  multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+  multiclaw start
+  multiclaw verify
   multiclaw status
   multiclaw stop
 

@@ -496,8 +496,15 @@ async function printDoctor() {
     console.log(`- path ${path.relative(repoRoot, requiredPath)}: ${exists ? 'ok' : 'missing'}`);
   }
 
-  const generatedRootWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(path.join(repoRoot, 'generated-live'))}' ]`]);
-  console.log(`- generated-live writable: ${generatedRootWritable.status === 0 ? 'yes' : 'no or missing'}`);
+  const generatedRootPath = path.join(repoRoot, 'generated-live');
+  const generatedRootExists = await fs.access(generatedRootPath).then(() => true).catch(() => false);
+  if (generatedRootExists) {
+    const generatedRootWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(generatedRootPath)}' ]`]);
+    console.log(`- generated-live writable: ${generatedRootWritable.status === 0 ? 'yes' : 'no'}`);
+  } else {
+    const repoWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(repoRoot)}' ]`]);
+    console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
+  }
 
   const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   if (state?.url) {

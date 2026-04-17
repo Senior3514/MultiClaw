@@ -640,7 +640,7 @@ video {
 }
 
 .floating-core {
-  animation: floatY 6.2s ease-in-out infinite;
+  animation: floatCentered 6.2s ease-in-out infinite;
   will-change: transform;
 }
 
@@ -1322,6 +1322,11 @@ button:hover {
 @keyframes floatY {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes floatCentered {
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-8px); }
 }
 
 @keyframes fadeUp {

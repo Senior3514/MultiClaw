@@ -23,7 +23,7 @@ if (sessionArea) {
           <span class="status-dot"></span>
           <span>${healthLabel}</span>
           <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
-          <a class="button-link secondary" href="./dashboard.html">Dashboard</a>
+          <a class="button-link secondary" href="./dashboard.html">Workspace</a>
           <button id="publicLogoutBtn" type="button">Log out</button>
         </div>
       `;
@@ -37,7 +37,7 @@ if (sessionArea) {
   } else {
     sessionArea.innerHTML = isLanding
       ? `<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>`
-      : `<div class="session-chip"><span class="status-dot"></span><span>${healthLabel}</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./login.html">Log in</a></div>`;
+      : `<div class="session-chip"><span class="status-dot"></span><span>${healthLabel}</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>`;
     bindThemeToggles(sessionArea);
   }
 }

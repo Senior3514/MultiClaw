@@ -134,7 +134,7 @@ export function mountSession() {
 
   const session = getSession();
   if (!session?.email) {
-    sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./login.html">Log in</a></div>';
+    sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>';
     bindThemeToggles(sessionArea);
     return;
   }

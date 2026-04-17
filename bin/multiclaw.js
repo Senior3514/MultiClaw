@@ -19,6 +19,7 @@ const runtimeConfigPath = path.join(runtimeDir, 'config.json');
 const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
 const pidPath = path.join(repoRoot, 'ops', 'multiclaw-web.pid');
 const statePath = path.join(repoRoot, 'ops', 'multiclaw-web.state.json');
+const generatedLiveRoot = path.join(repoRoot, 'generated-live');
 
 function slugify(value) {
   return String(value || '')
@@ -456,6 +457,78 @@ async function verifyRuntime() {
   }
 }
 
+function buildLocalCompanyReply(company, prompt) {
+  const normalizedPrompt = String(prompt || '').trim();
+  const promptLower = normalizedPrompt.toLowerCase();
+  const roles = company.roles || [];
+  const missions = company.missions || [];
+  const nextSteps = company.nextSteps || [];
+  const operator = roles[0]?.title || 'Primary Operator';
+
+  let reply = `${company.projectName || 'This company'} is active and ready for operator direction.`;
+  let suggestedActions = nextSteps.slice(0, 3);
+
+  if (promptLower.includes('next') || promptLower.includes('priority') || promptLower.includes('fix')) {
+    reply = 'Here is the strongest near-term operating focus.';
+    suggestedActions = nextSteps.slice(0, 3);
+  } else if (promptLower.includes('mission') || promptLower.includes('goal') || promptLower.includes('plan')) {
+    reply = 'These are the mission-level directions currently shaping the company.';
+    suggestedActions = missions.slice(0, 3);
+  } else if (promptLower.includes('company') || promptLower.includes('operate') || promptLower.includes('work')) {
+    reply = 'This company is structured to operate through clear ownership, mission focus, and next-step execution.';
+    suggestedActions = [...nextSteps.slice(0, 2), ...missions.slice(0, 1)];
+  }
+
+  return { speaker: operator, reply, suggestedActions };
+}
+
+async function askCompanyCli() {
+  const companyId = getArgValue('--company');
+  const prompt = argv.slice(1).filter((arg, index, list) => {
+    const previous = list[index - 1];
+    return !arg.startsWith('--') && previous !== '--company';
+  }).join(' ').trim();
+
+  if (!prompt) {
+    console.error('Usage: multiclaw ask [--company <companyId>] "your question"');
+    process.exitCode = 1;
+    return;
+  }
+
+  const companyDirs = await fs.readdir(generatedLiveRoot, { withFileTypes: true }).catch(() => []);
+  const candidates = companyDirs.filter((entry) => entry.isDirectory() && entry.name !== '.auth');
+  if (!candidates.length) {
+    console.error('No generated companies found under generated-live/.');
+    process.exitCode = 1;
+    return;
+  }
+
+  let selectedCompanyId = companyId;
+  if (!selectedCompanyId) {
+    const dated = await Promise.all(candidates.map(async (entry) => ({
+      companyId: entry.name,
+      mtime: (await fs.stat(path.join(generatedLiveRoot, entry.name))).mtimeMs,
+    })));
+    dated.sort((a, b) => b.mtime - a.mtime);
+    selectedCompanyId = dated[0]?.companyId;
+  }
+
+  const companyPath = path.join(generatedLiveRoot, selectedCompanyId, 'company.json');
+  const company = await fs.readFile(companyPath, 'utf8').then((raw) => JSON.parse(raw)).catch(() => null);
+  if (!company) {
+    console.error(`Company not found: ${selectedCompanyId}`);
+    process.exitCode = 1;
+    return;
+  }
+
+  const result = buildLocalCompanyReply(company, prompt);
+  console.log(`${result.speaker}`);
+  console.log(result.reply);
+  for (const action of result.suggestedActions || []) {
+    console.log(`- ${action}`);
+  }
+}
+
 function printGuide() {
   console.log(`MultiClaw guide
 
@@ -564,6 +637,7 @@ Usage:
   multiclaw walkthrough
   multiclaw doctor
   multiclaw verify
+  multiclaw ask [--company <companyId>] "your question"
   multiclaw init
   multiclaw init --demo
   multiclaw configure
@@ -579,6 +653,7 @@ Notes:
   - walkthrough prints the full command walkthrough
   - doctor checks the local environment for the core runtime prerequisites
   - verify runs doctor, status, and the end-to-end smoke flow when the runtime is up
+  - ask lets you talk to the latest generated company from the CLI, or target a specific one with --company
   - init generates a company package under ./generated/
   - configure opens the interactive runtime setup flow
   - setup creates a local runtime config under ./.multiclaw/config.json
@@ -597,6 +672,11 @@ async function main() {
 
   if (command === 'guide') {
     printGuide();
+    return;
+  }
+
+  if (command === 'ask') {
+    await askCompanyCli();
     return;
   }
 

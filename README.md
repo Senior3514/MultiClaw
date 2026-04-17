@@ -192,8 +192,11 @@ node ./bin/multiclaw.js setup --tailscale --port 8813 --provider openai --model 
 Useful runtime commands:
 
 ```bash
+multiclaw start
+multiclaw verify
+multiclaw ask "what should this company do next?"
+multiclaw stop
 npm run dev
-npm run stop
 npm run status
 npm run e2e:smoke
 ```

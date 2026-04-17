@@ -43,7 +43,7 @@ async function loadStats() {
     statsArtifactsEl.textContent = stats.artifacts;
 
     if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
-    if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Session-aware preview active with a protected workspace flow.';
+    if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Workspace flow active across install, steering, and company generation.';
     if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} generated compan${stats.companies === 1 ? 'y' : 'ies'}`;
     if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is becoming visible through dashboard, topology, and contact surfaces.';
     if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `${stats.artifacts} artifacts live`;

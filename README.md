@@ -12,7 +12,7 @@ A user describes what they built, what they need, and what outcomes they want. M
 - mission briefs
 - workspaces
 - operating rules
-- internal chat surfaces
+- team coordination surfaces
 - dashboards
 - runbooks
 - maintenance cadence
@@ -41,12 +41,11 @@ Over time it should also become channel-flexible and access-flexible, with suppo
 - Product-first, not toy-first
 - Built for real operation, not just demos
 - Privacy-safe public surface, with private implementation details kept out of the product
-- Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, internal ops, and infrastructure targets like VPS environments
+- Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, operations-heavy teams, and infrastructure targets like VPS environments
 
 ## MVP thesis
 
-The first real version should not try to replace OpenClaw.
-It should become the best generator and orchestration layer on top of OpenClaw.
+The first real version should stay simple to install, clear to operate, and strong enough to generate visible company structure from day one.
 
 ## Quick start
 

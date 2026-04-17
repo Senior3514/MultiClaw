@@ -1742,12 +1742,20 @@ body.light-theme .panel-strong {
   }
 
   .landing-hero {
-    gap: 10px;
+    gap: 8px;
     padding-block: 10px;
   }
 
   .landing-copy {
-    margin-top: -4px;
+    margin-top: -10px;
+  }
+
+  .hero-brand {
+    margin-bottom: 8px;
+  }
+
+  .hero-brand-mark {
+    display: none;
   }
 
   .hero-copy h1 {
@@ -1781,39 +1789,39 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 270px;
-    width: min(100%, 360px);
+    min-height: 320px;
+    width: min(100%, 420px);
     aspect-ratio: 1 / 1;
-    padding: 12px;
+    padding: 14px;
   }
 
   .graphic-core {
-    width: 160px;
-    height: 160px;
+    width: 176px;
+    height: 176px;
   }
 
   .graphic-avatar {
-    width: 76px;
-    height: 76px;
+    width: 84px;
+    height: 84px;
   }
 
   .graphic-core strong {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .orbit-a {
-    width: 162px;
-    height: 162px;
+    width: 176px;
+    height: 176px;
   }
 
   .orbit-b {
-    width: 208px;
-    height: 208px;
+    width: 228px;
+    height: 228px;
   }
 
   .orbit-c {
-    width: 114px;
-    height: 114px;
+    width: 122px;
+    height: 122px;
   }
 
   .graphic-node {

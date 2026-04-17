@@ -2,6 +2,8 @@
 
 MultiClaw is the fastest way to generate a full behind-the-scenes AGI company for any product, startup, or business.
 
+It is a standalone product, not something tied to our own VPS. The goal is for people to take it from GitHub and run it on their own machines or VPS environments.
+
 A user describes what they built, what they need, and what outcomes they want. MultiClaw then creates a coordinated AI company around it:
 
 - agent roster

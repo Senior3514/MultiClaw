@@ -457,12 +457,13 @@ Uninstall:
 `);
 }
 
-function printDoctor() {
+async function printDoctor() {
   const checks = [
     ['git', ['--version']],
     ['node', ['--version']],
     ['npm', ['--version']],
     ['python3', ['--version']],
+    ['curl', ['--version']],
   ];
 
   console.log('MultiClaw doctor');
@@ -475,6 +476,36 @@ function printDoctor() {
 
   const tailscale = spawnSync('tailscale', ['status'], { encoding: 'utf8' });
   console.log(`- tailscale: ${tailscale.status === 0 ? 'available' : 'not available or not connected'}`);
+
+  const config = await loadRuntimeConfig();
+  console.log(`- runtime config: ${runtimeConfigPath} (${config.bind}:${config.port}, ${config.provider}/${config.model})`);
+
+  const runtimeEnv = await fs.readFile(runtimeEnvPath, 'utf8').then(() => 'present').catch(() => 'missing');
+  console.log(`- runtime env: ${runtimeEnv}`);
+
+  const requiredPaths = [
+    path.join(repoRoot, 'ops', 'start_local.sh'),
+    path.join(repoRoot, 'ops', 'start_tailscale_only.sh'),
+    path.join(repoRoot, 'ops', 'stop.sh'),
+    path.join(repoRoot, 'ops', 'server.py'),
+    path.join(repoRoot, 'web', 'index.html'),
+  ];
+
+  for (const requiredPath of requiredPaths) {
+    const exists = await fs.access(requiredPath).then(() => true).catch(() => false);
+    console.log(`- path ${path.relative(repoRoot, requiredPath)}: ${exists ? 'ok' : 'missing'}`);
+  }
+
+  const generatedRootWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(path.join(repoRoot, 'generated-live'))}' ]`]);
+  console.log(`- generated-live writable: ${generatedRootWritable.status === 0 ? 'yes' : 'no or missing'}`);
+
+  const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
+  if (state?.url) {
+    const health = spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', `${state.url.replace(/\/$/, '')}/api/health`], { encoding: 'utf8' });
+    console.log(`- runtime health: ${health.status === 0 ? `ok (${health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
+  } else {
+    console.log('- runtime health: runtime not started');
+  }
 }
 
 function printHelp() {
@@ -526,7 +557,7 @@ async function main() {
   }
 
   if (command === 'doctor') {
-    printDoctor();
+    await printDoctor();
     return;
   }
 

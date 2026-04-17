@@ -65,6 +65,22 @@ multiclaw verify
 multiclaw stop
 ```
 
+Current verified surfaces:
+- web workspace
+- CLI runtime commands
+- company generation
+- company pages
+- artifact access and pack download
+- ask flow
+
+Current provider registry:
+- OpenAI
+- Anthropic
+- Google
+- OpenRouter
+- Groq
+- Ollama / local
+
 The default private flow is single-user and should not force account friction on your own VPS.
 
 Uninstall:

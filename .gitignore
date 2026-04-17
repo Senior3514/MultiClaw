@@ -5,3 +5,5 @@ generated-live/
 ops/*.log
 ops/*.pid
 ops/*.state.json
+package-lock.json
+node_modules/

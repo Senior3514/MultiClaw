@@ -1431,9 +1431,9 @@ button:hover {
 
 .choice-card.selected,
 .provider-card.selected {
-  border-color: rgba(124, 92, 255, 0.78);
-  background: rgba(124, 92, 255, 0.12);
-  box-shadow: 0 16px 36px rgba(44, 54, 120, 0.28);
+  border-color: rgba(243, 74, 120, 0.72);
+  background: rgba(243, 74, 120, 0.12);
+  box-shadow: 0 16px 36px rgba(37, 18, 28, 0.34);
 }
 
 .install-command {
@@ -1441,8 +1441,8 @@ button:hover {
   white-space: pre-wrap;
   word-break: break-word;
   border-radius: 18px;
-  background: rgba(5, 8, 19, 0.84);
-  border: 1px solid rgba(145, 163, 255, 0.12);
+  background: rgba(5, 13, 18, 0.84);
+  border: 1px solid rgba(86, 212, 209, 0.14);
   padding: 18px;
   font-size: 14px;
   line-height: 1.6;

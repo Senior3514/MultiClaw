@@ -77,6 +77,38 @@
           </div>
         </section>
 
+        <section class="panel section-block landing-section">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">Install</div>
+              <h2>Install MultiClaw from the home page.</h2>
+              <p>One primary command. The deeper steps stay inside the product flow.</p>
+            </div>
+          </div>
+          <div id="homePlatformChoices" class="choice-grid">
+            <button class="choice-card selected" type="button" data-platform="ubuntu">
+              <strong>Linux / VPS</strong>
+              <span>Best current path.</span>
+            </button>
+            <button class="choice-card" type="button" data-platform="macos">
+              <strong>macOS</strong>
+              <span>Same calm bootstrap flow.</span>
+            </button>
+            <button class="choice-card" type="button" data-platform="windows">
+              <strong>Windows / WSL</strong>
+              <span>Use WSL for now.</span>
+            </button>
+          </div>
+          <div class="panel install-panel">
+            <pre class="install-command" id="homeInstallCommand">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+            <div class="cta-row">
+              <button class="button-link secondary button-reset" id="copyHomeInstallCommand">Copy install</button>
+              <a class="button-link secondary" href="./install.html">Open install page</a>
+            </div>
+            <p id="homePlatformNote" class="install-subtitle">Ubuntu/VPS is the cleanest path right now.</p>
+          </div>
+        </section>
+
         <section class="cards-grid landing-cards">
           <article class="panel feature-card hover-lift">
             <div class="eyebrow">01</div>

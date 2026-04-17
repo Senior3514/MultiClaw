@@ -2,6 +2,58 @@ import { hasServerSession } from './auth.js';
 
 const tryGeneratorBtn = document.getElementById('tryGeneratorBtn');
 const openWorkspaceBtn = document.getElementById('openWorkspaceBtn');
+const homeInstallCommandEl = document.getElementById('homeInstallCommand');
+const copyHomeInstallButton = document.getElementById('copyHomeInstallCommand');
+const homePlatformNoteEl = document.getElementById('homePlatformNote');
+
+const homeInstallState = {
+  platform: 'ubuntu',
+};
+
+const homePlatformNotes = {
+  ubuntu: 'Ubuntu/VPS is the cleanest path right now.',
+  macos: 'macOS follows the same one-command flow after git, node, npm, and python3 are installed.',
+  windows: 'Windows should use WSL for the cleanest current runtime experience.',
+};
+
+function renderHomeInstallCommand() {
+  if (!homeInstallCommandEl || !homePlatformNoteEl) return;
+  homeInstallCommandEl.textContent = homeInstallState.platform === 'windows'
+    ? 'wsl bash -lc "curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash"'
+    : 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
+  homePlatformNoteEl.textContent = homePlatformNotes[homeInstallState.platform];
+}
+
+async function copyWithFeedback(button, text, successText) {
+  try {
+    await navigator.clipboard.writeText(text);
+    button.textContent = successText;
+    setTimeout(() => {
+      button.textContent = button.dataset.defaultLabel;
+    }, 1200);
+  } catch {
+    button.textContent = 'Copy failed';
+    setTimeout(() => {
+      button.textContent = button.dataset.defaultLabel;
+    }, 1200);
+  }
+}
+
+copyHomeInstallButton?.setAttribute('data-default-label', 'Copy install');
+copyHomeInstallButton?.addEventListener('click', async () => {
+  await copyWithFeedback(copyHomeInstallButton, homeInstallCommandEl.textContent, 'Copied');
+});
+
+document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('#homePlatformChoices .choice-card').forEach((item) => item.classList.remove('selected'));
+    button.classList.add('selected');
+    homeInstallState.platform = button.dataset.platform;
+    renderHomeInstallCommand();
+  });
+});
+
+renderHomeInstallCommand();
 
 const session = await hasServerSession();
 

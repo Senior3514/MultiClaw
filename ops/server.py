@@ -161,7 +161,21 @@ def infer_archetype(business_model: str, description: str) -> str:
     return "Product operating company"
 
 
-def build_roles(archetype: str):
+def parse_custom_roles(raw_value: str):
+    roles = []
+    for line in (raw_value or "").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if "|" in line:
+            title, scope = [part.strip() for part in line.split("|", 1)]
+        else:
+            title, scope = line, "Owns a user-defined company function."
+        roles.append({"title": title, "scope": scope})
+    return roles
+
+
+def build_roles(archetype: str, role_template: str = "Balanced", custom_roles_raw: str = ""):
     common = [
         {"title": "Operator", "scope": "Runs priorities, execution rhythm, and the company pulse."},
         {"title": "CTO / Systems Lead", "scope": "Owns architecture, infrastructure, model routing, and technical integrity."},
@@ -186,7 +200,31 @@ def build_roles(archetype: str):
             {"title": "Research Lead", "scope": "Owns strategic discovery and deeper market learning."},
         ])
 
-    return common
+    template_roles = {
+        "Executive": [
+            {"title": "CFO / Finance Lead", "scope": "Owns financial posture, budget awareness, and business health."},
+            {"title": "COO / Operations Director", "scope": "Owns operating cadence, delivery quality, and execution discipline."},
+        ],
+        "Engineering-heavy": [
+            {"title": "Engineering Lead", "scope": "Owns engineering throughput, code quality, and implementation velocity."},
+            {"title": "Production Lead", "scope": "Owns runtime stability, release readiness, and deployment discipline."},
+        ],
+        "Go-to-market": [
+            {"title": "Marketing Lead", "scope": "Owns campaigns, brand pull, and market visibility."},
+            {"title": "Revenue Lead", "scope": "Owns commercial motion, pricing pressure, and funnel performance."},
+        ],
+    }.get(role_template, [])
+
+    merged = common + template_roles + parse_custom_roles(custom_roles_raw)
+    deduped = []
+    seen = set()
+    for role in merged:
+        key = role["title"].strip().lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(role)
+    return deduped
 
 
 def build_routing(description: str):
@@ -369,9 +407,11 @@ def generate_company(payload):
     stage = payload.get("stage", "MVP").strip()
     top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
     tone = payload.get("tone", "Sharp, premium, operational").strip()
+    role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
+    custom_roles = payload.get("customRoles", "")
 
     archetype = infer_archetype(business_model, description)
-    roles = build_roles(archetype)
+    roles = build_roles(archetype, role_template, custom_roles)
     routing = build_routing(description)
     missions = build_missions(project_name, top_goals)
     next_steps = build_next_steps(project_name)
@@ -390,6 +430,8 @@ def generate_company(payload):
         "businessModel": business_model,
         "stage": stage,
         "tone": tone,
+        "roleTemplate": role_template,
+        "customRoles": custom_roles,
         "topGoals": top_goals,
         "archetype": archetype,
         "roles": roles,
@@ -398,7 +440,7 @@ def generate_company(payload):
         "companySoul": company_soul,
         "contactSurfaces": contact_surfaces,
         "nextSteps": next_steps,
-        "departmentsCount": 5,
+        "departmentsCount": max(5, min(12, len(roles))),
         "rolesCount": len(roles),
         "generatedAt": generated_at,
     }

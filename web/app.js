@@ -16,6 +16,8 @@ const PRESETS = {
     stage: 'Growth',
     topGoals: 'Ship faster, onboard users, retain customers',
     tone: 'Sharp, premium, operational',
+    roleTemplate: 'Balanced',
+    customRoles: '',
   },
   revenue: {
     productOrigin: 'Homegrown app',
@@ -27,6 +29,8 @@ const PRESETS = {
     stage: 'Growth',
     topGoals: 'Close customers, recover leads, run like a company',
     tone: 'Sharp, confident, premium',
+    roleTemplate: 'Go-to-market',
+    customRoles: 'CFO / Finance Lead | Owns budget awareness and business health',
   },
   marketplace: {
     productOrigin: 'Existing product',
@@ -38,6 +42,8 @@ const PRESETS = {
     stage: 'MVP',
     topGoals: 'Validate matching, grow liquidity, tighten operations',
     tone: 'Structured, premium, decisive',
+    roleTemplate: 'Executive',
+    customRoles: '',
   },
 };
 
@@ -114,6 +120,8 @@ function getFormData() {
     stage: el('stage').value,
     topGoals: el('topGoals').value.trim(),
     tone: el('tone').value.trim(),
+    roleTemplate: el('roleTemplate').value,
+    customRoles: el('customRoles').value.trim(),
   };
 }
 
@@ -159,6 +167,8 @@ function applyPreset(name) {
   el('stage').value = preset.stage;
   el('topGoals').value = preset.topGoals;
   el('tone').value = preset.tone;
+  if (preset.roleTemplate) el('roleTemplate').value = preset.roleTemplate;
+  if (typeof preset.customRoles === 'string') el('customRoles').value = preset.customRoles;
   setStatus(`Preset loaded: ${preset.projectName}`, 'idle');
 }
 

@@ -2,14 +2,15 @@
 
 :root {
   color-scheme: dark;
-  --bg: #060816;
-  --panel: rgba(13, 18, 38, 0.82);
-  --panel-strong: rgba(20, 28, 59, 0.96);
-  --line: rgba(98, 119, 255, 0.18);
-  --text: #ecf1ff;
-  --muted: #9aa7d0;
-  --primary: #7c5cff;
-  --accent: #28d7b9;
+  --bg: #07131a;
+  --panel: rgba(10, 24, 31, 0.82);
+  --panel-strong: rgba(13, 31, 42, 0.96);
+  --line: rgba(86, 212, 209, 0.18);
+  --text: #f7fbff;
+  --muted: #a7c7d1;
+  --primary: #f34a78;
+  --accent: #56d4d1;
+  --accent-soft: #f7d7a0;
   --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   --display-font: 'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif;
 }
@@ -28,9 +29,10 @@ html, body {
 body {
   font-family: var(--display-font);
   background:
-    radial-gradient(circle at top left, rgba(124, 92, 255, 0.22), transparent 32%),
-    radial-gradient(circle at top right, rgba(40, 215, 185, 0.12), transparent 28%),
-    linear-gradient(180deg, #060816 0%, #080b18 100%);
+    radial-gradient(circle at top left, rgba(243, 74, 120, 0.18), transparent 32%),
+    radial-gradient(circle at top right, rgba(86, 212, 209, 0.16), transparent 28%),
+    radial-gradient(circle at 50% 0%, rgba(247, 215, 160, 0.08), transparent 26%),
+    linear-gradient(180deg, #07131a 0%, #09171f 100%);
   color: var(--text);
 }
 
@@ -112,7 +114,7 @@ body.auth-pending .site-shell {
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(145, 163, 255, 0.12);
+  border: 1px solid rgba(86, 212, 209, 0.14);
 }
 
 .session-chip span {
@@ -140,7 +142,7 @@ body.auth-pending .site-shell {
   border-radius: 12px;
   font-size: 15px;
   background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(145, 163, 255, 0.06);
+  border: 1px solid rgba(86, 212, 209, 0.08);
 }
 
 .landing-header {
@@ -201,11 +203,12 @@ body.auth-pending .site-shell {
   overflow: hidden;
   background:
     url('./multiclaw-logo-current.jpg') center/cover no-repeat,
-    radial-gradient(circle at 50% 50%, rgba(118, 92, 255, 0.55), rgba(22, 28, 49, 0.9));
+    radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.46), rgba(8, 22, 27, 0.92));
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
     0 24px 60px rgba(0, 0, 0, 0.35),
-    0 12px 28px rgba(76, 106, 255, 0.32),
+    0 12px 28px rgba(86, 212, 209, 0.22),
+    0 0 26px rgba(243, 74, 120, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   animation: brandPulse 4.8s ease-in-out infinite;
 }
@@ -230,7 +233,7 @@ body.auth-pending .site-shell {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(40, 215, 185, 0.34), transparent 70%);
+  background: radial-gradient(circle, rgba(247, 215, 160, 0.3), transparent 70%);
   filter: blur(8px);
 }
 

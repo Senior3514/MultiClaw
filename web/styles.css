@@ -223,7 +223,7 @@ body.light-theme .site-header {
   isolation: isolate;
   overflow: hidden;
   background:
-    url('./multiclaw-avatar-3d.png') center/cover no-repeat,
+    url('./multiclaw-avatar-6claws-exact.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.46), rgba(8, 22, 27, 0.92));
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
@@ -657,7 +657,7 @@ video {
   border-radius: 50%;
   flex: 0 0 26px;
   background:
-    url('./multiclaw-avatar-3d.png') center/cover no-repeat,
+    url('./multiclaw-avatar-6claws-exact.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.4), rgba(8, 22, 27, 0.92));
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.28),

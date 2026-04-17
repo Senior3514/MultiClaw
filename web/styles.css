@@ -676,6 +676,8 @@ video {
 .node-2 { animation: orbitNode2 18s linear infinite reverse; }
 .node-3 { animation: orbitNode3 16s linear infinite; }
 .node-4 { animation: orbitNode4 20s linear infinite reverse; }
+.node-5 { animation: orbitNode5 17s linear infinite; }
+.node-6 { animation: orbitNode6 22s linear infinite reverse; }
 
 .cards-grid,
 .logic-grid,
@@ -1412,6 +1414,16 @@ button:hover {
 @keyframes orbitNode4 {
   from { transform: translate(-50%, -50%) rotate(270deg) translateY(-138px) rotate(-270deg); }
   to { transform: translate(-50%, -50%) rotate(630deg) translateY(-138px) rotate(-630deg); }
+}
+
+@keyframes orbitNode5 {
+  from { transform: translate(-50%, -50%) rotate(45deg) translateY(-150px) rotate(-45deg); }
+  to { transform: translate(-50%, -50%) rotate(405deg) translateY(-150px) rotate(-405deg); }
+}
+
+@keyframes orbitNode6 {
+  from { transform: translate(-50%, -50%) rotate(225deg) translateY(-150px) rotate(-225deg); }
+  to { transform: translate(-50%, -50%) rotate(585deg) translateY(-150px) rotate(-585deg); }
 }
 
 @keyframes pulseDot {

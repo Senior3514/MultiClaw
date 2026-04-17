@@ -24,10 +24,28 @@ if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
 fi
 
 nohup python3 "$ROOT/ops/server.py" "$HOST" "$PORT" >"$LOG_FILE" 2>&1 &
-echo $! > "$PID_FILE"
+PID="$!"
+echo "$PID" > "$PID_FILE"
 printf '{\n  "host": "%s",\n  "port": %s,\n  "url": "http://%s:%s/"\n}\n' "$HOST" "$PORT" "$HOST" "$PORT" > "$STATE_FILE"
-sleep 2
 
-echo "MultiClaw web started"
-echo "URL: http://$HOST:$PORT/"
-echo "Log: $LOG_FILE"
+HEALTH_URL="http://$HOST:$PORT/api/health"
+for _ in $(seq 1 20); do
+  if curl --silent --show-error --max-time 2 "$HEALTH_URL" >/dev/null 2>&1; then
+    echo "MultiClaw web started"
+    echo "URL: http://$HOST:$PORT/"
+    echo "Health: $HEALTH_URL"
+    echo "Log: $LOG_FILE"
+    exit 0
+  fi
+  sleep 1
+done
+
+if kill -0 "$PID" 2>/dev/null; then
+  kill "$PID" 2>/dev/null || true
+fi
+rm -f "$PID_FILE"
+
+echo "MultiClaw failed to become healthy on $HEALTH_URL" >&2
+echo "Last log lines:" >&2
+tail -n 30 "$LOG_FILE" >&2 || true
+exit 1

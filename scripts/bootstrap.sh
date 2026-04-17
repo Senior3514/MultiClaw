@@ -82,6 +82,7 @@ npm install
 npm link
 
 echo "MultiClaw bootstrap complete."
+multiclaw doctor
 
 auto_start() {
   CMD=(multiclaw up "--${BIND}" --port "$PORT" --provider "$PROVIDER" --model "$MODEL" --api-key-env "$API_KEY_ENV")
@@ -119,4 +120,5 @@ if [[ -t 0 ]]; then
   fi
 else
   echo "Run 'multiclaw walkthrough' for the next steps."
+  echo "Then run 'multiclaw doctor' if you want a readiness snapshot."
 fi

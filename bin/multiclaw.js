@@ -407,6 +407,10 @@ async function printStatus() {
   const host = state?.host || (bind === 'local' ? '127.0.0.1' : (getTailscaleIp() || 'tailscale-unavailable'));
   const port = state?.port || config.port;
   const url = state?.url || `http://${host}:${port}/`;
+  const healthUrl = `${url.replace(/\/$/, '')}/api/health`;
+  const health = running
+    ? spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', healthUrl], { encoding: 'utf8' })
+    : null;
 
   console.log('MultiClaw runtime status');
   console.log(`- bind: ${bind}`);
@@ -418,6 +422,7 @@ async function printStatus() {
   console.log(`- runtime env: ${runtimeEnvPath}`);
   console.log(`- pid: ${running || 'not running'}`);
   console.log(`- url: ${url}`);
+  console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
 }
 
 function printGuide() {

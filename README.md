@@ -1,8 +1,8 @@
 # MultiClaw
 
-MultiClaw is the fastest way to generate a full behind-the-scenes AGI company for any product, startup, or business.
+MultiClaw is the fastest way to launch a real AI company around your product.
 
-It is a standalone product, not something tied to our own VPS. The goal is for people to take it from GitHub and run it on their own machines or VPS environments.
+It is a standalone product that people should be able to take from GitHub and run on their own machine or VPS.
 
 A user describes what they built, what they need, and what outcomes they want. MultiClaw then creates a coordinated AI company around it:
 
@@ -20,24 +20,19 @@ A user describes what they built, what they need, and what outcomes they want. M
 
 ## Core idea
 
-OpenClaw gives powerful agent infrastructure.
-MultiClaw takes that kind of capability and turns it into an original, user-owned, instantly deployable AI company.
+MultiClaw turns one product, repo, app, or machine into a coordinated AI company.
 
-The simplest way to think about it is this: OpenClaw can feel like one powerful personal AI operator. MultiClaw should feel just as simple to start, but instead of one assistant it can generate one or more deep-context AI companies or AI arms around the exact products, repos, machines, or operating domains you care about.
+The goal is simple: make it easy to start, clear to steer, and strong enough to do real work.
 
-We do not need to clone the substrate experience. We reuse proven foundations, then take the company layer, operator layer, and product experience in our own direction.
-
-The user stays high-privilege.
-The generated company exists behind the scenes to operate, maintain, and advance the product according to the creator's requirements, boundaries, and standards.
+The user stays in control.
+The generated company exists to operate, maintain, and advance the target according to the creator's requirements, boundaries, and standards.
 
 ## Platform direction
 
-The product should reuse OpenClaw-like execution infrastructure while remaining model-agnostic.
+MultiClaw is built to stay model-agnostic, portable, and easy to operate.
 That means the experience layer can stay stable while routing work across many AI providers.
 
-It should also become portable across environments, so a user can run MultiClaw on their own machine, connect their own model, and use the product without depending on this specific VPS.
-
-Over time it should also become channel-agnostic and access-flexible, with support for communication surfaces, private networking, VPN-style access, and stronger identity layers where needed.
+Over time it should also become channel-flexible and access-flexible, with support for communication surfaces, private networking, and stronger identity layers where needed.
 
 ## Positioning
 
@@ -45,7 +40,7 @@ Over time it should also become channel-agnostic and access-flexible, with suppo
 - Easy setup
 - Product-first, not toy-first
 - Built for real operation, not just demos
-- Privacy-safe public surface, with backstage details kept out of the product
+- Privacy-safe public surface, with private implementation details kept out of the product
 - Works for apps, e-commerce, SaaS, agencies, marketplaces, content businesses, internal ops, and infrastructure targets like VPS environments
 
 ## MVP thesis
@@ -55,25 +50,7 @@ It should become the best generator and orchestration layer on top of OpenClaw.
 
 ## Quick start
 
-### Generate a company package
-
-```bash
-npm run example
-```
-
-This generates a working starter company under:
-
-```bash
-generated/<project-slug>/
-```
-
-You can also run the interactive flow:
-
-```bash
-npm run init
-```
-
-### Configure and run the workspace
+### Install and run
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
@@ -95,7 +72,7 @@ multiclaw verify
 multiclaw stop
 ```
 
-The default private flow is single-user and should not force signup or email friction on your own VPS.
+The default private flow is single-user and should not force account friction on your own VPS.
 
 Uninstall:
 
@@ -104,7 +81,7 @@ curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/u
 ```
 
 The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.
-For local mode, MultiClaw now defaults toward a simpler single-user flow instead of forcing preview-style account friction.
+For local mode, MultiClaw defaults toward a simpler single-user flow instead of forcing account friction.
 
 Ordered flow:
 1. Install the core product
@@ -122,12 +99,6 @@ Primary channel direction:
 - Telegram
 - later Discord and Slack
 
-Claw family direction:
-- NanoClaw
-- MicroClaw
-- OpenClaw
-- MultiClaw as the umbrella orchestration layer
-
 Core product direction:
 - attach to what already exists
 - generate the company shape around it
@@ -142,7 +113,7 @@ Provider access direction:
 - router providers
 - local or self-hosted models
 
-Technical USP direction:
+Technical direction:
 - attach-and-run on top of what already exists
 - generate a living company, not a single assistant
 - communicate with agents from birth
@@ -169,10 +140,16 @@ node ./bin/multiclaw.js setup --tailscale --port 8813 --provider openai --model 
 
 Inside the installed product, MultiClaw should guide the rest of the runtime, verification, and steering flow naturally.
 
-And the provider-routing skeleton demo:
+Generate a local example company:
 
 ```bash
-npm run demo:router
+npm run example
+```
+
+Run the interactive initializer:
+
+```bash
+npm run init
 ```
 
 For the isolated tailscale-only product preview:

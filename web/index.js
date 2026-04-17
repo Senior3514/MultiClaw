@@ -62,15 +62,21 @@ if (session?.email) {
   document.querySelectorAll('[data-auth-dashboard]').forEach((link) => {
     link.href = './dashboard.html';
   });
-  if (tryGeneratorBtn) tryGeneratorBtn.href = './generator.html';
+  if (tryGeneratorBtn) {
+    tryGeneratorBtn.href = './generator.html';
+    tryGeneratorBtn.textContent = 'Open generator';
+  }
   if (openWorkspaceBtn) {
     openWorkspaceBtn.href = './dashboard.html';
     openWorkspaceBtn.textContent = 'Open workspace';
   }
 } else {
-  if (tryGeneratorBtn) tryGeneratorBtn.href = './login.html';
+  if (tryGeneratorBtn) {
+    tryGeneratorBtn.href = './platform.html';
+    tryGeneratorBtn.textContent = 'See platform';
+  }
   if (openWorkspaceBtn) {
-    openWorkspaceBtn.href = './signup.html';
-    openWorkspaceBtn.textContent = 'Create account';
+    openWorkspaceBtn.href = './install.html';
+    openWorkspaceBtn.textContent = 'Install now';
   }
 }

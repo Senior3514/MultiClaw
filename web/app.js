@@ -80,7 +80,7 @@ function renderBrand(data) {
     <div class="brand-row">
       <small>${label}</small>
       <strong>${value}</strong>
-      <p>${label === 'Company ID' ? 'Safe public identifier for the generated company, without exposing server internals.' : 'Generated from the founder intake and used as operating context.'}</p>
+      <p>${label === 'Company ID' ? 'Safe public identifier for the generated company, without exposing server internals.' : 'Generated from the company brief and used as operating context.'}</p>
     </div>
   `).join('');
 }

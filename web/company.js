@@ -17,6 +17,7 @@ const topologyEl = document.getElementById('companyTopology');
 const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
+const eventsEl = document.getElementById('companyEvents');
 const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
 const refineCompanyBtn = document.getElementById('refineCompanyBtn');
@@ -122,6 +123,17 @@ function renderNextSteps(steps) {
   `).join('');
 }
 
+function renderEvents(events) {
+  const list = events?.length ? events : [{ title: 'No activity yet', detail: 'This company has not logged any visible events yet.', timestamp: 'Waiting', kind: 'idle' }];
+  return list.map((event) => `
+    <div class="mission-card">
+      <small>${event.timestamp}</small>
+      <strong>${event.title}</strong>
+      <p>${event.detail}</p>
+    </div>
+  `).join('');
+}
+
 function renderArtifacts(artifacts) {
   return artifacts.map((artifact) => `
     <div class="route-card">
@@ -161,6 +173,7 @@ async function askCompany() {
     const result = await response.json();
     if (!response.ok) throw new Error(result.error || `Failed with status ${response.status}`);
     companyAskResult.innerHTML = renderAskResult(result);
+    await loadCompany();
   } catch (error) {
     console.error(error);
     companyAskResult.innerHTML = '<div class="route-card"><strong>Request failed</strong><p>The company did not answer this request.</p></div>';
@@ -189,6 +202,8 @@ async function loadCompany() {
     const company = await response.json();
     const artifactsResponse = await fetch(`/api/company/${encodeURIComponent(companyId)}/artifacts`);
     const artifacts = artifactsResponse.ok ? await artifactsResponse.json() : [];
+    const eventsResponse = await fetch(`/api/company/${encodeURIComponent(companyId)}/events`);
+    const events = eventsResponse.ok ? await eventsResponse.json() : [];
 
     titleEl.textContent = company.projectName;
     setStatus(`Loaded company ${company.companyId}.`, 'success');
@@ -209,6 +224,7 @@ async function loadCompany() {
     rolesEl.innerHTML = renderRoles(company.roles);
     missionsEl.innerHTML = renderMissions(company.missions);
     nextStepsEl.innerHTML = renderNextSteps(company.nextSteps || []);
+    if (eventsEl) eventsEl.innerHTML = renderEvents(events);
     artifactsEl.innerHTML = renderArtifacts(artifacts);
   } catch (error) {
     console.error(error);

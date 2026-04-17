@@ -9,6 +9,7 @@ import json
 import os
 import re
 import secrets
+import shutil
 import sqlite3
 import sys
 import time
@@ -16,6 +17,7 @@ import zipfile
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
 GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
+TMP_GENERATED_ROOT = GENERATED_ROOT / ".tmp"
 AUTH_ROOT = GENERATED_ROOT / ".auth"
 DB_PATH = AUTH_ROOT / "multiclaw.db"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
@@ -60,6 +62,23 @@ def read_json(path: Path, default):
 def write_json(path: Path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def append_company_event(company_id: str, kind: str, title: str, detail: str, payload=None):
+    events_path = GENERATED_ROOT / company_id / "events.json"
+    events = read_json(events_path, [])
+    events.insert(0, {
+        "timestamp": now_utc(),
+        "kind": kind,
+        "title": title,
+        "detail": detail,
+        "payload": payload or {},
+    })
+    write_json(events_path, events[:100])
+
+
+def load_company_events(company_id: str):
+    return read_json(GENERATED_ROOT / company_id / "events.json", [])
 
 
 def hash_password(password: str, salt_hex: str) -> str:
@@ -406,58 +425,20 @@ def build_company_soul(project_name: str, description: str, tone: str, autonomy_
     }
 
 
-def generate_company(payload):
-    product_origin = payload.get("productOrigin", "Existing product").strip() or "Existing product"
-    autonomy_mode = payload.get("autonomyMode", "Operator-assisted").strip() or "Operator-assisted"
-    project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
-    description = payload.get("description", "A serious AI product.").strip()
-    audience = payload.get("audience", "Builders").strip()
-    business_model = payload.get("businessModel", "SaaS").strip()
-    stage = payload.get("stage", "MVP").strip()
-    top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
-    tone = payload.get("tone", "Sharp, premium, operational").strip()
-    role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
-    custom_roles = payload.get("customRoles", "")
-    existing_assets = parse_existing_assets(payload.get("existingAssets", ""))
-
-    archetype = infer_archetype(business_model, description)
-    roles = build_roles(archetype, role_template, custom_roles)
-    routing = build_routing(description)
-    missions = build_missions(project_name, top_goals)
-    next_steps = build_next_steps(project_name)
-    contact_surfaces = build_contact_surfaces()
-    slug = slugify(project_name)
-    generated_at = now_utc()
-    company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
-
-    result = {
-        "projectName": project_name,
-        "companyId": slug,
-        "productOrigin": product_origin,
-        "autonomyMode": autonomy_mode,
-        "description": description,
-        "audience": audience,
-        "businessModel": business_model,
-        "stage": stage,
-        "tone": tone,
-        "roleTemplate": role_template,
-        "customRoles": custom_roles,
-        "existingAssets": existing_assets,
-        "topGoals": top_goals,
-        "archetype": archetype,
-        "roles": roles,
-        "routing": routing,
-        "missions": missions,
-        "companySoul": company_soul,
-        "contactSurfaces": contact_surfaces,
-        "nextSteps": next_steps,
-        "departmentsCount": max(5, min(12, len(roles))),
-        "rolesCount": len(roles),
-        "generatedAt": generated_at,
-    }
-
-    output_dir = GENERATED_ROOT / slug
+def write_company_artifacts(output_dir: Path, result, roles, missions, next_steps, existing_assets, contact_surfaces, routing):
     output_dir.mkdir(parents=True, exist_ok=True)
+    project_name = result["projectName"]
+    slug = result["companyId"]
+    product_origin = result["productOrigin"]
+    autonomy_mode = result["autonomyMode"]
+    archetype = result["archetype"]
+    audience = result["audience"]
+    business_model = result["businessModel"]
+    stage = result["stage"]
+    tone = result["tone"]
+    generated_at = result["generatedAt"]
+    company_soul = result["companySoul"]
+
     (output_dir / "company.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (output_dir / "README.md").write_text(
         f"# {project_name}\n\n"
@@ -515,6 +496,79 @@ def generate_company(payload):
         encoding="utf-8",
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")
+    write_json(output_dir / "events.json", [])
+
+
+def generate_company(payload):
+    product_origin = payload.get("productOrigin", "Existing product").strip() or "Existing product"
+    autonomy_mode = payload.get("autonomyMode", "Operator-assisted").strip() or "Operator-assisted"
+    project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
+    description = payload.get("description", "A serious AI product.").strip()
+    audience = payload.get("audience", "Builders").strip()
+    business_model = payload.get("businessModel", "SaaS").strip()
+    stage = payload.get("stage", "MVP").strip()
+    top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
+    tone = payload.get("tone", "Sharp, premium, operational").strip()
+    role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
+    custom_roles = payload.get("customRoles", "")
+    existing_assets = parse_existing_assets(payload.get("existingAssets", ""))
+
+    archetype = infer_archetype(business_model, description)
+    roles = build_roles(archetype, role_template, custom_roles)
+    routing = build_routing(description)
+    missions = build_missions(project_name, top_goals)
+    next_steps = build_next_steps(project_name)
+    contact_surfaces = build_contact_surfaces()
+    slug = slugify(project_name)
+    generated_at = now_utc()
+    company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
+
+    result = {
+        "projectName": project_name,
+        "companyId": slug,
+        "productOrigin": product_origin,
+        "autonomyMode": autonomy_mode,
+        "description": description,
+        "audience": audience,
+        "businessModel": business_model,
+        "stage": stage,
+        "tone": tone,
+        "roleTemplate": role_template,
+        "customRoles": custom_roles,
+        "existingAssets": existing_assets,
+        "topGoals": top_goals,
+        "archetype": archetype,
+        "roles": roles,
+        "routing": routing,
+        "missions": missions,
+        "companySoul": company_soul,
+        "contactSurfaces": contact_surfaces,
+        "nextSteps": next_steps,
+        "departmentsCount": max(5, min(12, len(roles))),
+        "rolesCount": len(roles),
+        "generatedAt": generated_at,
+    }
+
+    final_dir = GENERATED_ROOT / slug
+    temp_dir = TMP_GENERATED_ROOT / f"{slug}-{int(time.time() * 1000)}-{secrets.token_hex(4)}"
+    temp_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        write_company_artifacts(temp_dir, result, roles, missions, next_steps, existing_assets, contact_surfaces, routing)
+        if final_dir.exists():
+            shutil.rmtree(final_dir)
+        temp_dir.rename(final_dir)
+        append_company_event(
+            slug,
+            "company-generated",
+            "Company generated",
+            f"Generated {project_name} with {len(roles)} core roles and {len(missions)} mission directions.",
+            {"companyId": slug, "rolesCount": len(roles), "missionsCount": len(missions)},
+        )
+    except Exception:
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        raise
 
     return result
 
@@ -651,6 +705,17 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 self.send_json(404, {"error": "company not found"})
             return
 
+        if self.path.startswith("/api/company/") and self.path.endswith("/events"):
+            if not self.require_session():
+                return
+            company_id = self.path.split("/api/company/", 1)[1].split("/events", 1)[0].strip()
+            company = load_company(company_id)
+            if company is None:
+                self.send_json(404, {"error": "company not found"})
+                return
+            self.send_json(200, load_company_events(company_id))
+            return
+
         if self.path.startswith("/api/company/"):
             if not self.require_session():
                 return
@@ -735,7 +800,15 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 if not prompt.strip():
                     self.send_json(400, {"error": "prompt is required"})
                     return
-                self.send_json(200, build_company_reply(company, prompt))
+                result = build_company_reply(company, prompt)
+                append_company_event(
+                    company_id,
+                    "operator-ask",
+                    "Operator request",
+                    prompt.strip(),
+                    {"speaker": result.get("speaker"), "reply": result.get("reply")},
+                )
+                self.send_json(200, result)
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return
@@ -759,6 +832,7 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
+    TMP_GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
     AUTH_ROOT.mkdir(parents=True, exist_ok=True)
     init_db()
     server = ThreadingHTTPServer((HOST, PORT), MultiClawHandler)

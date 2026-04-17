@@ -85,7 +85,15 @@ Or the lower-level install-only path:
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
 ```
 
-Then open the guided MultiClaw flow and continue configuration from inside the product.
+Then continue from inside the product.
+
+Quick start after install:
+
+```bash
+multiclaw start
+multiclaw verify
+multiclaw stop
+```
 
 The default private flow is single-user and should not force signup or email friction on your own VPS.
 

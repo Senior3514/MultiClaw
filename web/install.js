@@ -4,6 +4,12 @@ const copyBaseButton = document.getElementById('copyBaseInstallCommand');
 const copyAdvancedButton = document.getElementById('copyAdvancedInstallCommand');
 const uninstallCommandEl = document.getElementById('uninstallCommand');
 const copyUninstallButton = document.getElementById('copyUninstallCommand');
+const quickStartCommandEl = document.getElementById('quickStartCommand');
+const quickVerifyCommandEl = document.getElementById('quickVerifyCommand');
+const quickStopCommandEl = document.getElementById('quickStopCommand');
+const copyQuickStartButton = document.getElementById('copyQuickStartCommand');
+const copyQuickVerifyButton = document.getElementById('copyQuickVerifyCommand');
+const copyQuickStopButton = document.getElementById('copyQuickStopCommand');
 const platformNoteEl = document.getElementById('platformNote');
 const bindModeNoteEl = document.getElementById('bindModeNote');
 
@@ -33,6 +39,9 @@ function renderCommand() {
     advancedInstallCommandEl.textContent = `Continue inside MultiClaw after install. Bind: ${state.bind}. Provider: ${state.provider}.`;
   }
   uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
+  if (quickStartCommandEl) quickStartCommandEl.textContent = 'multiclaw start';
+  if (quickVerifyCommandEl) quickVerifyCommandEl.textContent = 'multiclaw verify';
+  if (quickStopCommandEl) quickStopCommandEl.textContent = 'multiclaw stop';
   platformNoteEl.textContent = platformNotes[state.platform];
   bindModeNoteEl.textContent = bindModeNotes[state.bind];
 }
@@ -80,6 +89,9 @@ async function copyWithFeedback(button, text, successText) {
 copyBaseButton.dataset.defaultLabel = 'Copy install';
 if (copyAdvancedButton) copyAdvancedButton.dataset.defaultLabel = 'Copy advanced start';
 copyUninstallButton.dataset.defaultLabel = 'Copy uninstall';
+if (copyQuickStartButton) copyQuickStartButton.dataset.defaultLabel = 'Copy start';
+if (copyQuickVerifyButton) copyQuickVerifyButton.dataset.defaultLabel = 'Copy verify';
+if (copyQuickStopButton) copyQuickStopButton.dataset.defaultLabel = 'Copy stop';
 
 copyBaseButton.addEventListener('click', async () => {
   await copyWithFeedback(copyBaseButton, baseInstallCommandEl.textContent, 'Copied');
@@ -94,5 +106,23 @@ if (copyAdvancedButton && advancedInstallCommandEl) {
 copyUninstallButton.addEventListener('click', async () => {
   await copyWithFeedback(copyUninstallButton, uninstallCommandEl.textContent, 'Copied');
 });
+
+if (copyQuickStartButton && quickStartCommandEl) {
+  copyQuickStartButton.addEventListener('click', async () => {
+    await copyWithFeedback(copyQuickStartButton, quickStartCommandEl.textContent, 'Copied');
+  });
+}
+
+if (copyQuickVerifyButton && quickVerifyCommandEl) {
+  copyQuickVerifyButton.addEventListener('click', async () => {
+    await copyWithFeedback(copyQuickVerifyButton, quickVerifyCommandEl.textContent, 'Copied');
+  });
+}
+
+if (copyQuickStopButton && quickStopCommandEl) {
+  copyQuickStopButton.addEventListener('click', async () => {
+    await copyWithFeedback(copyQuickStopButton, quickStopCommandEl.textContent, 'Copied');
+  });
+}
 
 renderCommand();

@@ -542,15 +542,15 @@ video {
   position: absolute;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
-  width: 214px;
-  height: 214px;
+  width: 252px;
+  height: 252px;
   z-index: 3;
   border-radius: 50%;
   display: grid;
   place-items: center;
   text-align: center;
-  gap: 8px;
-  padding: 20px;
+  gap: 6px;
+  padding: 18px;
   background:
     radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.22), transparent 24%),
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.28), rgba(10, 25, 33, 0.98));
@@ -570,8 +570,8 @@ video {
 }
 
 .graphic-avatar {
-  width: 112px;
-  height: 112px;
+  width: 152px;
+  height: 152px;
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     0 0 42px rgba(124, 92, 255, 0.26),
@@ -579,12 +579,12 @@ video {
 }
 
 .graphic-core strong {
-  font-size: 24px;
+  font-size: 22px;
 }
 
 .graphic-core span {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
 }
@@ -1802,17 +1802,17 @@ body.light-theme .panel-strong {
   }
 
   .graphic-core {
-    width: 176px;
-    height: 176px;
+    width: 210px;
+    height: 210px;
   }
 
   .graphic-avatar {
-    width: 84px;
-    height: 84px;
+    width: 118px;
+    height: 118px;
   }
 
   .graphic-core strong {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .orbit-a {

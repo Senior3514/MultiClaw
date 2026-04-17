@@ -260,19 +260,19 @@ def build_contact_surfaces():
             "name": "Web workspace",
             "status": "Live now",
             "purpose": "Operate the company, inspect outputs, and steer the first cycle through the main product UI.",
-            "substrate": "MultiClaw surface over OpenClaw-style runtime",
+            "substrate": "MultiClaw web surface",
         },
         {
             "name": "CLI",
             "status": "Live now",
             "purpose": "Install, configure, start, stop, verify, and operate the runtime without depending on the web UI.",
-            "substrate": "MultiClaw command layer over the existing substrate",
+            "substrate": "MultiClaw command layer",
         },
         {
             "name": "Telegram and future channels",
-            "status": "Substrate-ready",
-            "purpose": "Route communication through proven transport infrastructure instead of rebuilding messaging from scratch.",
-            "substrate": "OpenClaw and NanoClaw communication foundations",
+            "status": "Planned",
+            "purpose": "Add messaging channels after the core runtime is live and steady.",
+            "substrate": "MultiClaw channel layer",
         },
     ]
 

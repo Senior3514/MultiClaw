@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PID_FILE="$ROOT/ops/multiclaw-web.pid"
-LOG_FILE="$ROOT/ops/multiclaw-web.log"
-STATE_FILE="$ROOT/ops/multiclaw-web.state.json"
+PID_FILE="$ROOT/ops/multiclaw-web.tailscale.pid"
+LOG_FILE="$ROOT/ops/multiclaw-web.tailscale.log"
+STATE_FILE="$ROOT/ops/multiclaw-web.tailscale.state.json"
 RUNTIME_ENV_FILE="$ROOT/.multiclaw/runtime.env"
 PORT="${1:-8813}"
 

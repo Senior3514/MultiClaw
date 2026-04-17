@@ -17,9 +17,19 @@ const repoRoot = path.resolve(path.dirname(__filename), '..');
 const runtimeDir = path.join(cwd, '.multiclaw');
 const runtimeConfigPath = path.join(runtimeDir, 'config.json');
 const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
-const pidPath = path.join(repoRoot, 'ops', 'multiclaw-web.pid');
-const statePath = path.join(repoRoot, 'ops', 'multiclaw-web.state.json');
 const generatedLiveRoot = path.join(repoRoot, 'generated-live');
+
+function runtimeFileSuffix(bind) {
+  return bind === 'local' ? 'local' : 'tailscale';
+}
+
+function runtimePidPath(bind) {
+  return path.join(repoRoot, 'ops', `multiclaw-web.${runtimeFileSuffix(bind)}.pid`);
+}
+
+function runtimeStatePath(bind) {
+  return path.join(repoRoot, 'ops', `multiclaw-web.${runtimeFileSuffix(bind)}.state.json`);
+}
 
 function slugify(value) {
   return String(value || '')
@@ -402,9 +412,9 @@ async function upRuntime() {
 
 async function getRuntimeSnapshot() {
   const config = await loadRuntimeConfig();
-  const running = await fs.readFile(pidPath, 'utf8').then((value) => value.trim()).catch(() => null);
-  const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   const bind = config.bind;
+  const running = await fs.readFile(runtimePidPath(bind), 'utf8').then((value) => value.trim()).catch(() => null);
+  const state = await fs.readFile(runtimeStatePath(bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   const host = state?.host || (bind === 'local' ? '127.0.0.1' : (getTailscaleIp() || 'tailscale-unavailable'));
   const port = state?.port || config.port;
   const url = state?.url || `http://${host}:${port}/`;
@@ -619,7 +629,7 @@ async function printDoctor() {
     console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
   }
 
-  const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
+  const state = await fs.readFile(runtimeStatePath(config.bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   if (state?.url) {
     const health = spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', `${state.url.replace(/\/$/, '')}/api/health`], { encoding: 'utf8' });
     console.log(`- runtime health: ${health.status === 0 ? `ok (${health.stdout.trim() || 'reachable'})` : 'unreachable'}`);

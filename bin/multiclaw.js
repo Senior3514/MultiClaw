@@ -432,6 +432,9 @@ function printGuide() {
 3. Start the runtime
    multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
 
+   Or with OpenRouter:
+   multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+
 4. Check status
    multiclaw status
 
@@ -449,6 +452,7 @@ Then:
   multiclaw walkthrough
   multiclaw configure
   multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+  multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
   multiclaw status
   multiclaw stop
 

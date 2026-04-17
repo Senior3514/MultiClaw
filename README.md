@@ -91,16 +91,29 @@ multiclaw configure
 multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 
+Or with OpenRouter:
+
+```bash
+multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+```
+
 Or, if you want to install and start in one go:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --start --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```
 
+Or with OpenRouter in one go:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --start --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+```
+
 Or after cloning locally:
 
 ```bash
 npm run up -- --tailscale --provider openai --model gpt-5.4 --api-key YOUR_KEY
+npm run up -- --tailscale --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
 ```
 
 Uninstall:

@@ -21,11 +21,15 @@ if (session?.email) {
 }
 
 function renderCompany(company) {
+  const execution = company.executionState || {};
+
   return `
     <div class="route-card">
       <small>${company.generatedAt}</small>
       <strong>${company.projectName}</strong>
       <p>${company.archetype}</p>
+      <small>${execution.status || 'unknown'}</small>
+      <p>${execution.focus || 'Awaiting visible focus'}</p>
       <div class="cta-row">
         <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>
       </div>
@@ -45,7 +49,7 @@ async function loadStats() {
     if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
     if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Workspace flow active across install, steering, and company generation.';
     if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} generated compan${stats.companies === 1 ? 'y' : 'ies'}`;
-    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is becoming visible through dashboard, topology, and contact surfaces.';
+    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is visible through topology, execution state, activity feed, and company control surfaces.';
     if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `${stats.artifacts} artifacts live`;
     if (missionArtifactsCopyEl) missionArtifactsCopyEl.textContent = 'Generated outputs are accumulating as tangible proof that the product is doing real work.';
   } catch (error) {

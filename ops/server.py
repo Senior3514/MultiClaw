@@ -465,6 +465,10 @@ def list_companies():
             company.setdefault("productOrigin", "Existing product")
             company.setdefault("autonomyMode", "Operator-assisted")
             company.setdefault("nextSteps", build_next_steps(company.get("projectName", company_dir.name)))
+            execution_state = read_json(company_dir / "EXECUTION-STATE.json", None)
+            if execution_state is None:
+                execution_state = update_company_execution_state(company_dir.name, company)
+            company["executionState"] = execution_state
             companies.append(company)
         except Exception:
             continue

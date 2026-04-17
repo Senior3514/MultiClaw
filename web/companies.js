@@ -16,6 +16,8 @@ function setStatus(message, kind = 'idle') {
 }
 
 function renderCompanyCard(company) {
+  const execution = company.executionState || {};
+
   return `
     <article class="panel feature-card company-card">
       <div class="eyebrow">${company.companyId}</div>
@@ -28,8 +30,14 @@ function renderCompanyCard(company) {
         <span>${company.autonomyMode || 'Operator-assisted'}</span>
         <span>${company.rolesCount} leads</span>
       </div>
+      <div class="route-card">
+        <small>${execution.status || 'unknown'}</small>
+        <strong>${execution.focus || 'Awaiting visible focus'}</strong>
+        <p>${execution.summary || 'Execution summary not available yet.'}</p>
+      </div>
       <div class="company-footer">
         <small>Generated: ${company.generatedAt}</small>
+        <small>Last activity: ${execution.lastActivityAt || 'n/a'}</small>
       </div>
       <div class="cta-row">
         <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>

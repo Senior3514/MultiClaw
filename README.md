@@ -100,6 +100,8 @@ multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUT
 
 Or, if you want to install, start, and verify in one go:
 
+The default private flow is single-user and should not force signup or email friction on your own VPS.
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash -s -- --start --provider openai --model gpt-5.4 --api-key YOUR_KEY
 ```

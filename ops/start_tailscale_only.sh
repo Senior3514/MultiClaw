@@ -15,6 +15,8 @@ if [[ -f "$RUNTIME_ENV_FILE" ]]; then
   set +a
 fi
 
+export MULTICLAW_AUTH_MODE="${MULTICLAW_AUTH_MODE:-single-user}"
+
 TS_IP="$(tailscale ip -4 | head -n1)"
 
 if [[ -z "$TS_IP" ]]; then

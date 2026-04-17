@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700;800&display=swap');
+
 :root {
   color-scheme: dark;
   --bg: #060816;
@@ -9,6 +11,7 @@
   --primary: #7c5cff;
   --accent: #28d7b9;
   --shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+  --display-font: 'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif;
 }
 
 * {
@@ -23,7 +26,7 @@ html, body {
 }
 
 body {
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--display-font);
   background:
     radial-gradient(circle at top left, rgba(124, 92, 255, 0.22), transparent 32%),
     radial-gradient(circle at top right, rgba(40, 215, 185, 0.12), transparent 28%),
@@ -161,6 +164,8 @@ body.auth-pending .site-shell {
   justify-items: center;
   gap: 14px;
   margin-bottom: 18px;
+  animation: avatarBob 6s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .hero-brand strong {
@@ -253,6 +258,11 @@ body.auth-pending .site-shell {
 h1, h2, h3, h4, p, strong {
   margin: 0;
   overflow-wrap: anywhere;
+}
+
+h1, h2, h3, h4, .brand-inline strong, .hero-brand strong {
+  font-family: var(--display-font);
+  letter-spacing: -0.02em;
 }
 
 p {
@@ -1308,6 +1318,11 @@ button:hover {
       0 16px 34px rgba(76, 106, 255, 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
+}
+
+@keyframes avatarBob {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
 }
 
 @keyframes tickerScroll {

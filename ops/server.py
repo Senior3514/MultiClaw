@@ -239,6 +239,44 @@ def build_contact_surfaces():
     ]
 
 
+def build_company_reply(company, prompt: str):
+    prompt = (prompt or "").strip()
+    prompt_lower = prompt.lower()
+    roles = company.get("roles", [])
+    missions = company.get("missions", [])
+    next_steps = company.get("nextSteps", [])
+    contact_surfaces = company.get("contactSurfaces", [])
+    operator = roles[0]["title"] if roles else "Primary Operator"
+
+    if any(token in prompt_lower for token in ["next", "priority", "priorities", "fix", "what should"]):
+        reply = "Here is the most useful near-term focus for this company right now."
+        suggested = next_steps[:3] or missions[:3]
+    elif any(token in prompt_lower for token in ["talk", "contact", "reach", "channel", "telegram"]):
+        reply = "These are the strongest current contact and operating surfaces for this company."
+        suggested = [
+            f"{surface['name']}: {surface['status']}"
+            for surface in contact_surfaces[:3]
+        ]
+    elif any(token in prompt_lower for token in ["mission", "goal", "plan"]):
+        reply = "These are the current mission-level directions this company is optimized around."
+        suggested = missions[:3]
+    else:
+        reply = (
+            f"{company.get('projectName', 'This company')} is active. The company is structured to operate through clear leadership, mission focus, and visible next steps."
+        )
+        suggested = [
+            *(next_steps[:2] or []),
+            *(missions[:1] or []),
+        ]
+
+    return {
+        "speaker": operator,
+        "reply": reply,
+        "suggestedActions": suggested,
+        "companyId": company.get("companyId"),
+    }
+
+
 def build_next_steps(project_name: str):
     return [
         f"Review the generated structure for {project_name}.",
@@ -624,6 +662,25 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if token:
                 delete_session(token)
             self.send_json(200, {"ok": True}, f"{SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax")
+            return
+
+        if self.path.startswith("/api/company/") and self.path.endswith("/ask"):
+            if not self.require_session():
+                return
+            try:
+                company_id = self.path.split("/api/company/", 1)[1].split("/ask", 1)[0].strip()
+                company = load_company(company_id)
+                if company is None:
+                    self.send_json(404, {"error": "company not found"})
+                    return
+                payload = self.read_json_body()
+                prompt = payload.get("prompt", "")
+                if not prompt.strip():
+                    self.send_json(400, {"error": "prompt is required"})
+                    return
+                self.send_json(200, build_company_reply(company, prompt))
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
             return
 
         if self.path == "/api/generate":

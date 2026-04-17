@@ -18,6 +18,9 @@ const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
 const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
+const companyAskInput = document.getElementById('companyAskInput');
+const companyAskBtn = document.getElementById('companyAskBtn');
+const companyAskResult = document.getElementById('companyAskResult');
 
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
@@ -120,6 +123,40 @@ function renderArtifacts(artifacts) {
   `).join('');
 }
 
+function renderAskResult(result) {
+  return `
+    <div class="mission-card">
+      <small>${result.speaker}</small>
+      <strong>${result.reply}</strong>
+      <p>${(result.suggestedActions || []).join(' • ')}</p>
+    </div>
+  `;
+}
+
+async function askCompany() {
+  const prompt = companyAskInput?.value?.trim();
+  if (!prompt) return;
+
+  companyAskBtn.disabled = true;
+  companyAskResult.innerHTML = '<div class="route-card"><strong>Thinking...</strong><p>Contacting the company operator surface.</p></div>';
+
+  try {
+    const response = await fetch(`/api/company/${encodeURIComponent(companyId)}/ask`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Failed with status ${response.status}`);
+    companyAskResult.innerHTML = renderAskResult(result);
+  } catch (error) {
+    console.error(error);
+    companyAskResult.innerHTML = '<div class="route-card"><strong>Request failed</strong><p>The company did not answer this request.</p></div>';
+  } finally {
+    companyAskBtn.disabled = false;
+  }
+}
+
 async function loadCompany() {
   if (!companyId) {
     titleEl.textContent = 'Missing company ID';
@@ -163,5 +200,12 @@ async function loadCompany() {
     setStatus('Failed to load company data.', 'error');
   }
 }
+
+companyAskBtn?.addEventListener('click', askCompany);
+companyAskInput?.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    askCompany();
+  }
+});
 
 loadCompany();

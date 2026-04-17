@@ -11,40 +11,46 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "[1/8] health"
+echo "[1/9] health"
 curl --fail --silent --show-error "$BASE_URL/api/health" >/dev/null
 
-echo "[2/8] signup"
+echo "[2/9] signup"
 curl --fail --silent --show-error -c "$COOKIE_JAR" \
   -H 'Content-Type: application/json' \
   -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}" \
   "$BASE_URL/api/auth/signup" >/dev/null
 
-echo "[3/8] me"
+echo "[3/9] me"
 curl --fail --silent --show-error -b "$COOKIE_JAR" \
   "$BASE_URL/api/auth/me" >/dev/null
 
-echo "[4/8] generate"
+echo "[4/9] generate"
 GENERATE_RESPONSE="$(curl --fail --silent --show-error -b "$COOKIE_JAR" \
   -H 'Content-Type: application/json' \
   -d '{"productOrigin":"Existing product","autonomyMode":"Operator-assisted","projectName":"SmokeCo","description":"A smoke test company","audience":"Testers","businessModel":"SaaS","stage":"MVP","topGoals":"Verify the full flow","tone":"Sharp"}' \
   "$BASE_URL/api/generate")"
 COMPANY_ID="$(printf '%s' "$GENERATE_RESPONSE" | python3 -c 'import json,sys; print(json.load(sys.stdin)["companyId"])')"
 
-echo "[5/8] companies"
+echo "[5/9] companies"
 curl --fail --silent --show-error -b "$COOKIE_JAR" \
   "$BASE_URL/api/companies" >/dev/null
 
-echo "[6/8] company"
+echo "[6/9] company"
 curl --fail --silent --show-error -b "$COOKIE_JAR" \
   "$BASE_URL/api/company/$COMPANY_ID" >/dev/null
 
-echo "[7/8] artifacts"
+echo "[7/9] artifacts"
 curl --fail --silent --show-error -b "$COOKIE_JAR" \
   "$BASE_URL/api/company/$COMPANY_ID/artifacts" >/dev/null
 
-echo "[8/8] pack download"
+echo "[8/9] pack download"
 curl --fail --silent --show-error -b "$COOKIE_JAR" \
   "$BASE_URL/api/company/$COMPANY_ID/download" >/dev/null
+
+echo "[9/9] ask company"
+curl --fail --silent --show-error -b "$COOKIE_JAR" \
+  -H 'Content-Type: application/json' \
+  -d '{"prompt":"what should this company do next?"}' \
+  "$BASE_URL/api/company/$COMPANY_ID/ask" >/dev/null
 
 echo "MultiClaw smoke test passed: $BASE_URL (company: $COMPANY_ID)"

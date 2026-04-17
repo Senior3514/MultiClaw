@@ -9,6 +9,7 @@ const companyId = params.get('id');
 const titleEl = document.getElementById('companyTitle');
 const statusEl = document.getElementById('companyStatus');
 const overviewEl = document.getElementById('companyOverview');
+const executionEl = document.getElementById('companyExecution');
 const assetsEl = document.getElementById('companyAssets');
 const soulEl = document.getElementById('companySoul');
 const routingEl = document.getElementById('companyRouting');
@@ -38,6 +39,43 @@ function renderRows(rows) {
       <p>Generated company metadata.</p>
     </div>
   `).join('');
+}
+
+function renderExecution(state) {
+  if (!state) {
+    return '<div class="route-card"><strong>Unknown</strong><p>Execution state is not available yet.</p></div>';
+  }
+
+  const missionBoard = (state.missionBoard || []).slice(0, 3).map((mission) => `${mission.status}: ${mission.title}`).join(' • ');
+  const nextStepBoard = (state.nextStepBoard || []).slice(0, 2).map((step) => `${step.status}: ${step.title}`).join(' • ');
+
+  return `
+    <div class="brand-row">
+      <small>Status</small>
+      <strong>${state.status}</strong>
+      <p>${state.summary}</p>
+    </div>
+    <div class="brand-row">
+      <small>Current focus</small>
+      <strong>${state.focus}</strong>
+      <p>What this company should concentrate on right now.</p>
+    </div>
+    <div class="brand-row">
+      <small>Last visible activity</small>
+      <strong>${state.lastActivityAt}</strong>
+      <p>${state.eventsCount} events, ${state.missionsCount} missions, ${state.nextStepsCount} next steps.</p>
+    </div>
+    <div class="route-card">
+      <small>Mission board</small>
+      <strong>Execution posture</strong>
+      <p>${missionBoard || 'No mission board yet.'}</p>
+    </div>
+    <div class="route-card">
+      <small>Next-step board</small>
+      <strong>Activation posture</strong>
+      <p>${nextStepBoard || 'No next-step board yet.'}</p>
+    </div>
+  `;
 }
 
 function renderAssets(assets) {
@@ -216,6 +254,7 @@ async function loadCompany() {
       ['Stage', company.stage],
       ['Generated', company.generatedAt],
     ]);
+    if (executionEl) executionEl.innerHTML = renderExecution(company.executionState);
     assetsEl.innerHTML = renderAssets(company.existingAssets);
     soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);

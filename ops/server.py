@@ -81,6 +81,60 @@ def load_company_events(company_id: str):
     return read_json(GENERATED_ROOT / company_id / "events.json", [])
 
 
+def build_execution_state(company, events=None):
+    events = events or []
+    next_steps = company.get("nextSteps") or []
+    missions = company.get("missions") or []
+    last_event = events[0] if events else None
+    has_operator_input = any(event.get("kind") == "operator-ask" for event in events)
+
+    if has_operator_input:
+        status = "active"
+        summary = "The company has operator input and visible execution activity."
+    elif events:
+        status = "initialized"
+        summary = "The company has been generated and is waiting for stronger operator steering."
+    else:
+        status = "warming-up"
+        summary = "The company exists, but visible execution has not started yet."
+
+    mission_board = []
+    for index, mission in enumerate(missions):
+        mission_board.append({
+            "title": mission,
+            "status": "active" if index == 0 and events else "queued",
+        })
+
+    next_step_board = []
+    for index, step in enumerate(next_steps):
+        next_step_board.append({
+            "title": step,
+            "status": "recommended" if index == 0 else "pending",
+        })
+
+    return {
+        "status": status,
+        "summary": summary,
+        "focus": (next_steps[:1] or missions[:1] or ["Await first operator instruction."])[0],
+        "eventsCount": len(events),
+        "missionsCount": len(missions),
+        "nextStepsCount": len(next_steps),
+        "lastActivityAt": last_event.get("timestamp") if last_event else company.get("generatedAt"),
+        "missionBoard": mission_board,
+        "nextStepBoard": next_step_board,
+    }
+
+
+def update_company_execution_state(company_id: str, company=None):
+    company = company or load_company(company_id)
+    if company is None:
+        return None
+    events = load_company_events(company_id)
+    state = build_execution_state(company, events)
+    write_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", state)
+    return state
+
+
 def hash_password(password: str, salt_hex: str) -> str:
     salt = bytes.fromhex(salt_hex)
     digest = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, 200_000)
@@ -412,6 +466,10 @@ def load_company(company_id: str):
         ),
     )
     company.setdefault("contactSurfaces", build_contact_surfaces())
+    execution_state = read_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", None)
+    if execution_state is None:
+        execution_state = update_company_execution_state(company_id, company)
+    company["executionState"] = execution_state
     return company
 
 
@@ -497,6 +555,7 @@ def write_company_artifacts(output_dir: Path, result, roles, missions, next_step
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")
     write_json(output_dir / "events.json", [])
+    write_json(output_dir / "EXECUTION-STATE.json", build_execution_state(result, []))
 
 
 def generate_company(payload):
@@ -565,6 +624,7 @@ def generate_company(payload):
             f"Generated {project_name} with {len(roles)} core roles and {len(missions)} mission directions.",
             {"companyId": slug, "rolesCount": len(roles), "missionsCount": len(missions)},
         )
+        update_company_execution_state(slug, result)
     except Exception:
         if temp_dir.exists():
             shutil.rmtree(temp_dir, ignore_errors=True)
@@ -808,6 +868,7 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     prompt.strip(),
                     {"speaker": result.get("speaker"), "reply": result.get("reply")},
                 )
+                update_company_execution_state(company_id, company)
                 self.send_json(200, result)
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})

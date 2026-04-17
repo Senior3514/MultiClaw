@@ -1643,7 +1643,7 @@ body.light-theme .panel-strong {
 
   .landing-header .site-nav {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     overflow: visible;
   }
 
@@ -1686,6 +1686,15 @@ body.light-theme .panel-strong {
     box-shadow: 0 18px 36px rgba(3, 5, 14, 0.3);
   }
 
+  .landing-hero {
+    gap: 10px;
+    padding-block: 10px;
+  }
+
+  .landing-copy {
+    margin-top: -4px;
+  }
+
   .hero-copy h1 {
     font-size: 36px;
   }
@@ -1717,44 +1726,44 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 300px;
-    width: min(100%, 460px);
+    min-height: 230px;
+    width: min(100%, 320px);
     aspect-ratio: 1 / 1;
-    padding: 14px;
+    padding: 10px;
   }
 
   .graphic-core {
-    width: 168px;
-    height: 168px;
+    width: 144px;
+    height: 144px;
   }
 
   .graphic-avatar {
-    width: 82px;
-    height: 82px;
+    width: 68px;
+    height: 68px;
   }
 
   .graphic-core strong {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   .orbit-a {
-    width: 172px;
-    height: 172px;
+    width: 148px;
+    height: 148px;
   }
 
   .orbit-b {
-    width: 220px;
-    height: 220px;
+    width: 190px;
+    height: 190px;
   }
 
   .orbit-c {
-    width: 120px;
-    height: 120px;
+    width: 102px;
+    height: 102px;
   }
 
   .graphic-node {
-    font-size: 11px;
-    padding: 7px 9px;
+    font-size: 10px;
+    padding: 6px 8px;
   }
 
   .landing-cards .feature-card,
@@ -1775,5 +1784,10 @@ body.light-theme .panel-strong {
 
   .session-chip {
     justify-content: space-between;
+  }
+
+  .landing-header .session-chip {
+    justify-content: center;
+    gap: 8px;
   }
 }

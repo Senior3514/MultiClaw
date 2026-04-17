@@ -223,7 +223,7 @@ body.light-theme .site-header {
   isolation: isolate;
   overflow: hidden;
   background:
-    url('./multiclaw-avatar-from-6claw-reference.png') center/cover no-repeat,
+    url('./multiclaw-avatar-bright-hybrid.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.46), rgba(8, 22, 27, 0.92));
   border: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow:
@@ -657,7 +657,7 @@ video {
   border-radius: 50%;
   flex: 0 0 26px;
   background:
-    url('./multiclaw-avatar-from-6claw-reference.png') center/cover no-repeat,
+    url('./multiclaw-avatar-bright-hybrid.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.4), rgba(8, 22, 27, 0.92));
   box-shadow:
     0 8px 16px rgba(0, 0, 0, 0.28),
@@ -1382,18 +1382,24 @@ button:hover {
 
 @keyframes brandPulse {
   0%, 100% {
-    transform: translateY(0) scale(1);
+    transform: translateY(0) scale(1) rotate(0deg);
     box-shadow:
       0 24px 60px rgba(0, 0, 0, 0.35),
       0 12px 28px rgba(76, 106, 255, 0.32),
       inset 0 1px 0 rgba(255, 255, 255, 0.18);
   }
+  30% {
+    transform: translateY(-1px) scale(1.02) rotate(-3deg);
+  }
   50% {
-    transform: translateY(-2px) scale(1.02);
+    transform: translateY(-2px) scale(1.03) rotate(2deg);
     box-shadow:
       0 28px 70px rgba(0, 0, 0, 0.4),
       0 16px 34px rgba(76, 106, 255, 0.38),
       inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  70% {
+    transform: translateY(-1px) scale(1.02) rotate(-2deg);
   }
 }
 

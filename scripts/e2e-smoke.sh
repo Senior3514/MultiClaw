@@ -2,12 +2,14 @@
 set -euo pipefail
 
 BASE_URL="${1:-${MULTICLAW_BASE_URL:-http://127.0.0.1:8813}}"
+AUTH_MODE="${MULTICLAW_AUTH_MODE:-single-user}"
 COOKIE_JAR="$(mktemp)"
+HEADERS_FILE="$(mktemp)"
 EMAIL="smoke$(date +%s)@example.com"
 PASSWORD="supersecure123"
 
 cleanup() {
-  rm -f "$COOKIE_JAR"
+  rm -f "$COOKIE_JAR" "$HEADERS_FILE"
 }
 trap cleanup EXIT
 
@@ -39,14 +41,21 @@ echo "[4/15] walkthrough page"
 check_page "$BASE_URL/walkthrough.html" "Walkthrough"
 
 echo "[5/15] signup"
-curl --fail --silent --show-error -c "$COOKIE_JAR" \
+curl --fail --silent --show-error -D "$HEADERS_FILE" -c "$COOKIE_JAR" \
   -H 'Content-Type: application/json' \
   -d "{\"email\":\"$EMAIL\",\"password\":\"$PASSWORD\"}" \
   "$BASE_URL/api/auth/signup" >/dev/null
 
+if [[ "$AUTH_MODE" == "multi-user" ]]; then
+  grep -qi '^set-cookie:' "$HEADERS_FILE"
+  grep -q '[[:graph:]]' "$COOKIE_JAR"
+fi
+
 echo "[6/15] me"
-curl --fail --silent --show-error -b "$COOKIE_JAR" \
-  "$BASE_URL/api/auth/me" >/dev/null
+ME_RESPONSE="$(curl --fail --silent --show-error -b "$COOKIE_JAR" "$BASE_URL/api/auth/me")"
+if [[ "$AUTH_MODE" == "multi-user" ]]; then
+  printf '%s' "$ME_RESPONSE" | grep -q "$EMAIL"
+fi
 
 echo "[7/15] dashboard page"
 check_page "$BASE_URL/dashboard.html" "Mission control" auth

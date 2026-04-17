@@ -1767,8 +1767,8 @@ body.light-theme .panel-strong {
     width: 100%;
     display: flex;
     gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
+    overflow-x: visible;
     padding-bottom: 2px;
   }
 
@@ -1835,7 +1835,7 @@ body.light-theme .panel-strong {
   }
 
   .hero-copy h1 {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .section-heading h2,

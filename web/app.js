@@ -114,6 +114,36 @@ function renderMissions(missions) {
   `).join('');
 }
 
+function estimateArchetype(data) {
+  const text = `${data.businessModel || ''} ${data.description || ''}`.toLowerCase();
+  if (text.includes('marketplace')) return 'marketplace company';
+  if (text.includes('content') || text.includes('media')) return 'content company';
+  if (text.includes('service') || text.includes('lead')) return 'revenue ops company';
+  return 'product operating company';
+}
+
+function countCustomRoles(rawValue) {
+  return (rawValue || '').split('\n').map((line) => line.trim()).filter(Boolean).length;
+}
+
+function estimateRolesCount(data) {
+  const templateCount = {
+    Balanced: 0,
+    Executive: 2,
+    'Engineering-heavy': 2,
+    'Go-to-market': 2,
+  }[data.roleTemplate] || 0;
+  return 7 + templateCount + countCustomRoles(data.customRoles);
+}
+
+function updateLivePreview() {
+  const data = getFormData();
+  el('heroTitle').textContent = `${data.projectName || 'Untitled Project'}, powered by MultiClaw`;
+  el('heroSubtitle').textContent = `${data.description || 'A living AI company generated around your target system.'} This company is shaping into a ${estimateArchetype(data)}.`;
+  el('rolesCount').textContent = String(estimateRolesCount(data));
+  el('departmentsCount').textContent = String(Math.max(5, Math.min(12, estimateRolesCount(data))));
+}
+
 function getFormData() {
   return {
     productOrigin: el('productOrigin').value,
@@ -280,3 +310,9 @@ if (savedSettings.defaultAutonomyMode) el('autonomyMode').value = savedSettings.
 
 renderWizard();
 await loadCompanyForRefinement();
+updateLivePreview();
+
+document.querySelectorAll('input, textarea, select').forEach((field) => {
+  field.addEventListener('input', updateLivePreview);
+  field.addEventListener('change', updateLivePreview);
+});

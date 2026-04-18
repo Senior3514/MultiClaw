@@ -29,16 +29,16 @@ const platformNotes = {
 
 const bindModeNotes = {
   local: 'Local mode is optimized toward a simpler single-user product flow on your own machine.',
-  tailscale: 'Tailscale mode is optimized toward a protected workspace flow with cleaner private access.',
+  tailscale: 'Private-network mode is optimized toward a protected workspace flow with cleaner private access.',
 };
 
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
-  baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
+  baseInstallCommandEl.textContent = 'cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
   if (advancedInstallCommandEl) {
     advancedInstallCommandEl.textContent = `Continue inside MultiClaw after install. Bind: ${state.bind}. Provider: ${state.provider}.`;
   }
-  uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
+  uninstallCommandEl.textContent = 'cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   if (quickStartCommandEl) quickStartCommandEl.textContent = 'multiclaw start';
   if (quickVerifyCommandEl) quickVerifyCommandEl.textContent = 'multiclaw verify';
   if (quickStopCommandEl) quickStopCommandEl.textContent = 'multiclaw stop';

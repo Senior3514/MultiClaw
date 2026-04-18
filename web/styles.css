@@ -349,6 +349,10 @@ video {
   margin-inline: auto;
 }
 
+.landing-page .site-main > .landing-hero {
+  width: min(100%, 1280px);
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: 1fr;
@@ -467,18 +471,14 @@ video {
 .hero-graphic {
   position: relative;
   overflow: hidden;
-  min-height: clamp(460px, 62vw, 760px);
+  min-height: clamp(460px, 56vw, 760px);
   width: min(100%, 760px);
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
   margin-inline: auto;
-  padding: 18px;
-  background:
-    radial-gradient(circle at 50% 48%, rgba(243, 74, 120, 0.16), transparent 24%),
-    radial-gradient(circle at 50% 50%, rgba(86, 212, 209, 0.14), transparent 42%),
-    radial-gradient(circle at 50% 18%, rgba(247, 215, 160, 0.08), transparent 18%),
-    linear-gradient(180deg, rgba(7, 19, 26, 0.98), rgba(10, 22, 30, 0.94));
+  padding: 12px;
+  background: transparent;
 }
 
 .hero-graphic::before,
@@ -508,16 +508,16 @@ video {
 }
 
 .hero-graphic::before {
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
   border: 1px solid rgba(86, 212, 209, 0.08);
-  box-shadow: 0 0 120px rgba(86, 212, 209, 0.1);
+  box-shadow: 0 0 120px rgba(86, 212, 209, 0.12);
   animation: stagePulse 6s ease-in-out infinite;
 }
 
 .hero-graphic::after {
-  width: 450px;
-  height: 450px;
+  width: 500px;
+  height: 500px;
   border: 1px solid rgba(247, 215, 160, 0.06);
   animation: stagePulse 7.5s ease-in-out infinite reverse;
 }
@@ -532,30 +532,42 @@ video {
 }
 
 .glow-a {
-  width: 220px;
-  height: 220px;
+  width: 260px;
+  height: 260px;
   background: rgba(243, 74, 120, 0.28);
 }
 
 .glow-b {
-  width: 360px;
-  height: 360px;
+  width: 380px;
+  height: 380px;
   background: rgba(86, 212, 209, 0.18);
+}
+
+.glow-c {
+  width: 500px;
+  height: 500px;
+  background: rgba(124, 92, 255, 0.1);
+}
+
+.glow-d {
+  width: 620px;
+  height: 620px;
+  background: rgba(247, 215, 160, 0.07);
 }
 
 .graphic-core {
   position: absolute;
   inset: 50% auto auto 50%;
   transform: translate(-50%, -50%);
-  width: 270px;
-  height: 270px;
+  width: 276px;
+  height: 276px;
   z-index: 3;
   border-radius: 50%;
   display: grid;
   place-items: center;
   text-align: center;
-  gap: 6px;
-  padding: 18px;
+  gap: 2px;
+  padding: 14px;
   background:
     radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.22), transparent 24%),
     radial-gradient(circle at 50% 50%, rgba(243, 74, 120, 0.28), rgba(10, 25, 33, 0.98));
@@ -574,9 +586,28 @@ video {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.graphic-core::after {
+  content: '';
+  position: absolute;
+  inset: -28px;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg,
+      rgba(243, 74, 120, 0.0),
+      rgba(243, 74, 120, 0.18),
+      rgba(124, 92, 255, 0.2),
+      rgba(86, 212, 209, 0.22),
+      rgba(247, 215, 160, 0.18),
+      rgba(243, 74, 120, 0.0));
+  filter: blur(18px);
+  opacity: 0.75;
+  z-index: -1;
+  animation: cosmicHaloSpin 24s linear infinite;
+}
+
 .graphic-avatar {
-  width: 164px;
-  height: 164px;
+  width: 178px;
+  height: 178px;
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     0 0 42px rgba(124, 92, 255, 0.26),
@@ -584,14 +615,14 @@ video {
 }
 
 .graphic-core strong {
-  font-size: 22px;
+  font-size: 26px;
 }
 
 .graphic-core span {
   color: var(--muted);
   font-size: 12px;
   text-transform: uppercase;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
 }
 
 .graphic-orbit {
@@ -603,33 +634,47 @@ video {
 }
 
 .orbit-a {
-  width: 196px;
-  height: 196px;
+  width: 210px;
+  height: 210px;
 }
 
 .orbit-b {
-  width: 252px;
-  height: 252px;
+  width: 270px;
+  height: 270px;
 }
 
 .orbit-c {
-  width: 136px;
-  height: 136px;
+  width: 146px;
+  height: 146px;
   border-style: dashed;
   border-color: rgba(255, 255, 255, 0.08);
 }
 
 .orbit-d {
-  width: 324px;
-  height: 324px;
+  width: 340px;
+  height: 340px;
   border-color: rgba(86, 212, 209, 0.08);
 }
 
 .orbit-e {
-  width: 408px;
-  height: 408px;
+  width: 430px;
+  height: 430px;
   border-style: dashed;
   border-color: rgba(247, 215, 160, 0.08);
+}
+
+.orbit-f {
+  width: 530px;
+  height: 530px;
+  border-style: dotted;
+  border-color: rgba(243, 74, 120, 0.08);
+}
+
+.orbit-g {
+  width: 630px;
+  height: 630px;
+  border-style: dashed;
+  border-color: rgba(124, 92, 255, 0.07);
 }
 
 .graphic-orb {
@@ -644,27 +689,57 @@ video {
 }
 
 .orb-1 {
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   animation: orbDrift1 18s linear infinite;
 }
 
 .orb-2 {
-  width: 22px;
-  height: 22px;
+  width: 28px;
+  height: 28px;
   animation: orbDrift2 22s linear infinite reverse;
 }
 
 .orb-3 {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   animation: orbDrift3 15s linear infinite;
+}
+
+.orb-4 {
+  width: 18px;
+  height: 18px;
+  animation: orbDrift4 24s linear infinite;
+}
+
+.orb-5 {
+  width: 24px;
+  height: 24px;
+  animation: orbDrift5 19s linear infinite reverse;
+}
+
+.orb-6 {
+  width: 14px;
+  height: 14px;
+  animation: orbDrift6 28s linear infinite;
+}
+
+.orb-7 {
+  width: 26px;
+  height: 26px;
+  animation: orbDrift7 26s linear infinite reverse;
+}
+
+.orb-8 {
+  width: 12px;
+  height: 12px;
+  animation: orbDrift8 32s linear infinite;
 }
 
 .graphic-node {
   position: absolute;
   inset: 50% auto auto 50%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   z-index: 4;
   border-radius: 999px;
   background: rgba(10, 24, 31, 0.94);
@@ -691,14 +766,18 @@ video {
   animation: sparkPulse 4.2s ease-in-out infinite;
 }
 
-.spark-1 { transform: translate(-50%, -50%) rotate(20deg) translateY(-178px); }
-.spark-2 { transform: translate(-50%, -50%) rotate(78deg) translateY(-184px); }
-.spark-3 { transform: translate(-50%, -50%) rotate(138deg) translateY(-176px); }
-.spark-4 { transform: translate(-50%, -50%) rotate(198deg) translateY(-182px); }
-.spark-5 { transform: translate(-50%, -50%) rotate(258deg) translateY(-178px); }
-.spark-6 { transform: translate(-50%, -50%) rotate(318deg) translateY(-184px); }
-.spark-7 { transform: translate(-50%, -50%) rotate(48deg) translateY(-228px); }
-.spark-8 { transform: translate(-50%, -50%) rotate(228deg) translateY(-228px); }
+.spark-1 { transform: translate(-50%, -50%) rotate(20deg) translateY(-236px); }
+.spark-2 { transform: translate(-50%, -50%) rotate(78deg) translateY(-244px); }
+.spark-3 { transform: translate(-50%, -50%) rotate(138deg) translateY(-232px); }
+.spark-4 { transform: translate(-50%, -50%) rotate(198deg) translateY(-240px); }
+.spark-5 { transform: translate(-50%, -50%) rotate(258deg) translateY(-236px); }
+.spark-6 { transform: translate(-50%, -50%) rotate(318deg) translateY(-244px); }
+.spark-7 { transform: translate(-50%, -50%) rotate(48deg) translateY(-300px); }
+.spark-8 { transform: translate(-50%, -50%) rotate(228deg) translateY(-300px); }
+.spark-9 { transform: translate(-50%, -50%) rotate(108deg) translateY(-336px); }
+.spark-10 { transform: translate(-50%, -50%) rotate(288deg) translateY(-336px); }
+.spark-11 { transform: translate(-50%, -50%) rotate(0deg) translateY(-356px); }
+.spark-12 { transform: translate(-50%, -50%) rotate(180deg) translateY(-356px); }
 
 .claw-dot {
   width: 26px;
@@ -748,6 +827,8 @@ video {
 .node-4 { animation: orbitNode4 20s linear infinite reverse; }
 .node-5 { animation: orbitNode5 17s linear infinite; }
 .node-6 { animation: orbitNode6 22s linear infinite reverse; }
+.node-7 { animation: orbitNode7 19s linear infinite; }
+.node-8 { animation: orbitNode8 24s linear infinite reverse; }
 
 .cards-grid,
 .logic-grid,
@@ -1478,34 +1559,50 @@ button:hover {
   50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
 }
 
+@keyframes cosmicHaloSpin {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  to { transform: rotate(360deg) scale(1); }
+}
+
 @keyframes orbitNode1 {
-  from { transform: translate(-50%, -50%) rotate(0deg) translateY(-122px) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg) translateY(-122px) rotate(-360deg); }
+  from { transform: translate(-50%, -50%) rotate(0deg) translateY(-148px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateY(-148px) rotate(-360deg); }
 }
 
 @keyframes orbitNode2 {
-  from { transform: translate(-50%, -50%) rotate(90deg) translateY(-136px) rotate(-90deg); }
-  to { transform: translate(-50%, -50%) rotate(450deg) translateY(-136px) rotate(-450deg); }
+  from { transform: translate(-50%, -50%) rotate(90deg) translateY(-156px) rotate(-90deg); }
+  to { transform: translate(-50%, -50%) rotate(450deg) translateY(-156px) rotate(-450deg); }
 }
 
 @keyframes orbitNode3 {
-  from { transform: translate(-50%, -50%) rotate(180deg) translateY(-116px) rotate(-180deg); }
-  to { transform: translate(-50%, -50%) rotate(540deg) translateY(-116px) rotate(-540deg); }
+  from { transform: translate(-50%, -50%) rotate(180deg) translateY(-136px) rotate(-180deg); }
+  to { transform: translate(-50%, -50%) rotate(540deg) translateY(-136px) rotate(-540deg); }
 }
 
 @keyframes orbitNode4 {
-  from { transform: translate(-50%, -50%) rotate(270deg) translateY(-138px) rotate(-270deg); }
-  to { transform: translate(-50%, -50%) rotate(630deg) translateY(-138px) rotate(-630deg); }
+  from { transform: translate(-50%, -50%) rotate(270deg) translateY(-156px) rotate(-270deg); }
+  to { transform: translate(-50%, -50%) rotate(630deg) translateY(-156px) rotate(-630deg); }
 }
 
 @keyframes orbitNode5 {
-  from { transform: translate(-50%, -50%) rotate(45deg) translateY(-150px) rotate(-45deg); }
-  to { transform: translate(-50%, -50%) rotate(405deg) translateY(-150px) rotate(-405deg); }
+  from { transform: translate(-50%, -50%) rotate(45deg) translateY(-188px) rotate(-45deg); }
+  to { transform: translate(-50%, -50%) rotate(405deg) translateY(-188px) rotate(-405deg); }
 }
 
 @keyframes orbitNode6 {
-  from { transform: translate(-50%, -50%) rotate(225deg) translateY(-150px) rotate(-225deg); }
-  to { transform: translate(-50%, -50%) rotate(585deg) translateY(-150px) rotate(-585deg); }
+  from { transform: translate(-50%, -50%) rotate(225deg) translateY(-188px) rotate(-225deg); }
+  to { transform: translate(-50%, -50%) rotate(585deg) translateY(-188px) rotate(-585deg); }
+}
+
+@keyframes orbitNode7 {
+  from { transform: translate(-50%, -50%) rotate(28deg) translateY(-228px) rotate(-28deg); }
+  to { transform: translate(-50%, -50%) rotate(388deg) translateY(-228px) rotate(-388deg); }
+}
+
+@keyframes orbitNode8 {
+  from { transform: translate(-50%, -50%) rotate(208deg) translateY(-228px) rotate(-208deg); }
+  to { transform: translate(-50%, -50%) rotate(568deg) translateY(-228px) rotate(-568deg); }
 }
 
 @keyframes sparkPulse {
@@ -1524,8 +1621,33 @@ button:hover {
 }
 
 @keyframes orbDrift3 {
-  from { transform: translate(-50%, -50%) rotate(250deg) translateY(-186px) rotate(-250deg); }
-  to { transform: translate(-50%, -50%) rotate(610deg) translateY(-186px) rotate(-610deg); }
+  from { transform: translate(-50%, -50%) rotate(250deg) translateY(-246px) rotate(-250deg); }
+  to { transform: translate(-50%, -50%) rotate(610deg) translateY(-246px) rotate(-610deg); }
+}
+
+@keyframes orbDrift4 {
+  from { transform: translate(-50%, -50%) rotate(70deg) translateY(-318px) rotate(-70deg); }
+  to { transform: translate(-50%, -50%) rotate(430deg) translateY(-318px) rotate(-430deg); }
+}
+
+@keyframes orbDrift5 {
+  from { transform: translate(-50%, -50%) rotate(188deg) translateY(-356px) rotate(-188deg); }
+  to { transform: translate(-50%, -50%) rotate(548deg) translateY(-356px) rotate(-548deg); }
+}
+
+@keyframes orbDrift6 {
+  from { transform: translate(-50%, -50%) rotate(320deg) translateY(-404px) rotate(-320deg); }
+  to { transform: translate(-50%, -50%) rotate(680deg) translateY(-404px) rotate(-680deg); }
+}
+
+@keyframes orbDrift7 {
+  from { transform: translate(-50%, -50%) rotate(96deg) translateY(-462px) rotate(-96deg); }
+  to { transform: translate(-50%, -50%) rotate(456deg) translateY(-462px) rotate(-456deg); }
+}
+
+@keyframes orbDrift8 {
+  from { transform: translate(-50%, -50%) rotate(212deg) translateY(-520px) rotate(-212deg); }
+  to { transform: translate(-50%, -50%) rotate(572deg) translateY(-520px) rotate(-572deg); }
 }
 
 @keyframes pulseDot {
@@ -1694,9 +1816,9 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 340px;
+    min-height: 400px;
     width: 100%;
-    padding: 28px 16px;
+    padding: 14px 10px;
   }
 }
 
@@ -1767,8 +1889,8 @@ body.light-theme .panel-strong {
     width: 100%;
     display: flex;
     gap: 8px;
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    flex-wrap: wrap;
+    overflow-x: visible;
     padding-bottom: 2px;
   }
 
@@ -1835,7 +1957,7 @@ body.light-theme .panel-strong {
   }
 
   .hero-copy h1 {
-    font-size: 36px;
+    font-size: 34px;
   }
 
   .section-heading h2,
@@ -1865,24 +1987,24 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 340px;
-    width: min(100%, 460px);
+    min-height: 420px;
+    width: min(100%, 520px);
     aspect-ratio: 1 / 1;
-    padding: 14px;
+    padding: 12px;
   }
 
   .graphic-core {
-    width: 222px;
-    height: 222px;
+    width: 228px;
+    height: 228px;
   }
 
   .graphic-avatar {
-    width: 128px;
-    height: 128px;
+    width: 146px;
+    height: 146px;
   }
 
   .graphic-core strong {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .orbit-a {
@@ -1891,28 +2013,38 @@ body.light-theme .panel-strong {
   }
 
   .orbit-b {
-    width: 228px;
-    height: 228px;
+    width: 220px;
+    height: 220px;
   }
 
   .orbit-c {
-    width: 122px;
-    height: 122px;
+    width: 126px;
+    height: 126px;
   }
 
   .orbit-d {
-    width: 268px;
-    height: 268px;
+    width: 272px;
+    height: 272px;
   }
 
   .orbit-e {
-    width: 332px;
-    height: 332px;
+    width: 340px;
+    height: 340px;
+  }
+
+  .orbit-f {
+    width: 408px;
+    height: 408px;
+  }
+
+  .orbit-g {
+    width: 472px;
+    height: 472px;
   }
 
   .graphic-node {
-    font-size: 9px;
-    padding: 5px 7px;
+    font-size: 10px;
+    padding: 6px 8px;
     gap: 5px;
   }
 

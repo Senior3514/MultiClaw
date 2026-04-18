@@ -1,13 +1,24 @@
+import { isCapabilitySupported } from './capabilities.js';
+
+const VALID_PRIORITIES = new Set(['balanced', 'quality', 'speed']);
+const VALID_PRIVACY = new Set(['standard', 'high', 'strict']);
+const VALID_BUDGETS = new Set(['balanced', 'low', 'high']);
+
+function normalizeEnum(value, validValues, fallback) {
+  if (!value) return fallback;
+  return validValues.has(value) ? value : fallback;
+}
+
 function normalizePriority(priority) {
-  return priority || 'balanced';
+  return normalizeEnum(priority, VALID_PRIORITIES, 'balanced');
 }
 
 function normalizePrivacy(privacy) {
-  return privacy || 'standard';
+  return normalizeEnum(privacy, VALID_PRIVACY, 'standard');
 }
 
 function normalizeBudget(budget) {
-  return budget || 'balanced';
+  return normalizeEnum(budget, VALID_BUDGETS, 'balanced');
 }
 
 function scoreProvider(provider, options) {
@@ -55,27 +66,59 @@ export class ModelRouter {
       throw new Error('Router selection requires a capability');
     }
 
+    if (!isCapabilitySupported(capability)) {
+      return {
+        provider: null,
+        reason: `Unsupported capability requested: ${capability}`,
+        candidates: [],
+      };
+    }
+
     let candidates = this.registry.byCapability(capability);
+    const filters = [];
+
+    if (options.requireReady !== false) {
+      candidates = candidates.filter((provider) => provider.ready !== false);
+      filters.push('ready');
+    }
 
     if (options.allowedDeployments?.length) {
       candidates = candidates.filter((provider) => options.allowedDeployments.includes(provider.deployment));
+      filters.push(`deployments:${options.allowedDeployments.join(',')}`);
+    }
+
+    if (options.allowedProviders?.length) {
+      candidates = candidates.filter((provider) => options.allowedProviders.includes(provider.id));
+      filters.push(`allowedProviders:${options.allowedProviders.join(',')}`);
+    }
+
+    if (options.excludedProviders?.length) {
+      candidates = candidates.filter((provider) => !options.excludedProviders.includes(provider.id));
+      filters.push(`excludedProviders:${options.excludedProviders.join(',')}`);
     }
 
     if (!candidates.length) {
       return {
         provider: null,
-        reason: `No providers available for capability: ${capability}`,
+        reason: `No providers available for capability: ${capability}${filters.length ? ` after filters (${filters.join('; ')})` : ''}`,
         candidates: [],
       };
     }
 
+    const normalizedOptions = {
+      ...options,
+      priority: normalizePriority(options.priority),
+      budget: normalizeBudget(options.budget),
+      privacy: normalizePrivacy(options.privacy),
+    };
+
     const ranked = candidates
-      .map((provider) => ({ provider, score: scoreProvider(provider, options) }))
+      .map((provider) => ({ provider, score: scoreProvider(provider, normalizedOptions) }))
       .sort((a, b) => b.score - a.score);
 
     return {
       provider: ranked[0].provider,
-      reason: `Selected ${ranked[0].provider.id} for ${capability}`,
+      reason: `Selected ${ranked[0].provider.id} for ${capability}${filters.length ? ` with filters (${filters.join('; ')})` : ''}`,
       candidates: ranked,
     };
   }

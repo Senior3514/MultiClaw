@@ -19,7 +19,10 @@
         <nav class="site-nav">
           <a href="./index.html">Home</a>
           <a href="./install.html">Install</a>
-          <a href="./dashboard.html">Open workspace</a>
+          <a href="./walkthrough.html">Walkthrough</a>
+          <a href="./dashboard.html">Workspace</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./companies.html">Companies</a>
           <a href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
         <div id="sessionArea" class="session-area"></div>
@@ -55,7 +58,7 @@
             </div>
             <div class="logic-card hover-lift">
               <strong>3. Layer extras later</strong>
-              <p>Add Tailscale, channels, and advanced integrations only after the runtime is working.</p>
+              <p>Add private-network access, channels, and advanced integrations only after the runtime is working.</p>
             </div>
           </div>
         </section>
@@ -69,9 +72,9 @@
               <button class="choice-card" data-platform="windows">Windows (WSL)</button>
             </div>
 
-            <div class="eyebrow install-subtitle">Bind mode</div>
+            <div class="eyebrow install-subtitle">Access mode</div>
             <div class="choice-grid" id="bindChoices">
-              <button class="choice-card selected" data-bind="tailscale">Tailscale</button>
+              <button class="choice-card selected" data-bind="tailscale">Private network</button>
               <button class="choice-card" data-bind="local">Local only</button>
             </div>
 
@@ -84,12 +87,12 @@
             <pre class="install-command" id="baseInstallCommand"></pre>
             <div class="cta-row">
               <button class="button-link primary button-reset" id="copyBaseInstallCommand">Copy install</button>
-              <a class="button-link secondary" href="./dashboard.html">Open workspace</a>
-              <a class="button-link secondary" href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">Open GitHub</a>
+              <a class="button-link secondary" href="./dashboard.html">Enter workspace</a>
+              <a class="button-link secondary" href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">GitHub</a>
             </div>
             <div class="install-notes">
               <p id="platformNote">Ubuntu/VPS is the cleanest path right now.</p>
-              <p id="bindModeNote">Local mode should feel simple and direct. Tailscale mode should feel protected and shareable.</p>
+              <p id="bindModeNote">Local mode should feel simple and direct. Private-network mode should feel protected and shareable.</p>
               <p>This gives you the base product and the `multiclaw` command with minimal friction.</p>
               <p>MultiClaw is a standalone product. Anyone should be able to take it from GitHub and run it on their own machine or VPS.</p>
               <p>Default private install flow is single-user and should not force account friction on your own VPS.</p>

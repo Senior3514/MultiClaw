@@ -19,7 +19,10 @@
         <nav class="site-nav">
           <a href="./index.html">Home</a>
           <a href="./install.html">Install</a>
-          <a href="./dashboard.html">Open workspace</a>
+          <a href="./walkthrough.html">Walkthrough</a>
+          <a href="./dashboard.html">Workspace</a>
+          <a href="./generator.html">Generator</a>
+          <a href="./companies.html">Companies</a>
           <a href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
         <div id="sessionArea" class="session-area"></div>
@@ -39,7 +42,7 @@
         <section class="logic-grid operation-grid">
           <div class="logic-card hover-lift">
             <strong>1. Bootstrap</strong>
-            <pre class="install-command" id="cmdBootstrap">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+            <pre class="install-command" id="cmdBootstrap">cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
             <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdBootstrap">Copy</button></div>
           </div>
           <div class="logic-card hover-lift">
@@ -60,11 +63,17 @@
           <article class="panel install-panel">
             <div class="eyebrow">After install</div>
             <p>MultiClaw should expose the rest of the journey from inside the product and CLI naturally, without turning the public walkthrough into a wall of commands.</p>
+            <pre class="install-command" id="cmdStart">multiclaw start</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdStart">Copy start</button></div>
+            <pre class="install-command" id="cmdVerify">multiclaw verify</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdVerify">Copy verify</button></div>
+            <pre class="install-command" id="cmdStop">multiclaw stop</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdStop">Copy stop</button></div>
           </article>
           <article class="panel panel-strong install-panel">
             <div class="eyebrow">If you need to remove it</div>
-            <pre class="install-command" id="cmdUninstall">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash</pre>
-            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdUninstall">Copy</button></div>
+            <pre class="install-command" id="cmdUninstall">cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash</pre>
+            <div class="cta-row"><button class="button-link secondary button-reset" data-copy-target="cmdUninstall">Copy uninstall</button></div>
           </article>
         </section>
       </main>

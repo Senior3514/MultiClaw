@@ -3,12 +3,14 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from pathlib import Path
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 import hashlib
 import io
 import json
 import os
 import re
 import secrets
+import shutil
 import sqlite3
 import sys
 import time
@@ -16,11 +18,13 @@ import zipfile
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
 GENERATED_ROOT = Path(__file__).resolve().parent.parent / "generated-live"
+TMP_GENERATED_ROOT = GENERATED_ROOT / ".tmp"
 AUTH_ROOT = GENERATED_ROOT / ".auth"
 DB_PATH = AUTH_ROOT / "multiclaw.db"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
+SESSION_TTL_SECONDS = 60 * 60 * 24 * 14
 RATE_LIMITS = {}
 AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
 SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
@@ -42,6 +46,15 @@ def allow_rate(key: str, limit: int, window_seconds: int):
     return True
 
 
+def parse_utc_timestamp(value: str):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S UTC").replace(tzinfo=timezone.utc)
+    except Exception:
+        return None
+
+
 def slugify(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower())
     slug = re.sub(r"^-+|-+$", "", slug)
@@ -60,6 +73,119 @@ def read_json(path: Path, default):
 def write_json(path: Path, payload):
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+
+def append_company_event(company_id: str, kind: str, title: str, detail: str, payload=None):
+    events_path = GENERATED_ROOT / company_id / "events.json"
+    events = read_json(events_path, [])
+    events.insert(0, {
+        "timestamp": now_utc(),
+        "kind": kind,
+        "title": title,
+        "detail": detail,
+        "payload": payload or {},
+    })
+    write_json(events_path, events[:100])
+
+
+def load_company_events(company_id: str):
+    return read_json(GENERATED_ROOT / company_id / "events.json", [])
+
+
+def build_execution_state(company, events=None):
+    events = events or []
+    next_steps = company.get("nextSteps") or []
+    missions = company.get("missions") or []
+    last_event = events[0] if events else None
+    has_operator_input = any(event.get("kind") == "operator-ask" for event in events)
+
+    if has_operator_input:
+        status = "active"
+        summary = "The company has operator input and visible execution activity."
+    elif events:
+        status = "initialized"
+        summary = "The company has been generated and is waiting for stronger operator steering."
+    else:
+        status = "warming-up"
+        summary = "The company exists, but visible execution has not started yet."
+
+    mission_board = []
+    for index, mission in enumerate(missions):
+        mission_board.append({
+            "title": mission,
+            "status": "active" if index == 0 and events else "queued",
+        })
+
+    next_step_board = []
+    for index, step in enumerate(next_steps):
+        next_step_board.append({
+            "title": step,
+            "status": "recommended" if index == 0 else "pending",
+        })
+
+    return {
+        "status": status,
+        "summary": summary,
+        "focus": (next_steps[:1] or missions[:1] or ["Await first operator instruction."])[0],
+        "eventsCount": len(events),
+        "missionsCount": len(missions),
+        "nextStepsCount": len(next_steps),
+        "lastActivityAt": last_event.get("timestamp") if last_event else company.get("generatedAt"),
+        "missionBoard": mission_board,
+        "nextStepBoard": next_step_board,
+    }
+
+
+def update_company_execution_state(company_id: str, company=None):
+    company = company or load_company(company_id)
+    if company is None:
+        return None
+    events = load_company_events(company_id)
+    state = build_execution_state(company, events)
+    write_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", state)
+    return state
+
+
+def run_company_cycle(company_id: str, company=None):
+    company = company or load_company(company_id)
+    if company is None:
+        return None
+
+    events = load_company_events(company_id)
+    cycle_number = sum(1 for event in events if event.get("kind") == "execution-cycle") + 1
+    state = read_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", None) or build_execution_state(company, events)
+    focus = state.get("focus") or (company.get("nextSteps") or company.get("missions") or ["Await first operator instruction."])[0]
+    mission = (company.get("missions") or ["No mission declared yet."])[0]
+    next_step = (company.get("nextSteps") or ["No next step declared yet."])[0]
+    artifact_name = f"CYCLE-{cycle_number:03}.md"
+    cycle_time = now_utc()
+
+    (GENERATED_ROOT / company_id / artifact_name).write_text(
+        f"# Execution Cycle {cycle_number}\n\n"
+        f"- Company: {company.get('projectName', company_id)}\n"
+        f"- Cycle: {cycle_number}\n"
+        f"- Generated at: {cycle_time}\n"
+        f"- Focus: {focus}\n"
+        f"- Primary mission: {mission}\n"
+        f"- Recommended next action: {next_step}\n",
+        encoding="utf-8",
+    )
+
+    append_company_event(
+        company_id,
+        "execution-cycle",
+        f"Execution cycle {cycle_number}",
+        f"Advanced the company around: {focus}",
+        {"cycleNumber": cycle_number, "artifact": artifact_name, "focus": focus},
+    )
+    state = update_company_execution_state(company_id, company)
+    return {
+        "cycleNumber": cycle_number,
+        "artifact": artifact_name,
+        "focus": focus,
+        "status": state.get("status") if state else "active",
+        "summary": state.get("summary") if state else "Execution cycle completed.",
+    }
 
 
 def hash_password(password: str, salt_hex: str) -> str:
@@ -106,8 +232,28 @@ def get_users():
     ]
 
 
+def cleanup_expired_sessions(conn=None):
+    owns_conn = conn is None
+    if conn is None:
+        conn = get_db()
+    try:
+        rows = conn.execute("SELECT token, created_at FROM sessions").fetchall()
+        expired_tokens = []
+        now = datetime.now(timezone.utc)
+        for row in rows:
+            created_at = parse_utc_timestamp(row["created_at"])
+            if created_at is None or (now - created_at).total_seconds() > SESSION_TTL_SECONDS:
+                expired_tokens.append(row["token"])
+        if expired_tokens:
+            conn.executemany("DELETE FROM sessions WHERE token = ?", [(token,) for token in expired_tokens])
+    finally:
+        if owns_conn:
+            conn.close()
+
+
 def get_sessions():
     with get_db() as conn:
+        cleanup_expired_sessions(conn)
         rows = conn.execute("SELECT token, email, created_at FROM sessions").fetchall()
     return {row["token"]: {"email": row["email"], "createdAt": row["created_at"]} for row in rows}
 
@@ -350,6 +496,10 @@ def list_companies():
             company.setdefault("productOrigin", "Existing product")
             company.setdefault("autonomyMode", "Operator-assisted")
             company.setdefault("nextSteps", build_next_steps(company.get("projectName", company_dir.name)))
+            execution_state = read_json(company_dir / "EXECUTION-STATE.json", None)
+            if execution_state is None:
+                execution_state = update_company_execution_state(company_dir.name, company)
+            company["executionState"] = execution_state
             companies.append(company)
         except Exception:
             continue
@@ -363,10 +513,9 @@ def build_stats():
     for company in companies:
         company_dir = GENERATED_ROOT / company["companyId"]
         artifacts += len([path for path in company_dir.iterdir() if path.is_file()]) if company_dir.exists() else 0
-    user_count = 1 if AUTH_MODE == "single-user" else len(users)
     return {
         "companies": len(companies),
-        "users": user_count,
+        "users": 1 if AUTH_MODE == "single-user" else len(users),
         "artifacts": artifacts,
         "mode": AUTH_MODE,
     }
@@ -395,6 +544,10 @@ def load_company(company_id: str):
         ),
     )
     company.setdefault("contactSurfaces", build_contact_surfaces())
+    execution_state = read_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", None)
+    if execution_state is None:
+        execution_state = update_company_execution_state(company_id, company)
+    company["executionState"] = execution_state
     return company
 
 
@@ -408,58 +561,20 @@ def build_company_soul(project_name: str, description: str, tone: str, autonomy_
     }
 
 
-def generate_company(payload):
-    product_origin = payload.get("productOrigin", "Existing product").strip() or "Existing product"
-    autonomy_mode = payload.get("autonomyMode", "Operator-assisted").strip() or "Operator-assisted"
-    project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
-    description = payload.get("description", "A serious AI product.").strip()
-    audience = payload.get("audience", "Builders").strip()
-    business_model = payload.get("businessModel", "SaaS").strip()
-    stage = payload.get("stage", "MVP").strip()
-    top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
-    tone = payload.get("tone", "Sharp, premium, operational").strip()
-    role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
-    custom_roles = payload.get("customRoles", "")
-    existing_assets = parse_existing_assets(payload.get("existingAssets", ""))
-
-    archetype = infer_archetype(business_model, description)
-    roles = build_roles(archetype, role_template, custom_roles)
-    routing = build_routing(description)
-    missions = build_missions(project_name, top_goals)
-    next_steps = build_next_steps(project_name)
-    contact_surfaces = build_contact_surfaces()
-    slug = slugify(project_name)
-    generated_at = now_utc()
-    company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
-
-    result = {
-        "projectName": project_name,
-        "companyId": slug,
-        "productOrigin": product_origin,
-        "autonomyMode": autonomy_mode,
-        "description": description,
-        "audience": audience,
-        "businessModel": business_model,
-        "stage": stage,
-        "tone": tone,
-        "roleTemplate": role_template,
-        "customRoles": custom_roles,
-        "existingAssets": existing_assets,
-        "topGoals": top_goals,
-        "archetype": archetype,
-        "roles": roles,
-        "routing": routing,
-        "missions": missions,
-        "companySoul": company_soul,
-        "contactSurfaces": contact_surfaces,
-        "nextSteps": next_steps,
-        "departmentsCount": max(5, min(12, len(roles))),
-        "rolesCount": len(roles),
-        "generatedAt": generated_at,
-    }
-
-    output_dir = GENERATED_ROOT / slug
+def write_company_artifacts(output_dir: Path, result, roles, missions, next_steps, existing_assets, contact_surfaces, routing):
     output_dir.mkdir(parents=True, exist_ok=True)
+    project_name = result["projectName"]
+    slug = result["companyId"]
+    product_origin = result["productOrigin"]
+    autonomy_mode = result["autonomyMode"]
+    archetype = result["archetype"]
+    audience = result["audience"]
+    business_model = result["businessModel"]
+    stage = result["stage"]
+    tone = result["tone"]
+    generated_at = result["generatedAt"]
+    company_soul = result["companySoul"]
+
     (output_dir / "company.json").write_text(json.dumps(result, indent=2), encoding="utf-8")
     (output_dir / "README.md").write_text(
         f"# {project_name}\n\n"
@@ -517,6 +632,81 @@ def generate_company(payload):
         encoding="utf-8",
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")
+    write_json(output_dir / "events.json", [])
+    write_json(output_dir / "EXECUTION-STATE.json", build_execution_state(result, []))
+
+
+def generate_company(payload):
+    product_origin = payload.get("productOrigin", "Existing product").strip() or "Existing product"
+    autonomy_mode = payload.get("autonomyMode", "Operator-assisted").strip() or "Operator-assisted"
+    project_name = payload.get("projectName", "Untitled Project").strip() or "Untitled Project"
+    description = payload.get("description", "A serious AI product.").strip()
+    audience = payload.get("audience", "Builders").strip()
+    business_model = payload.get("businessModel", "SaaS").strip()
+    stage = payload.get("stage", "MVP").strip()
+    top_goals = payload.get("topGoals", "Ship, validate, grow").strip()
+    tone = payload.get("tone", "Sharp, premium, operational").strip()
+    role_template = payload.get("roleTemplate", "Balanced").strip() or "Balanced"
+    custom_roles = payload.get("customRoles", "")
+    existing_assets = parse_existing_assets(payload.get("existingAssets", ""))
+
+    archetype = infer_archetype(business_model, description)
+    roles = build_roles(archetype, role_template, custom_roles)
+    routing = build_routing(description)
+    missions = build_missions(project_name, top_goals)
+    next_steps = build_next_steps(project_name)
+    contact_surfaces = build_contact_surfaces()
+    slug = slugify(project_name)
+    generated_at = now_utc()
+    company_soul = build_company_soul(project_name, description, tone, autonomy_mode, archetype)
+
+    result = {
+        "projectName": project_name,
+        "companyId": slug,
+        "productOrigin": product_origin,
+        "autonomyMode": autonomy_mode,
+        "description": description,
+        "audience": audience,
+        "businessModel": business_model,
+        "stage": stage,
+        "tone": tone,
+        "roleTemplate": role_template,
+        "customRoles": custom_roles,
+        "existingAssets": existing_assets,
+        "topGoals": top_goals,
+        "archetype": archetype,
+        "roles": roles,
+        "routing": routing,
+        "missions": missions,
+        "companySoul": company_soul,
+        "contactSurfaces": contact_surfaces,
+        "nextSteps": next_steps,
+        "departmentsCount": max(5, min(12, len(roles))),
+        "rolesCount": len(roles),
+        "generatedAt": generated_at,
+    }
+
+    final_dir = GENERATED_ROOT / slug
+    temp_dir = TMP_GENERATED_ROOT / f"{slug}-{int(time.time() * 1000)}-{secrets.token_hex(4)}"
+    temp_dir.parent.mkdir(parents=True, exist_ok=True)
+
+    try:
+        write_company_artifacts(temp_dir, result, roles, missions, next_steps, existing_assets, contact_surfaces, routing)
+        if final_dir.exists():
+            shutil.rmtree(final_dir)
+        temp_dir.rename(final_dir)
+        append_company_event(
+            slug,
+            "company-generated",
+            "Company generated",
+            f"Generated {project_name} with {len(roles)} core roles and {len(missions)} mission directions.",
+            {"companyId": slug, "rolesCount": len(roles), "missionsCount": len(missions)},
+        )
+        update_company_execution_state(slug, result)
+    except Exception:
+        if temp_dir.exists():
+            shutil.rmtree(temp_dir, ignore_errors=True)
+        raise
 
     return result
 
@@ -568,6 +758,19 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_json(401, {"error": "authentication required"})
             return None
         return token, session
+
+    def require_same_origin(self):
+        if AUTH_MODE == "single-user":
+            return True
+        origin_header = self.headers.get("Origin") or self.headers.get("Referer")
+        if not origin_header:
+            return True
+        parsed = urlparse(origin_header)
+        expected_host = self.headers.get("Host", "")
+        if parsed.netloc and parsed.netloc != expected_host:
+            self.send_json(403, {"error": "cross-origin request blocked"})
+            return False
+        return True
 
     def do_GET(self):
         if self.path == "/api/health":
@@ -653,6 +856,17 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 self.send_json(404, {"error": "company not found"})
             return
 
+        if self.path.startswith("/api/company/") and self.path.endswith("/events"):
+            if not self.require_session():
+                return
+            company_id = self.path.split("/api/company/", 1)[1].split("/events", 1)[0].strip()
+            company = load_company(company_id)
+            if company is None:
+                self.send_json(404, {"error": "company not found"})
+                return
+            self.send_json(200, load_company_events(company_id))
+            return
+
         if self.path.startswith("/api/company/"):
             if not self.require_session():
                 return
@@ -668,6 +882,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/api/auth/signup":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, SINGLE_USER_SESSION)
                 return
@@ -694,6 +910,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/login":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, SINGLE_USER_SESSION)
                 return
@@ -714,6 +932,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/logout":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, {"ok": True})
                 return
@@ -723,7 +943,26 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_json(200, {"ok": True}, f"{SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax")
             return
 
+        if self.path.startswith("/api/company/") and self.path.endswith("/cycle"):
+            if not self.require_same_origin():
+                return
+            if not self.require_session():
+                return
+            try:
+                company_id = self.path.split("/api/company/", 1)[1].split("/cycle", 1)[0].strip()
+                company = load_company(company_id)
+                if company is None:
+                    self.send_json(404, {"error": "company not found"})
+                    return
+                result = run_company_cycle(company_id, company)
+                self.send_json(200, result)
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
+            return
+
         if self.path.startswith("/api/company/") and self.path.endswith("/ask"):
+            if not self.require_same_origin():
+                return
             if not self.require_session():
                 return
             try:
@@ -737,12 +976,23 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 if not prompt.strip():
                     self.send_json(400, {"error": "prompt is required"})
                     return
-                self.send_json(200, build_company_reply(company, prompt))
+                result = build_company_reply(company, prompt)
+                append_company_event(
+                    company_id,
+                    "operator-ask",
+                    "Operator request",
+                    prompt.strip(),
+                    {"speaker": result.get("speaker"), "reply": result.get("reply")},
+                )
+                update_company_execution_state(company_id, company)
+                self.send_json(200, result)
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return
 
         if self.path == "/api/generate":
+            if not self.require_same_origin():
+                return
             if not self.require_session():
                 return
             if not allow_rate(f"generate:{self.client_address[0]}", 30, 60):
@@ -761,6 +1011,7 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
 if __name__ == "__main__":
     GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
+    TMP_GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
     AUTH_ROOT.mkdir(parents=True, exist_ok=True)
     init_db()
     server = ThreadingHTTPServer((HOST, PORT), MultiClawHandler)

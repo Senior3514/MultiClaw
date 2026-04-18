@@ -17,14 +17,13 @@
           </div>
         </a>
         <nav class="site-nav">
-          <a href="./dashboard.html">Dashboard</a>
-          <a href="./tour.html">Tour</a>
+          <a href="./index.html">Home</a>
+          <a href="./install.html">Install</a>
           <a href="./walkthrough.html">Walkthrough</a>
+          <a href="./dashboard.html">Workspace</a>
           <a href="./generator.html">Generator</a>
           <a href="./companies.html">Companies</a>
-          <a href="./settings.html">Settings</a>
-          <a href="./install.html">Install</a>
-          <a href="./platform.html">Platform</a>
+          <a href="https://github.com/Senior3514/MultiClaw" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
         <div id="sessionArea" class="session-area"></div>
       </header>
@@ -47,6 +46,13 @@
               <span>Overview</span>
             </div>
             <div id="companyOverview" class="stack"></div>
+          </div>
+          <div class="panel panel-strong">
+            <div class="panel-head">
+              <h3>Execution state</h3>
+              <span>Live company</span>
+            </div>
+            <div id="companyExecution" class="stack"></div>
           </div>
           <div class="panel">
             <div class="panel-head">
@@ -116,9 +122,11 @@
               <a class="button-link primary" href="./dashboard.html">Return to dashboard</a>
               <a id="refineCompanyBtn" class="button-link secondary" href="#">Refine in generator</a>
               <a id="downloadCompanyPackBtn" class="button-link secondary" href="#">Download company pack</a>
+              <button id="runCompanyCycleBtn" class="button-link secondary button-reset" type="button">Run execution cycle</button>
               <a class="button-link secondary" href="#companyTopology">Review company topology</a>
-              <a class="button-link secondary" href="#companyArtifacts">Open artifacts</a>
-              <a class="button-link secondary" href="#companyMissions">Open mission board</a>
+              <a class="button-link secondary" href="#companyArtifacts">Artifacts</a>
+              <a class="button-link secondary" href="#companyMissions">Mission board</a>
+              <div id="companyCycleResult" class="stack"></div>
             </div>
           </div>
           <div class="panel">
@@ -127,6 +135,13 @@
               <span>Activation</span>
             </div>
             <div id="companyNextSteps" class="stack"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Activity feed</h3>
+              <span>Live state</span>
+            </div>
+            <div id="companyEvents" class="stack"></div>
           </div>
           <div class="panel">
             <div class="panel-head">

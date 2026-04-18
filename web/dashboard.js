@@ -22,14 +22,27 @@ if (session?.email) {
     : `Welcome back, ${session.email}`;
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function renderCompany(company) {
+  const execution = company.executionState || {};
+
   return `
     <div class="route-card">
-      <small>${company.generatedAt}</small>
-      <strong>${company.projectName}</strong>
-      <p>${company.archetype}</p>
+      <small>${escapeHtml(company.generatedAt)}</small>
+      <strong>${escapeHtml(company.projectName)}</strong>
+      <p>${escapeHtml(company.archetype)}</p>
+      <small>${escapeHtml(execution.status || 'unknown')}</small>
+      <p>${escapeHtml(execution.focus || 'Awaiting visible focus')}</p>
       <div class="cta-row">
-        <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>
+        <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">View company</a>
       </div>
     </div>
   `;
@@ -47,7 +60,7 @@ async function loadStats() {
     if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
     if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Workspace flow active across install, steering, and company generation.';
     if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} generated compan${stats.companies === 1 ? 'y' : 'ies'}`;
-    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is becoming visible through dashboard, topology, and contact surfaces.';
+    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is visible through topology, execution state, activity feed, and company control surfaces.';
     if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `${stats.artifacts} artifacts live`;
     if (missionArtifactsCopyEl) missionArtifactsCopyEl.textContent = 'Generated outputs are accumulating as tangible proof that the product is doing real work.';
   } catch (error) {
@@ -72,7 +85,7 @@ async function loadRecentCompanies() {
     recentCompaniesEl.innerHTML = companies.slice(0, 3).map(renderCompany).join('');
   } catch (error) {
     console.error(error);
-    recentCompaniesEl.innerHTML = '<div class="route-card"><strong>Failed to load companies</strong><p>Try again shortly.</p><div class="cta-row"><a class="button-link secondary" href="./companies.html">Open companies</a></div></div>';
+    recentCompaniesEl.innerHTML = '<div class="route-card"><strong>Failed to load companies</strong><p>Try again shortly.</p><div class="cta-row"><a class="button-link secondary" href="./companies.html">Companies</a></div></div>';
   }
 }
 

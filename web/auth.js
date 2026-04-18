@@ -35,11 +35,15 @@ export function mountThemeToggleOnly() {
 
 applyTheme();
 
-function setLocalSession(email, mode) {
-  localStorage.setItem(
-    SESSION_KEY,
-    JSON.stringify({ email, mode: mode || null, signedInAt: new Date().toISOString() }),
-  );
+function setLocalSession(sessionOrEmail, modeOverride = null) {
+  const session = typeof sessionOrEmail === 'string'
+    ? { email: sessionOrEmail, mode: modeOverride }
+    : (sessionOrEmail || {});
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    email: session.email,
+    mode: session.mode,
+    signedInAt: new Date().toISOString(),
+  }));
 }
 
 export function isSingleUserSession(session) {
@@ -109,7 +113,7 @@ export async function requireAuth() {
 
   try {
     const serverSession = await request('/api/auth/me');
-    setLocalSession(serverSession.email, serverSession.mode);
+    setLocalSession(serverSession);
     document.body?.classList.remove('auth-pending');
     return serverSession;
   } catch {
@@ -122,7 +126,7 @@ export async function requireAuth() {
 export async function hasServerSession() {
   try {
     const serverSession = await request('/api/auth/me');
-    setLocalSession(serverSession.email, serverSession.mode);
+    setLocalSession(serverSession);
     return serverSession;
   } catch {
     clearSession();
@@ -136,32 +140,30 @@ export function mountSession() {
 
   const session = getSession();
   if (!session?.email) {
-    sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>';
+    sessionArea.innerHTML = '<div class="session-chip"><span class="status-dot"></span><span>System check</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Workspace</a><a class="button-link secondary" href="./login.html">Sign in</a></div>';
     bindThemeToggles(sessionArea);
     return;
   }
 
   const isSingleUser = isSingleUserSession(session);
-  const label = isSingleUser ? 'Local workspace' : session.email;
-  const controlHtml = isSingleUser
-    ? ''
-    : '<button id="logoutBtn" type="button">Log out</button>';
-
   sessionArea.innerHTML = `
     <div class="session-chip">
       <span class="status-dot"></span>
-      <span>${label}</span>
+      <span>${isSingleUser ? 'Local workspace' : session.email}</span>
       <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
-      ${controlHtml}
+      <a class="button-link secondary" href="./dashboard.html">Workspace</a>
+      ${isSingleUser ? '<span class="button-link secondary">Single-user</span>' : '<button id="logoutBtn" type="button">Log out</button>'}
     </div>
   `;
 
   bindThemeToggles(sessionArea);
 
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await logOut();
-    window.location.href = './login.html';
-  });
+  if (!isSingleUser) {
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      await logOut();
+      window.location.href = './login.html';
+    });
+  }
 }
 
 export async function initAuthPage(mode) {

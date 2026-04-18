@@ -2,9 +2,9 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PID_FILE="$ROOT/ops/multiclaw-web.pid"
-LOG_FILE="$ROOT/ops/multiclaw-web.log"
-STATE_FILE="$ROOT/ops/multiclaw-web.state.json"
+PID_FILE="$ROOT/ops/multiclaw-web.tailscale.pid"
+LOG_FILE="$ROOT/ops/multiclaw-web.tailscale.log"
+STATE_FILE="$ROOT/ops/multiclaw-web.tailscale.state.json"
 RUNTIME_ENV_FILE="$ROOT/.multiclaw/runtime.env"
 PORT="${1:-8813}"
 
@@ -41,6 +41,11 @@ for _ in $(seq 1 20); do
     echo "URL: http://$TS_IP:$PORT/"
     echo "Health: $HEALTH_URL"
     echo "Log: $LOG_FILE"
+    echo ""
+    echo "Next:"
+    echo "  1. Open http://$TS_IP:$PORT/"
+    echo "  2. Run multiclaw verify"
+    echo "  3. Stop with multiclaw stop"
     exit 0
   fi
   sleep 1

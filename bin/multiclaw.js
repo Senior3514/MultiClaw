@@ -17,9 +17,19 @@ const repoRoot = path.resolve(path.dirname(__filename), '..');
 const runtimeDir = path.join(cwd, '.multiclaw');
 const runtimeConfigPath = path.join(runtimeDir, 'config.json');
 const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
-const pidPath = path.join(repoRoot, 'ops', 'multiclaw-web.pid');
-const statePath = path.join(repoRoot, 'ops', 'multiclaw-web.state.json');
 const generatedLiveRoot = path.join(repoRoot, 'generated-live');
+
+function runtimeFileSuffix(bind) {
+  return bind === 'local' ? 'local' : 'tailscale';
+}
+
+function runtimePidPath(bind) {
+  return path.join(repoRoot, 'ops', `multiclaw-web.${runtimeFileSuffix(bind)}.pid`);
+}
+
+function runtimeStatePath(bind) {
+  return path.join(repoRoot, 'ops', `multiclaw-web.${runtimeFileSuffix(bind)}.state.json`);
+}
 
 function slugify(value) {
   return String(value || '')
@@ -312,35 +322,37 @@ async function setupRuntime() {
     await saveRuntimeConfig(config);
     if (apiKeyValue) {
       await saveRuntimeEnv(config.apiKeyEnv, apiKeyValue);
-      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
     }
-    console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
-    console.log(JSON.stringify(config, null, 2));
+    printConfigSummary(config, Boolean(apiKeyValue));
     return;
   }
 
   const rl = readline.createInterface({ input, output });
-  const ask = async (label, fallback) => {
-    const answer = await rl.question(`${label}${fallback ? ` [${fallback}]` : ''}: `);
+  const ask = async (label, fallback, hint = '') => {
+    const suffix = fallback ? ` [${fallback}]` : '';
+    const prompt = hint ? `${label}${suffix} - ${hint}: ` : `${label}${suffix}: `;
+    const answer = await rl.question(prompt);
     return answer.trim() || fallback;
   };
 
   try {
-    const bindAnswer = (await ask('Bind mode (tailscale/local)', existing.bind)).toLowerCase();
+    console.log('MultiClaw configure');
+    console.log('Choose the cleanest runtime path for this machine. Press Enter to keep defaults.');
+    console.log('');
+    const bindAnswer = (await ask('1. Access mode', existing.bind, 'tailscale or local')).toLowerCase();
     const bind = bindAnswer === 'local' ? 'local' : 'tailscale';
-    const port = Number(await ask('Port', String(existing.port))) || existing.port;
-    const provider = await ask('Provider', existing.provider);
-    const model = await ask('Model', existing.model);
-    const apiKeyEnv = await ask('API key env var', existing.apiKeyEnv);
-    const apiKey = await ask('API key value (optional)', '');
+    const port = Number(await ask('2. Port', String(existing.port), 'default web port')) || existing.port;
+    const provider = await ask('3. Provider', existing.provider, 'openai, anthropic, google, openrouter, groq, ollama');
+    const model = await ask('4. Model', existing.model, 'for example gpt-5.4');
+    const apiKeyEnv = await ask('5. API key env var', existing.apiKeyEnv, 'env name to save/read');
+    const apiKey = await ask('6. API key value', '', 'optional, press Enter to skip for now');
     const config = { bind, port, provider, model, apiKeyEnv };
     await saveRuntimeConfig(config);
     if (apiKey) {
       await saveRuntimeEnv(config.apiKeyEnv, apiKey);
-      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
     }
-    console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
-    console.log(JSON.stringify(config, null, 2));
+    console.log('');
+    printConfigSummary(config, Boolean(apiKey));
   } finally {
     rl.close();
   }
@@ -363,6 +375,28 @@ function getTailscaleIp() {
   return result.stdout.split(/\r?\n/).map((line) => line.trim()).find(Boolean) || null;
 }
 
+function printConfigSummary(config, hasApiKey) {
+  console.log('MultiClaw configure');
+  console.log(`- bind: ${config.bind}`);
+  console.log(`- port: ${config.port}`);
+  console.log(`- provider: ${config.provider}`);
+  console.log(`- model: ${config.model}`);
+  console.log(`- api key env: ${config.apiKeyEnv}`);
+  console.log(`- config: ${runtimeConfigPath}`);
+  console.log(`- runtime env: ${hasApiKey ? 'saved' : 'not saved yet'}`);
+  console.log('');
+  console.log('Next:');
+  if (hasApiKey) {
+    console.log('  1. multiclaw start');
+    console.log('  2. multiclaw verify');
+    console.log('  3. multiclaw stop');
+  } else {
+    console.log('  1. multiclaw start');
+    console.log('  2. Open the URL it prints');
+    console.log('  3. If you want AI immediately: multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY');
+  }
+}
+
 async function startRuntime(forceBind = null) {
   const config = await loadRuntimeConfig();
   const bind = forceBind || config.bind;
@@ -377,8 +411,7 @@ async function startRuntime(forceBind = null) {
   if (process.exitCode) return;
 
   const snapshot = await getRuntimeSnapshot();
-  const healthy = snapshot.health && snapshot.health.status === 0;
-  if (healthy) {
+  if (snapshot.health && snapshot.health.status === 0) {
     console.log('');
     console.log(`Next: open ${snapshot.url} or run 'multiclaw verify'`);
   }
@@ -410,9 +443,9 @@ async function upRuntime() {
 
 async function getRuntimeSnapshot() {
   const config = await loadRuntimeConfig();
-  const running = await fs.readFile(pidPath, 'utf8').then((value) => value.trim()).catch(() => null);
-  const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   const bind = config.bind;
+  const running = await fs.readFile(runtimePidPath(bind), 'utf8').then((value) => value.trim()).catch(() => null);
+  const state = await fs.readFile(runtimeStatePath(bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   const host = state?.host || (bind === 'local' ? '127.0.0.1' : (getTailscaleIp() || 'tailscale-unavailable'));
   const port = state?.port || config.port;
   const url = state?.url || `http://${host}:${port}/`;
@@ -452,7 +485,7 @@ async function printStatus() {
   } else if (healthy) {
     console.log(`\nNext: open ${url} or run 'multiclaw verify'`);
   } else {
-    console.log('\nNext: check ops/multiclaw-web.log');
+    console.log('\nNext: check the runtime log and rerun multiclaw status');
   }
 }
 
@@ -555,22 +588,19 @@ async function askCompanyCli() {
 function printGuide() {
   console.log(`MultiClaw guide
 
-1. Install the base product
-   curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+Most people should do this:
 
-2. Open the guided runtime setup
-   multiclaw configure
+1. Install
+   cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 
-3. Start the runtime
-   multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+2. Start
+   multiclaw start
 
-   Or with OpenRouter:
-   multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
+3. Verify
+   multiclaw verify
 
-4. Check status
-   multiclaw status
-
-5. Open the URL and continue in the product UI
+4. Stop when done
+   multiclaw stop
 `);
 }
 
@@ -578,18 +608,18 @@ function printWalkthrough() {
   console.log(`MultiClaw walkthrough
 
 Base install:
-  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/install.sh | bash
+  cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 
 Then:
-  multiclaw walkthrough
-  multiclaw configure
-  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
-  multiclaw up --provider openrouter --model openai/gpt-5.4 --api-key-env OPENROUTER_API_KEY --api-key YOUR_KEY
-  multiclaw status
+  multiclaw start
+  multiclaw verify
   multiclaw stop
 
+If you want to save the API key and start in one command:
+  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+
 Uninstall:
-  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+  cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
 `);
 }
 
@@ -642,7 +672,7 @@ async function printDoctor() {
     console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
   }
 
-  const state = await fs.readFile(statePath, 'utf8').then((value) => JSON.parse(value)).catch(() => null);
+  const state = await fs.readFile(runtimeStatePath(config.bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   if (state?.url) {
     const health = spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', `${state.url.replace(/\/$/, '')}/api/health`], { encoding: 'utf8' });
     console.log(`- runtime health: ${health.status === 0 ? `ok (${health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
@@ -654,36 +684,24 @@ async function printDoctor() {
 function printHelp() {
   console.log(`MultiClaw
 
-Usage:
-  multiclaw help
+Fast path:
   multiclaw guide
+  multiclaw start
+  multiclaw verify
+  multiclaw stop
+
+Core commands:
   multiclaw walkthrough
   multiclaw doctor
-  multiclaw verify
-  multiclaw ask [--company <companyId>] "your question"
-  multiclaw init
-  multiclaw init --demo
-  multiclaw configure
-  multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw start [--port 8813]
-  multiclaw dev [--port 8813]
-  multiclaw stop
   multiclaw status
+  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
+  multiclaw configure
+  multiclaw ask [--company <companyId>] "your question"
 
 Notes:
-  - guide prints the clean step-by-step setup flow
-  - walkthrough prints the full command walkthrough
-  - doctor checks the local environment for the core runtime prerequisites
-  - verify runs doctor, status, and the end-to-end smoke flow when the runtime is up
-  - ask lets you talk to the latest generated company from the CLI, or target a specific one with --company
-  - init generates a company package under ./generated/
-  - configure opens the interactive runtime setup flow
-  - setup creates a local runtime config under ./.multiclaw/config.json
-  - setup/up can also save the API key into ./.multiclaw/runtime.env
-  - up is the one-command way to configure and start the runtime
-  - start uses the configured bind mode (tailscale by default)
-  - dev forces local bind on 127.0.0.1
+  - start uses the saved config and prints the URL
+  - up saves config and starts in one command
+  - verify checks doctor, status, and smoke when the runtime is up
 `);
 }
 

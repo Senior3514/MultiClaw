@@ -69,6 +69,8 @@ need_cmd node
 need_cmd npm
 need_cmd python3
 
+cd "$HOME"
+
 if [[ -d "$INSTALL_DIR/.git" ]]; then
   echo "Updating existing MultiClaw install at $INSTALL_DIR"
   git -C "$INSTALL_DIR" pull --ff-only
@@ -103,22 +105,21 @@ fi
 
 if [[ -t 0 ]]; then
   echo
-  echo "Next recommended step: multiclaw configure"
-  read -r -p "Run guided configure now? [Y/n] " answer
+  echo "Next recommended step: multiclaw start"
+  read -r -p "Start MultiClaw now? [Y/n] " answer
   answer="${answer:-Y}"
   if [[ "$answer" =~ ^[Yy]$ ]]; then
-    multiclaw configure
-    echo
-    read -r -p "Start runtime now? [Y/n] " start_answer
-    start_answer="${start_answer:-Y}"
-    if [[ "$start_answer" =~ ^[Yy]$ ]]; then
-      multiclaw start
-      multiclaw status
-    fi
+    multiclaw start
   else
-    echo "Run 'multiclaw walkthrough' when you're ready."
+    echo "Run 'multiclaw start' when you're ready."
+    echo "If you want to save the API key and start in one command, run:"
+    echo "  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
   fi
 else
-  echo "Run 'multiclaw walkthrough' for the next steps."
-  echo "Then run 'multiclaw doctor' if you want a readiness snapshot."
+  echo "Next:"
+  echo "  1. multiclaw start"
+  echo "  2. multiclaw verify"
+  echo "  3. multiclaw stop"
+  echo "If you want to save the API key and start in one command:"
+  echo "  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
 fi

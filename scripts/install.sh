@@ -95,6 +95,8 @@ need_cmd node
 need_cmd npm
 need_cmd python3
 
+cd "$HOME"
+
 if [[ -d "$INSTALL_DIR/.git" ]]; then
   echo "Updating existing MultiClaw install at $INSTALL_DIR"
   git -C "$INSTALL_DIR" pull --ff-only
@@ -116,11 +118,11 @@ echo "MultiClaw installed successfully."
 echo "Command available: multiclaw"
 
 echo "Next steps:"
-echo "  1. multiclaw doctor"
-echo "  2. multiclaw walkthrough"
-echo "  3. multiclaw guide"
-echo "  4. multiclaw configure"
-echo "  5. multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
+echo "  1. multiclaw start"
+echo "  2. multiclaw verify"
+echo "  3. multiclaw stop"
+echo "Optional one-command start with API key:"
+echo "  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
 
 auto_flags=0
 if [[ "$AUTO_START" == "1" || -n "$API_KEY" ]]; then

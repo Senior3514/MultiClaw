@@ -679,7 +679,23 @@ body.light-theme .copy-mini {
 
 body.light-theme .hero-graphic {
   background:
-    radial-gradient(circle at var(--hero-glow-x) var(--hero-glow-y), rgba(138, 111, 255, 0.18), rgba(255, 255, 255, 0.08) 58%, transparent 76%);
+    radial-gradient(circle at var(--hero-glow-x) var(--hero-glow-y), rgba(138, 111, 255, 0.28), rgba(255, 255, 255, 0.16) 58%, transparent 76%);
+}
+
+body.light-theme .hero-graphic .starfield {
+  opacity: 0.24;
+}
+
+body.light-theme .hero-graphic::before {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(90, 70, 170, 0.28), rgba(241, 235, 255, 0.82) 58%, rgba(255, 255, 255, 0.12) 82%, transparent 100%);
+  box-shadow:
+    0 0 120px rgba(143, 115, 255, 0.16),
+    0 0 200px rgba(124, 92, 255, 0.12);
+}
+
+body.light-theme .graphic-glow {
+  opacity: 0.54;
 }
 
 .hero-graphic::before,
@@ -798,6 +814,18 @@ body.light-theme .hero-graphic {
     0 28px 70px rgba(12, 14, 28, 0.58),
     0 0 80px rgba(86, 212, 209, 0.16);
   transition: transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
+  transform-style: preserve-3d;
+}
+
+body.light-theme .graphic-core {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.62), transparent 24%),
+    radial-gradient(circle at 50% 50%, rgba(124, 92, 255, 0.22), rgba(247, 243, 255, 0.97));
+  border-color: rgba(124, 92, 255, 0.22);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 28px 70px rgba(100, 76, 173, 0.16),
+    0 0 70px rgba(143, 115, 255, 0.16);
 }
 
 .graphic-core::before {
@@ -846,16 +874,26 @@ body.light-theme .hero-graphic {
 .graphic-avatar {
   width: 220px;
   height: 220px;
+  transform: translateZ(26px);
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     0 0 42px rgba(124, 92, 255, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
   transition: transform 220ms ease, filter 220ms ease;
+  animation: avatarBob 7.2s ease-in-out infinite;
+}
+
+body.light-theme .graphic-avatar {
+  box-shadow:
+    0 18px 42px rgba(100, 76, 173, 0.18),
+    0 0 42px rgba(143, 115, 255, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 .graphic-core strong {
   font-size: 21px;
   letter-spacing: 0.02em;
+  transform: translateZ(18px);
 }
 
 .graphic-core span {
@@ -863,6 +901,16 @@ body.light-theme .hero-graphic {
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.18em;
+  transform: translateZ(14px);
+}
+
+body.light-theme .graphic-core strong {
+  color: #261f47;
+}
+
+body.light-theme .graphic-core span,
+body.light-theme .hero-stage-brand span {
+  color: #726894;
 }
 
 .graphic-orbit {
@@ -1088,9 +1136,10 @@ body.light-theme .hero-graphic {
 }
 
 body.light-theme .graphic-node {
-  background: rgba(255, 255, 255, 0.88);
-  border-color: rgba(124, 92, 255, 0.14);
-  box-shadow: 0 18px 34px rgba(102, 78, 183, 0.14);
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(124, 92, 255, 0.18);
+  box-shadow: 0 18px 34px rgba(102, 78, 183, 0.12);
+  color: #342b59;
 }
 
 .graphic-spark {
@@ -3033,8 +3082,12 @@ body.light-theme .feature-card,
 body.light-theme .route-card,
 body.light-theme .panel,
 body.light-theme .panel-strong {
-  background: rgba(255, 255, 255, 0.88);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(248, 244, 255, 0.93));
   color: var(--text);
+  border-color: rgba(124, 92, 255, 0.14);
+  box-shadow:
+    0 22px 48px rgba(112, 87, 196, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 body.light-theme .terminal-window,

@@ -67,13 +67,59 @@ function renderHomeInstallCommand() {
 }
 
 async function copyWithFeedback(button, text, successText) {
+  const fallbackCopyText = (value) => {
+    const textarea = document.createElement('textarea');
+    textarea.value = value;
+    textarea.setAttribute('readonly', '');
+    textarea.style.position = 'fixed';
+    textarea.style.top = '0';
+    textarea.style.left = '-9999px';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+
+    const selection = document.getSelection();
+    const previousRange = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+
+    textarea.focus();
+    textarea.select();
+    textarea.setSelectionRange(0, textarea.value.length);
+
+    let copied = false;
+    try {
+      copied = document.execCommand('copy');
+    } catch {
+      copied = false;
+    }
+
+    document.body.removeChild(textarea);
+
+    if (previousRange && selection) {
+      selection.removeAllRanges();
+      selection.addRange(previousRange);
+    }
+
+    return copied;
+  };
+
   try {
-    await navigator.clipboard.writeText(text);
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else if (!fallbackCopyText(text)) {
+      throw new Error('clipboard unavailable');
+    }
     button.textContent = successText;
     setTimeout(() => {
       button.textContent = button.dataset.defaultLabel;
     }, 1200);
   } catch {
+    if (fallbackCopyText(text)) {
+      button.textContent = successText;
+      setTimeout(() => {
+        button.textContent = button.dataset.defaultLabel;
+      }, 1200);
+      return;
+    }
+
     button.textContent = 'Copy failed';
     setTimeout(() => {
       button.textContent = button.dataset.defaultLabel;

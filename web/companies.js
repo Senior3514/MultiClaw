@@ -49,7 +49,7 @@ function renderCompanyCard(company) {
         <small>Last activity: ${escapeHtml(execution.lastActivityAt || 'n/a')}</small>
       </div>
       <div class="cta-row">
-        <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>
+        <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">View company</a>
       </div>
     </article>
   `;

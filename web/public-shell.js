@@ -7,6 +7,7 @@ if (sessionArea) {
   const health = await fetch('/api/health').then((response) => response.json()).catch(() => null);
   const healthLabel = health?.status === 'ok' ? 'System online' : 'System check';
 
+  const isSingleUser = session?.mode === 'single-user';
   sessionArea.innerHTML = session?.email
     ? `
       <div class="session-chip">
@@ -14,7 +15,7 @@ if (sessionArea) {
         <span>${healthLabel}</span>
         <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
         <a class="button-link secondary" href="./dashboard.html">Workspace</a>
-        <button id="publicLogoutBtn" type="button">Log out</button>
+        ${isSingleUser ? '<span class="button-link secondary">Single-user</span>' : '<button id="publicLogoutBtn" type="button">Log out</button>'}
       </div>
     `
     : `
@@ -29,10 +30,12 @@ if (sessionArea) {
 
   bindThemeToggles(sessionArea);
 
-  document.getElementById('publicLogoutBtn')?.addEventListener('click', async () => {
-    await logOut();
-    window.location.href = './index.html';
-  });
+  if (!isSingleUser) {
+    document.getElementById('publicLogoutBtn')?.addEventListener('click', async () => {
+      await logOut();
+      window.location.href = './index.html';
+    });
+  }
 }
 
 if (session?.email) {

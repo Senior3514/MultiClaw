@@ -35,8 +35,15 @@ export function mountThemeToggleOnly() {
 
 applyTheme();
 
-function setLocalSession(email) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ email, signedInAt: new Date().toISOString() }));
+function setLocalSession(sessionOrEmail) {
+  const session = typeof sessionOrEmail === 'string'
+    ? { email: sessionOrEmail }
+    : (sessionOrEmail || {});
+  localStorage.setItem(SESSION_KEY, JSON.stringify({
+    email: session.email,
+    mode: session.mode,
+    signedInAt: new Date().toISOString(),
+  }));
 }
 
 export function getSession() {
@@ -139,22 +146,25 @@ export function mountSession() {
     return;
   }
 
+  const isSingleUser = session.mode === 'single-user';
   sessionArea.innerHTML = `
     <div class="session-chip">
       <span class="status-dot"></span>
-      <span>${session.email}</span>
+      <span>${isSingleUser ? 'Preview access' : session.email}</span>
       <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
       <a class="button-link secondary" href="./dashboard.html">Workspace</a>
-      <button id="logoutBtn" type="button">Log out</button>
+      ${isSingleUser ? '<span class="button-link secondary">Single-user</span>' : '<button id="logoutBtn" type="button">Log out</button>'}
     </div>
   `;
 
   bindThemeToggles(sessionArea);
 
-  document.getElementById('logoutBtn')?.addEventListener('click', async () => {
-    await logOut();
-    window.location.href = './login.html';
-  });
+  if (!isSingleUser) {
+    document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+      await logOut();
+      window.location.href = './login.html';
+    });
+  }
 }
 
 export async function initAuthPage(mode) {

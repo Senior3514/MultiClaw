@@ -322,35 +322,37 @@ async function setupRuntime() {
     await saveRuntimeConfig(config);
     if (apiKeyValue) {
       await saveRuntimeEnv(config.apiKeyEnv, apiKeyValue);
-      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
     }
-    console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
-    console.log(JSON.stringify(config, null, 2));
+    printConfigSummary(config, Boolean(apiKeyValue));
     return;
   }
 
   const rl = readline.createInterface({ input, output });
-  const ask = async (label, fallback) => {
-    const answer = await rl.question(`${label}${fallback ? ` [${fallback}]` : ''}: `);
+  const ask = async (label, fallback, hint = '') => {
+    const suffix = fallback ? ` [${fallback}]` : '';
+    const prompt = hint ? `${label}${suffix} - ${hint}: ` : `${label}${suffix}: `;
+    const answer = await rl.question(prompt);
     return answer.trim() || fallback;
   };
 
   try {
-    const bindAnswer = (await ask('Bind mode (tailscale/local)', existing.bind)).toLowerCase();
+    console.log('MultiClaw configure');
+    console.log('Choose the cleanest runtime path for this machine. Press Enter to keep defaults.');
+    console.log('');
+    const bindAnswer = (await ask('1. Access mode', existing.bind, 'tailscale or local')).toLowerCase();
     const bind = bindAnswer === 'local' ? 'local' : 'tailscale';
-    const port = Number(await ask('Port', String(existing.port))) || existing.port;
-    const provider = await ask('Provider', existing.provider);
-    const model = await ask('Model', existing.model);
-    const apiKeyEnv = await ask('API key env var', existing.apiKeyEnv);
-    const apiKey = await ask('API key value (optional)', '');
+    const port = Number(await ask('2. Port', String(existing.port), 'default web port')) || existing.port;
+    const provider = await ask('3. Provider', existing.provider, 'openai, anthropic, google, openrouter, groq, ollama');
+    const model = await ask('4. Model', existing.model, 'for example gpt-5.4');
+    const apiKeyEnv = await ask('5. API key env var', existing.apiKeyEnv, 'env name to save/read');
+    const apiKey = await ask('6. API key value', '', 'optional, press Enter to skip for now');
     const config = { bind, port, provider, model, apiKeyEnv };
     await saveRuntimeConfig(config);
     if (apiKey) {
       await saveRuntimeEnv(config.apiKeyEnv, apiKey);
-      console.log(`MultiClaw runtime key saved at ${runtimeEnvPath}`);
     }
-    console.log(`MultiClaw runtime configured at ${runtimeConfigPath}`);
-    console.log(JSON.stringify(config, null, 2));
+    console.log('');
+    printConfigSummary(config, Boolean(apiKey));
   } finally {
     rl.close();
   }
@@ -371,6 +373,28 @@ function getTailscaleIp() {
   const result = spawnSync('tailscale', ['ip', '-4'], { encoding: 'utf8' });
   if (result.status !== 0) return null;
   return result.stdout.split(/\r?\n/).map((line) => line.trim()).find(Boolean) || null;
+}
+
+function printConfigSummary(config, hasApiKey) {
+  console.log('MultiClaw configure');
+  console.log(`- bind: ${config.bind}`);
+  console.log(`- port: ${config.port}`);
+  console.log(`- provider: ${config.provider}`);
+  console.log(`- model: ${config.model}`);
+  console.log(`- api key env: ${config.apiKeyEnv}`);
+  console.log(`- config: ${runtimeConfigPath}`);
+  console.log(`- runtime env: ${hasApiKey ? 'saved' : 'not saved yet'}`);
+  console.log('');
+  console.log('Next:');
+  if (hasApiKey) {
+    console.log('  1. multiclaw start');
+    console.log('  2. multiclaw verify');
+    console.log('  3. multiclaw stop');
+  } else {
+    console.log('  1. multiclaw start');
+    console.log('  2. Open the URL it prints');
+    console.log('  3. If you want AI immediately: multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY');
+  }
 }
 
 async function startRuntime(forceBind = null) {

@@ -202,6 +202,26 @@ body.light-theme .site-header {
   height: 76px;
   border-radius: 50%;
   font-size: 34px;
+  overflow: visible;
+}
+
+.hero-brand-mark .avatar-appendage {
+  width: 18px;
+  height: 28px;
+}
+
+.hero-brand-mark .avatar-appendage::before,
+.hero-brand-mark .avatar-appendage::after {
+  width: 9px;
+  height: 10px;
+}
+
+.hero-brand-mark .avatar-appendage-left {
+  left: -2px;
+}
+
+.hero-brand-mark .avatar-appendage-right {
+  right: -2px;
 }
 
 .site-nav a:hover {
@@ -257,6 +277,56 @@ body.light-theme .site-header {
   border-radius: 50%;
   background: radial-gradient(circle, rgba(247, 215, 160, 0.3), transparent 70%);
   filter: blur(8px);
+}
+
+.avatar-appendage {
+  position: absolute;
+  top: 56%;
+  width: 34px;
+  height: 52px;
+  border-radius: 54% 46% 58% 42%;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.4), transparent 28%),
+    linear-gradient(180deg, rgba(243, 74, 120, 0.98), rgba(127, 74, 255, 0.9) 56%, rgba(45, 212, 190, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.32),
+    0 0 22px rgba(243, 74, 120, 0.24);
+  z-index: 0;
+}
+
+.avatar-appendage::before,
+.avatar-appendage::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 18px;
+  border-radius: 60% 40% 60% 40%;
+  background: inherit;
+  border: inherit;
+  box-shadow: inherit;
+}
+
+.avatar-appendage::before {
+  left: -6px;
+  top: 6px;
+  transform: rotate(-34deg);
+}
+
+.avatar-appendage::after {
+  right: -6px;
+  top: 14px;
+  transform: rotate(28deg);
+}
+
+.avatar-appendage-left {
+  left: -8px;
+  transform: translateY(-50%) rotate(-18deg);
+}
+
+.avatar-appendage-right {
+  right: -8px;
+  transform: translateY(-50%) scaleX(-1) rotate(-18deg);
 }
 
 .eyebrow {
@@ -608,10 +678,30 @@ video {
 .graphic-avatar {
   width: 178px;
   height: 178px;
+  overflow: visible;
   box-shadow:
     0 18px 42px rgba(0, 0, 0, 0.42),
     0 0 42px rgba(124, 92, 255, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.graphic-avatar .avatar-appendage {
+  width: 42px;
+  height: 66px;
+}
+
+.graphic-avatar .avatar-appendage::before,
+.graphic-avatar .avatar-appendage::after {
+  width: 20px;
+  height: 22px;
+}
+
+.graphic-avatar .avatar-appendage-left {
+  left: -12px;
+}
+
+.graphic-avatar .avatar-appendage-right {
+  right: -12px;
 }
 
 .graphic-core strong {

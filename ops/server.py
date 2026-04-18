@@ -15,6 +15,7 @@ import shutil
 import sqlite3
 import sys
 import time
+import traceback
 import zipfile
 
 WEB_ROOT = Path(__file__).resolve().parent.parent / "web"
@@ -38,12 +39,25 @@ class BodyTooLargeError(Exception):
     pass
 
 
+class InvalidJsonError(Exception):
+    pass
+
+
+class UnsupportedMediaTypeError(Exception):
+    pass
+
+
 def now_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
 
 def utc_now_datetime():
     return datetime.now(timezone.utc)
+
+
+def log_internal_error(context: str, exc: Exception):
+    print(f"[{now_utc()}] {context}: {exc}", file=sys.stderr)
+    traceback.print_exc()
 
 
 def allow_rate(key: str, limit: int, window_seconds: int):
@@ -928,10 +942,32 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Cross-Origin-Opener-Policy", "same-origin")
+        self.send_header("Cross-Origin-Resource-Policy", "same-origin")
+        self.send_header("Content-Security-Policy", "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self'; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'")
         self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
         super().end_headers()
 
+    def is_secure_request(self):
+        forwarded_proto = (self.headers.get("X-Forwarded-Proto", "").split(",", 1)[0].strip().lower())
+        if forwarded_proto == "https":
+            return True
+        forwarded = (self.headers.get("Forwarded", "") or "").lower()
+        return "proto=https" in forwarded
+
+    def build_session_cookie(self, token=None, *, clear=False):
+        parts = [f"{SESSION_COOKIE}={'' if clear else token}", "HttpOnly", "Path=/", "SameSite=Strict"]
+        if clear:
+            parts.append("Max-Age=0")
+        if self.is_secure_request():
+            parts.append("Secure")
+        return "; ".join(parts)
+
     def read_json_body(self):
+        content_type = (self.headers.get("Content-Type", "") or "").split(";", 1)[0].strip().lower()
+        if content_type and content_type != "application/json":
+            self.send_json(415, {"error": "content type must be application/json"})
+            raise UnsupportedMediaTypeError()
         raw_length = self.headers.get("Content-Length", "0") or "0"
         try:
             content_length = int(raw_length)
@@ -941,7 +977,11 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_json(413, {"error": "request body too large"})
             raise BodyTooLargeError()
         raw = self.rfile.read(content_length) if content_length else b""
-        return json.loads(raw.decode("utf-8") or "{}")
+        try:
+            return json.loads(raw.decode("utf-8") or "{}")
+        except json.JSONDecodeError:
+            self.send_json(400, {"error": "invalid json body"})
+            raise InvalidJsonError()
 
     def get_session(self):
         if AUTH_MODE == "single-user":
@@ -959,11 +999,15 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
     def send_json(self, status_code, payload, set_cookie=None):
         self.send_response(status_code)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
         if set_cookie:
             self.send_header("Set-Cookie", set_cookie)
         self.end_headers()
         self.wfile.write(json.dumps(payload).encode("utf-8"))
+
+    def send_internal_error(self, context: str, exc: Exception):
+        log_internal_error(context, exc)
+        self.send_json(500, {"error": "internal server error"})
 
     def require_session(self):
         token, session = self.get_session()
@@ -1147,13 +1191,13 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     return
                 create_user(email, password)
                 token = create_session(email)
-                self.send_json(200, {"email": email}, f"{SESSION_COOKIE}={token}; HttpOnly; Path=/; SameSite=Lax")
-            except BodyTooLargeError:
+                self.send_json(200, {"email": email}, self.build_session_cookie(token))
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except ValueError as exc:
                 self.send_json(400, {"error": str(exc)})
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("signup failed", exc)
             return
 
         if self.path == "/api/auth/login":
@@ -1173,11 +1217,11 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     self.send_json(401, {"error": "invalid email or password"})
                     return
                 token = create_session(email)
-                self.send_json(200, {"email": email}, f"{SESSION_COOKIE}={token}; HttpOnly; Path=/; SameSite=Lax")
-            except BodyTooLargeError:
+                self.send_json(200, {"email": email}, self.build_session_cookie(token))
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("login failed", exc)
             return
 
         if self.path == "/api/auth/logout":
@@ -1189,7 +1233,7 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             token, _ = self.get_session()
             if token:
                 delete_session(token)
-            self.send_json(200, {"ok": True}, f"{SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax")
+            self.send_json(200, {"ok": True}, self.build_session_cookie(clear=True))
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/cycle"):
@@ -1208,10 +1252,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     return
                 result = run_company_cycle(company_id, company)
                 self.send_json(200, result)
-            except BodyTooLargeError:
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("execution cycle failed", exc)
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/ask"):
@@ -1243,10 +1287,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 )
                 update_company_execution_state(company_id, company)
                 self.send_json(200, result)
-            except BodyTooLargeError:
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("company ask failed", exc)
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/autopilot"):
@@ -1270,10 +1314,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     self.send_json(404, {"error": "company not found"})
                     return
                 self.send_json(200, result)
-            except BodyTooLargeError:
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("autopilot update failed", exc)
             return
 
         if self.path == "/api/generate":
@@ -1288,10 +1332,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 payload = self.read_json_body()
                 result = generate_company(payload)
                 self.send_json(200, result)
-            except BodyTooLargeError:
+            except (BodyTooLargeError, InvalidJsonError, UnsupportedMediaTypeError):
                 return
             except Exception as exc:
-                self.send_json(500, {"error": str(exc)})
+                self.send_internal_error("company generation failed", exc)
             return
 
         self.send_json(404, {"error": "not found"})

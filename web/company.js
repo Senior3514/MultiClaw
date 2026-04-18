@@ -28,6 +28,15 @@ const companyAskInput = document.getElementById('companyAskInput');
 const companyAskBtn = document.getElementById('companyAskBtn');
 const companyAskResult = document.getElementById('companyAskResult');
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
   statusEl.className = `status-banner status-${kind}`;
@@ -36,8 +45,8 @@ function setStatus(message, kind = 'idle') {
 function renderRows(rows) {
   return rows.map(([label, value]) => `
     <div class="brand-row">
-      <small>${label}</small>
-      <strong>${value}</strong>
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
       <p>Generated company metadata.</p>
     </div>
   `).join('');
@@ -48,24 +57,24 @@ function renderExecution(state) {
     return '<div class="route-card"><strong>Unknown</strong><p>Execution state is not available yet.</p></div>';
   }
 
-  const missionBoard = (state.missionBoard || []).slice(0, 3).map((mission) => `${mission.status}: ${mission.title}`).join(' • ');
-  const nextStepBoard = (state.nextStepBoard || []).slice(0, 2).map((step) => `${step.status}: ${step.title}`).join(' • ');
+  const missionBoard = (state.missionBoard || []).slice(0, 3).map((mission) => `${escapeHtml(mission.status)}: ${escapeHtml(mission.title)}`).join(' • ');
+  const nextStepBoard = (state.nextStepBoard || []).slice(0, 2).map((step) => `${escapeHtml(step.status)}: ${escapeHtml(step.title)}`).join(' • ');
 
   return `
     <div class="brand-row">
       <small>Status</small>
-      <strong>${state.status}</strong>
-      <p>${state.summary}</p>
+      <strong>${escapeHtml(state.status)}</strong>
+      <p>${escapeHtml(state.summary)}</p>
     </div>
     <div class="brand-row">
       <small>Current focus</small>
-      <strong>${state.focus}</strong>
+      <strong>${escapeHtml(state.focus)}</strong>
       <p>What this company should concentrate on right now.</p>
     </div>
     <div class="brand-row">
       <small>Last visible activity</small>
-      <strong>${state.lastActivityAt}</strong>
-      <p>${state.eventsCount} events, ${state.missionsCount} missions, ${state.nextStepsCount} next steps.</p>
+      <strong>${escapeHtml(state.lastActivityAt)}</strong>
+      <p>${escapeHtml(state.eventsCount)} events, ${escapeHtml(state.missionsCount)} missions, ${escapeHtml(state.nextStepsCount)} next steps.</p>
     </div>
     <div class="route-card">
       <small>Mission board</small>
@@ -84,7 +93,7 @@ function renderAssets(assets) {
   const list = assets?.length ? assets : ['No attached claws or systems declared yet.'];
   return list.map((asset) => `
     <div class="route-card">
-      <strong>${asset}</strong>
+      <strong>${escapeHtml(asset)}</strong>
       <p>Imported into the company context as an existing claw, system, or asset.</p>
     </div>
   `).join('');
@@ -93,8 +102,8 @@ function renderAssets(assets) {
 function renderSoul(soul) {
   return Object.entries(soul || {}).map(([label, value]) => `
     <div class="brand-row">
-      <small>${label}</small>
-      <strong>${value}</strong>
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
       <p>Generated company identity and operating style.</p>
     </div>
   `).join('');
@@ -103,8 +112,8 @@ function renderSoul(soul) {
 function renderRouting(profile) {
   return Object.entries(profile).map(([label, value]) => `
     <div class="route-card">
-      <small>${label}</small>
-      <strong>${value}</strong>
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
       <p>Current default routing choice for this capability.</p>
     </div>
   `).join('');
@@ -113,10 +122,10 @@ function renderRouting(profile) {
 function renderContactSurfaces(surfaces) {
   return (surfaces || []).map((surface) => `
     <div class="route-card">
-      <small>${surface.status}</small>
-      <strong>${surface.name}</strong>
-      <p>${surface.purpose}</p>
-      <small>${surface.substrate}</small>
+      <small>${escapeHtml(surface.status)}</small>
+      <strong>${escapeHtml(surface.name)}</strong>
+      <p>${escapeHtml(surface.purpose)}</p>
+      <small>${escapeHtml(surface.substrate)}</small>
     </div>
   `).join('');
 }
@@ -127,18 +136,18 @@ function renderTopology(roles) {
 
   return `
     <div class="topology-core">Primary operator</div>
-    <div class="topology-node node-top">${top}</div>
-    <div class="topology-node node-right">${right}</div>
-    <div class="topology-node node-bottom">${bottom}</div>
-    <div class="topology-node node-left">${left}</div>
+    <div class="topology-node node-top">${escapeHtml(top)}</div>
+    <div class="topology-node node-right">${escapeHtml(right)}</div>
+    <div class="topology-node node-bottom">${escapeHtml(bottom)}</div>
+    <div class="topology-node node-left">${escapeHtml(left)}</div>
   `;
 }
 
 function renderRoles(roles) {
   return roles.map((role) => `
     <div class="role-card">
-      <h4>${role.title}</h4>
-      <p>${role.scope}</p>
+      <h4>${escapeHtml(role.title)}</h4>
+      <p>${escapeHtml(role.scope)}</p>
     </div>
   `).join('');
 }
@@ -147,7 +156,7 @@ function renderMissions(missions) {
   return missions.map((mission, index) => `
     <div class="mission-card">
       <small>Mission ${index + 1}</small>
-      <strong>${mission}</strong>
+      <strong>${escapeHtml(mission)}</strong>
       <p>Immediate operating focus for this generated company.</p>
     </div>
   `).join('');
@@ -157,7 +166,7 @@ function renderNextSteps(steps) {
   return steps.map((step, index) => `
     <div class="mission-card">
       <small>Step ${index + 1}</small>
-      <strong>${step}</strong>
+      <strong>${escapeHtml(step)}</strong>
       <p>Recommended next move to activate the company further.</p>
     </div>
   `).join('');
@@ -167,9 +176,9 @@ function renderEvents(events) {
   const list = events?.length ? events : [{ title: 'No activity yet', detail: 'This company has not logged any visible events yet.', timestamp: 'Waiting', kind: 'idle' }];
   return list.map((event) => `
     <div class="mission-card">
-      <small>${event.timestamp}</small>
-      <strong>${event.title}</strong>
-      <p>${event.detail}</p>
+      <small>${escapeHtml(event.timestamp)}</small>
+      <strong>${escapeHtml(event.title)}</strong>
+      <p>${escapeHtml(event.detail)}</p>
     </div>
   `).join('');
 }
@@ -177,8 +186,8 @@ function renderEvents(events) {
 function renderArtifacts(artifacts) {
   return artifacts.map((artifact) => `
     <div class="route-card">
-      <small>${artifact.size} bytes</small>
-      <strong>${artifact.name}</strong>
+      <small>${escapeHtml(artifact.size)} bytes</small>
+      <strong>${escapeHtml(artifact.name)}</strong>
       <p>Generated artifact saved by the backend for this company.</p>
       <div class="cta-row">
         <a class="button-link secondary" href="/api/company/${encodeURIComponent(companyId)}/artifact/${encodeURIComponent(artifact.name)}">Download</a>
@@ -190,9 +199,9 @@ function renderArtifacts(artifacts) {
 function renderAskResult(result) {
   return `
     <div class="mission-card">
-      <small>${result.speaker}</small>
-      <strong>${result.reply}</strong>
-      <p>${(result.suggestedActions || []).join(' • ')}</p>
+      <small>${escapeHtml(result.speaker)}</small>
+      <strong>${escapeHtml(result.reply)}</strong>
+      <p>${(result.suggestedActions || []).map(escapeHtml).join(' • ')}</p>
     </div>
   `;
 }
@@ -200,9 +209,9 @@ function renderAskResult(result) {
 function renderCycleResult(result) {
   return `
     <div class="mission-card">
-      <small>Cycle ${result.cycleNumber}</small>
-      <strong>${result.focus}</strong>
-      <p>${result.summary} Artifact: ${result.artifact}</p>
+      <small>Cycle ${escapeHtml(result.cycleNumber)}</small>
+      <strong>${escapeHtml(result.focus)}</strong>
+      <p>${escapeHtml(result.summary)} Artifact: ${escapeHtml(result.artifact)}</p>
     </div>
   `;
 }

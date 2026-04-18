@@ -10,6 +10,15 @@ const productOriginEl = document.getElementById('companiesProductOrigin');
 const autonomyModeEl = document.getElementById('companiesAutonomyMode');
 let allCompanies = [];
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
   statusEl.className = `status-banner status-${kind}`;
@@ -20,24 +29,24 @@ function renderCompanyCard(company) {
 
   return `
     <article class="panel feature-card company-card">
-      <div class="eyebrow">${company.companyId}</div>
-      <h2>${company.projectName}</h2>
-      <p>${company.description}</p>
+      <div class="eyebrow">${escapeHtml(company.companyId)}</div>
+      <h2>${escapeHtml(company.projectName)}</h2>
+      <p>${escapeHtml(company.description)}</p>
       <div class="company-meta">
-        <span>${company.archetype}</span>
-        <span>${company.stage}</span>
-        <span>${company.productOrigin || 'Existing product'}</span>
-        <span>${company.autonomyMode || 'Operator-assisted'}</span>
-        <span>${company.rolesCount} leads</span>
+        <span>${escapeHtml(company.archetype)}</span>
+        <span>${escapeHtml(company.stage)}</span>
+        <span>${escapeHtml(company.productOrigin || 'Existing product')}</span>
+        <span>${escapeHtml(company.autonomyMode || 'Operator-assisted')}</span>
+        <span>${escapeHtml(company.rolesCount)} leads</span>
       </div>
       <div class="route-card">
-        <small>${execution.status || 'unknown'}</small>
-        <strong>${execution.focus || 'Awaiting visible focus'}</strong>
-        <p>${execution.summary || 'Execution summary not available yet.'}</p>
+        <small>${escapeHtml(execution.status || 'unknown')}</small>
+        <strong>${escapeHtml(execution.focus || 'Awaiting visible focus')}</strong>
+        <p>${escapeHtml(execution.summary || 'Execution summary not available yet.')}</p>
       </div>
       <div class="company-footer">
-        <small>Generated: ${company.generatedAt}</small>
-        <small>Last activity: ${execution.lastActivityAt || 'n/a'}</small>
+        <small>Generated: ${escapeHtml(company.generatedAt)}</small>
+        <small>Last activity: ${escapeHtml(execution.lastActivityAt || 'n/a')}</small>
       </div>
       <div class="cta-row">
         <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>

@@ -20,16 +20,25 @@ if (session?.email) {
   titleEl.textContent = `Welcome back, ${session.email}`;
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function renderCompany(company) {
   const execution = company.executionState || {};
 
   return `
     <div class="route-card">
-      <small>${company.generatedAt}</small>
-      <strong>${company.projectName}</strong>
-      <p>${company.archetype}</p>
-      <small>${execution.status || 'unknown'}</small>
-      <p>${execution.focus || 'Awaiting visible focus'}</p>
+      <small>${escapeHtml(company.generatedAt)}</small>
+      <strong>${escapeHtml(company.projectName)}</strong>
+      <p>${escapeHtml(company.archetype)}</p>
+      <small>${escapeHtml(execution.status || 'unknown')}</small>
+      <p>${escapeHtml(execution.focus || 'Awaiting visible focus')}</p>
       <div class="cta-row">
         <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">Open company</a>
       </div>

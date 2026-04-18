@@ -64,6 +64,15 @@ function loadSettings() {
   }
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
 function renderBrand(data) {
   const rows = [
     ['Project', data.projectName],
@@ -78,8 +87,8 @@ function renderBrand(data) {
 
   return rows.map(([label, value]) => `
     <div class="brand-row">
-      <small>${label}</small>
-      <strong>${value}</strong>
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
       <p>${label === 'Company ID' ? 'Safe public identifier for the generated company, without exposing server internals.' : 'Generated from the company brief and used as operating context.'}</p>
     </div>
   `).join('');
@@ -88,8 +97,8 @@ function renderBrand(data) {
 function renderRouting(profile) {
   return Object.entries(profile).map(([label, value]) => `
     <div class="route-card">
-      <small>${label}</small>
-      <strong>${value}</strong>
+      <small>${escapeHtml(label)}</small>
+      <strong>${escapeHtml(value)}</strong>
       <p>Selected as the current default routing posture for this capability.</p>
     </div>
   `).join('');
@@ -98,8 +107,8 @@ function renderRouting(profile) {
 function renderOrg(roles) {
   return roles.map((role) => `
     <div class="role-card">
-      <h4>${role.title}</h4>
-      <p>${role.scope}</p>
+      <h4>${escapeHtml(role.title)}</h4>
+      <p>${escapeHtml(role.scope)}</p>
     </div>
   `).join('');
 }
@@ -108,7 +117,7 @@ function renderMissions(missions) {
   return missions.map((item, index) => `
     <div class="mission-card">
       <small>Mission ${index + 1}</small>
-      <strong>${item}</strong>
+      <strong>${escapeHtml(item)}</strong>
       <p>Immediate operating focus for the first company cycle.</p>
     </div>
   `).join('');

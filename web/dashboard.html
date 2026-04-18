@@ -29,9 +29,13 @@
       </header>
 
       <main class="site-main">
-        <section class="panel landing-hero">
+        <section class="panel landing-hero command-hero">
           <div class="hero-copy">
-            <div class="eyebrow">Command center</div>
+            <div class="eyebrow">
+              <span class="pulse-dot" aria-hidden="true"></span>
+              Command center
+              <span class="hero-tag" id="heroRuntimeTag">runtime · online</span>
+            </div>
             <h1 id="dashboardTitle">Welcome to your MultiClaw command center.</h1>
             <p>
               Operate the company layer, inspect pulse, and move from raw product to an active operating system.
@@ -42,18 +46,36 @@
               <a class="button-link secondary" href="./companies.html">Browse companies</a>
             </div>
           </div>
-          <div class="panel-strong stack">
-            <div class="route-card">
-              <small>Company pulse</small>
-              <strong>Live command surface</strong>
-              <p>One dense surface for generation, steering, telemetry, and company control.</p>
+          <aside class="panel-strong stack readiness-panel" aria-live="polite">
+            <div class="readiness-head">
+              <small>System readiness</small>
+              <strong id="readinessScore">—%</strong>
             </div>
-            <div class="route-card">
-              <small>Operator posture</small>
-              <strong>Strategic control remains human</strong>
-              <p>The system should feel authoritative and alive, while keeping the operator clearly in command.</p>
+            <div class="readiness-bar"><span id="readinessFill" style="width: 0%"></span></div>
+            <p class="readiness-caption" id="readinessCaption">Measuring runtime health, company pulse, and memory depth.</p>
+            <div class="readiness-grid">
+              <div>
+                <small>Cognitive load</small>
+                <strong id="cognitiveLoadValue">idle</strong>
+                <div class="micro-bar"><span id="cognitiveLoadFill" style="width: 0%"></span></div>
+              </div>
+              <div>
+                <small>Memory depth</small>
+                <strong id="memoryDepthValue">surface-only</strong>
+                <div class="micro-bar"><span id="memoryDepthFill" style="width: 10%"></span></div>
+              </div>
             </div>
+          </aside>
+        </section>
+
+        <section class="panel strategic-banner" id="strategicBanner">
+          <div class="strategic-glow" aria-hidden="true"></div>
+          <div class="strategic-content">
+            <small>Strategic recommendation</small>
+            <strong id="strategicHeadline">Generate the first company to activate the command center.</strong>
+            <p id="strategicDetail">MultiClaw steers the operator with the strongest near-term move based on live runtime state.</p>
           </div>
+          <a class="button-link primary" id="strategicCta" href="./generator.html">Generate a company</a>
         </section>
 
         <section class="grid-two">

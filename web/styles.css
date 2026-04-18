@@ -883,6 +883,26 @@ body.light-theme .hero-graphic {
   border-color: rgba(124, 92, 255, 0.07);
 }
 
+.orbit-h {
+  width: 980px;
+  height: 980px;
+  border-style: dotted;
+  border-color: rgba(86, 212, 209, 0.06);
+}
+
+.orbit-i {
+  width: 1080px;
+  height: 1080px;
+  border-color: rgba(243, 74, 120, 0.05);
+}
+
+.orbit-j {
+  width: 1180px;
+  height: 1180px;
+  border-style: dashed;
+  border-color: rgba(247, 215, 160, 0.05);
+}
+
 .graphic-orb {
   position: absolute;
   inset: 50% auto auto 50%;
@@ -942,6 +962,66 @@ body.light-theme .hero-graphic {
   animation: orbDrift8 32s linear infinite;
 }
 
+.orb-9 {
+  width: 42px;
+  height: 42px;
+  animation: orbDrift9 24s linear infinite reverse;
+}
+
+.orb-10 {
+  width: 10px;
+  height: 10px;
+  animation: orbDrift10 34s linear infinite;
+}
+
+.orb-11 {
+  width: 30px;
+  height: 30px;
+  animation: orbDrift11 20s linear infinite reverse;
+}
+
+.orb-12 {
+  width: 54px;
+  height: 54px;
+  animation: orbDrift12 29s linear infinite;
+}
+
+.orb-13 {
+  width: 16px;
+  height: 16px;
+  animation: orbDrift13 36s linear infinite reverse;
+}
+
+.orb-14 {
+  width: 22px;
+  height: 22px;
+  animation: orbDrift14 18s linear infinite;
+}
+
+.orb-15 {
+  width: 36px;
+  height: 36px;
+  animation: orbDrift15 30s linear infinite reverse;
+}
+
+.orb-16 {
+  width: 8px;
+  height: 8px;
+  animation: orbDrift16 40s linear infinite;
+}
+
+.orb-17 {
+  width: 48px;
+  height: 48px;
+  animation: orbDrift17 27s linear infinite reverse;
+}
+
+.orb-18 {
+  width: 18px;
+  height: 18px;
+  animation: orbDrift18 33s linear infinite;
+}
+
 .graphic-node {
   position: absolute;
   inset: 50% auto auto 50%;
@@ -960,6 +1040,17 @@ body.light-theme .hero-graphic {
   font-size: 12px;
   letter-spacing: 0.04em;
   transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.graphic-node-avatar-only {
+  padding: 8px;
+  gap: 0;
+  border-radius: 999px;
+  background: rgba(7, 19, 26, 0.7);
+}
+
+.graphic-node-avatar-labeled {
+  padding: 10px 14px 10px 10px;
 }
 
 body.light-theme .graphic-node {
@@ -1040,6 +1131,21 @@ body.light-theme .graphic-node {
     0 0 14px rgba(86, 212, 209, 0.18);
 }
 
+.claw-dot-medium {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+}
+
+.claw-dot-large {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(86, 212, 209, 0.22);
+}
+
 .copy-mini {
   min-width: 56px;
   min-height: 30px;
@@ -1102,6 +1208,14 @@ body.light-theme .graphic-node {
 .node-6 { animation: orbitNode6 22s linear infinite reverse; }
 .node-7 { animation: orbitNode7 19s linear infinite; }
 .node-8 { animation: orbitNode8 24s linear infinite reverse; }
+.node-9 { animation: orbitNode9 18s linear infinite; }
+.node-10 { animation: orbitNode10 26s linear infinite reverse; }
+.node-11 { animation: orbitNode11 21s linear infinite; }
+.node-12 { animation: orbitNode12 29s linear infinite reverse; }
+.node-13 { animation: orbitNode13 25s linear infinite; }
+.node-14 { animation: orbitNode14 31s linear infinite reverse; }
+.node-15 { animation: orbitNode15 23s linear infinite; }
+.node-16 { animation: orbitNode16 33s linear infinite reverse; }
 
 .cards-grid,
 .logic-grid,
@@ -2537,6 +2651,46 @@ button:hover {
   to { transform: translate(-50%, -50%) rotate(568deg) translateY(-362px) rotate(-568deg); }
 }
 
+@keyframes orbitNode9 {
+  from { transform: translate(-50%, -50%) rotate(134deg) translateY(-168px) rotate(-134deg); }
+  to { transform: translate(-50%, -50%) rotate(494deg) translateY(-168px) rotate(-494deg); }
+}
+
+@keyframes orbitNode10 {
+  from { transform: translate(-50%, -50%) rotate(332deg) translateY(-258px) rotate(-332deg); }
+  to { transform: translate(-50%, -50%) rotate(692deg) translateY(-258px) rotate(-692deg); }
+}
+
+@keyframes orbitNode11 {
+  from { transform: translate(-50%, -50%) rotate(18deg) translateY(-318px) rotate(-18deg); }
+  to { transform: translate(-50%, -50%) rotate(378deg) translateY(-318px) rotate(-378deg); }
+}
+
+@keyframes orbitNode12 {
+  from { transform: translate(-50%, -50%) rotate(156deg) translateY(-414px) rotate(-156deg); }
+  to { transform: translate(-50%, -50%) rotate(516deg) translateY(-414px) rotate(-516deg); }
+}
+
+@keyframes orbitNode13 {
+  from { transform: translate(-50%, -50%) rotate(72deg) translateY(-486px) rotate(-72deg); }
+  to { transform: translate(-50%, -50%) rotate(432deg) translateY(-486px) rotate(-432deg); }
+}
+
+@keyframes orbitNode14 {
+  from { transform: translate(-50%, -50%) rotate(252deg) translateY(-486px) rotate(-252deg); }
+  to { transform: translate(-50%, -50%) rotate(612deg) translateY(-486px) rotate(-612deg); }
+}
+
+@keyframes orbitNode15 {
+  from { transform: translate(-50%, -50%) rotate(298deg) translateY(-566px) rotate(-298deg); }
+  to { transform: translate(-50%, -50%) rotate(658deg) translateY(-566px) rotate(-658deg); }
+}
+
+@keyframes orbitNode16 {
+  from { transform: translate(-50%, -50%) rotate(118deg) translateY(-566px) rotate(-118deg); }
+  to { transform: translate(-50%, -50%) rotate(478deg) translateY(-566px) rotate(-478deg); }
+}
+
 @keyframes sparkPulse {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
@@ -2580,6 +2734,56 @@ button:hover {
 @keyframes orbDrift8 {
   from { transform: translate(-50%, -50%) rotate(212deg) translateY(-492px) rotate(-212deg); }
   to { transform: translate(-50%, -50%) rotate(572deg) translateY(-492px) rotate(-572deg); }
+}
+
+@keyframes orbDrift9 {
+  from { transform: translate(-50%, -50%) rotate(54deg) translateY(-146px) rotate(-54deg); }
+  to { transform: translate(-50%, -50%) rotate(414deg) translateY(-146px) rotate(-414deg); }
+}
+
+@keyframes orbDrift10 {
+  from { transform: translate(-50%, -50%) rotate(186deg) translateY(-172px) rotate(-186deg); }
+  to { transform: translate(-50%, -50%) rotate(546deg) translateY(-172px) rotate(-546deg); }
+}
+
+@keyframes orbDrift11 {
+  from { transform: translate(-50%, -50%) rotate(92deg) translateY(-268px) rotate(-92deg); }
+  to { transform: translate(-50%, -50%) rotate(452deg) translateY(-268px) rotate(-452deg); }
+}
+
+@keyframes orbDrift12 {
+  from { transform: translate(-50%, -50%) rotate(230deg) translateY(-284px) rotate(-230deg); }
+  to { transform: translate(-50%, -50%) rotate(590deg) translateY(-284px) rotate(-590deg); }
+}
+
+@keyframes orbDrift13 {
+  from { transform: translate(-50%, -50%) rotate(24deg) translateY(-356px) rotate(-24deg); }
+  to { transform: translate(-50%, -50%) rotate(384deg) translateY(-356px) rotate(-384deg); }
+}
+
+@keyframes orbDrift14 {
+  from { transform: translate(-50%, -50%) rotate(204deg) translateY(-376px) rotate(-204deg); }
+  to { transform: translate(-50%, -50%) rotate(564deg) translateY(-376px) rotate(-564deg); }
+}
+
+@keyframes orbDrift15 {
+  from { transform: translate(-50%, -50%) rotate(126deg) translateY(-452px) rotate(-126deg); }
+  to { transform: translate(-50%, -50%) rotate(486deg) translateY(-452px) rotate(-486deg); }
+}
+
+@keyframes orbDrift16 {
+  from { transform: translate(-50%, -50%) rotate(304deg) translateY(-538px) rotate(-304deg); }
+  to { transform: translate(-50%, -50%) rotate(664deg) translateY(-538px) rotate(-664deg); }
+}
+
+@keyframes orbDrift17 {
+  from { transform: translate(-50%, -50%) rotate(6deg) translateY(-618px) rotate(-6deg); }
+  to { transform: translate(-50%, -50%) rotate(366deg) translateY(-618px) rotate(-366deg); }
+}
+
+@keyframes orbDrift18 {
+  from { transform: translate(-50%, -50%) rotate(182deg) translateY(-648px) rotate(-182deg); }
+  to { transform: translate(-50%, -50%) rotate(542deg) translateY(-648px) rotate(-542deg); }
 }
 
 @keyframes pulseDot {

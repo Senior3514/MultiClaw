@@ -83,7 +83,7 @@ cd "$INSTALL_DIR"
 npm install
 npm link
 
-echo "MultiClaw bootstrap complete."
+echo "MultiClaw installed."
 multiclaw doctor
 
 auto_start() {
@@ -105,21 +105,18 @@ fi
 
 if [[ -t 0 ]]; then
   echo
-  echo "Next recommended step: multiclaw start"
+  echo "Next: multiclaw start"
   read -r -p "Start MultiClaw now? [Y/n] " answer
   answer="${answer:-Y}"
   if [[ "$answer" =~ ^[Yy]$ ]]; then
     multiclaw start
   else
     echo "Run 'multiclaw start' when you're ready."
-    echo "If you want to save the API key and start in one command, run:"
-    echo "  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
+    echo "Then run 'multiclaw verify'."
   fi
 else
   echo "Next:"
   echo "  1. multiclaw start"
   echo "  2. multiclaw verify"
   echo "  3. multiclaw stop"
-  echo "If you want to save the API key and start in one command:"
-  echo "  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY"
 fi

@@ -1180,6 +1180,17 @@ video {
   max-width: 720px;
 }
 
+.hero-primary-actions,
+.landing-final-actions {
+  justify-content: center;
+}
+
+.landing-final-command {
+  margin: 20px auto 0;
+  text-align: left;
+  width: min(100%, 920px);
+}
+
 .logic-card strong,
 .feature-card h2 {
   display: block;

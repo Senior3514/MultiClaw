@@ -69,6 +69,8 @@ need_cmd node
 need_cmd npm
 need_cmd python3
 
+cd "$HOME"
+
 if [[ -d "$INSTALL_DIR/.git" ]]; then
   echo "Updating existing MultiClaw install at $INSTALL_DIR"
   git -C "$INSTALL_DIR" pull --ff-only

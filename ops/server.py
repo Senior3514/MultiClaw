@@ -3,6 +3,7 @@ from http.server import ThreadingHTTPServer, SimpleHTTPRequestHandler
 from http.cookies import SimpleCookie
 from pathlib import Path
 from datetime import datetime, timezone
+from urllib.parse import urlparse
 import hashlib
 import io
 import json
@@ -23,6 +24,7 @@ DB_PATH = AUTH_ROOT / "multiclaw.db"
 HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
+SESSION_TTL_SECONDS = 60 * 60 * 24 * 14
 RATE_LIMITS = {}
 AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
 SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
@@ -42,6 +44,15 @@ def allow_rate(key: str, limit: int, window_seconds: int):
     entries.append(now)
     RATE_LIMITS[key] = entries
     return True
+
+
+def parse_utc_timestamp(value: str):
+    if not value:
+        return None
+    try:
+        return datetime.strptime(value, "%Y-%m-%d %H:%M:%S UTC").replace(tzinfo=timezone.utc)
+    except Exception:
+        return None
 
 
 def slugify(value: str) -> str:
@@ -221,8 +232,28 @@ def get_users():
     ]
 
 
+def cleanup_expired_sessions(conn=None):
+    owns_conn = conn is None
+    if conn is None:
+        conn = get_db()
+    try:
+        rows = conn.execute("SELECT token, created_at FROM sessions").fetchall()
+        expired_tokens = []
+        now = datetime.now(timezone.utc)
+        for row in rows:
+            created_at = parse_utc_timestamp(row["created_at"])
+            if created_at is None or (now - created_at).total_seconds() > SESSION_TTL_SECONDS:
+                expired_tokens.append(row["token"])
+        if expired_tokens:
+            conn.executemany("DELETE FROM sessions WHERE token = ?", [(token,) for token in expired_tokens])
+    finally:
+        if owns_conn:
+            conn.close()
+
+
 def get_sessions():
     with get_db() as conn:
+        cleanup_expired_sessions(conn)
         rows = conn.execute("SELECT token, email, created_at FROM sessions").fetchall()
     return {row["token"]: {"email": row["email"], "createdAt": row["created_at"]} for row in rows}
 
@@ -727,6 +758,19 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return None
         return token, session
 
+    def require_same_origin(self):
+        if AUTH_MODE == "single-user":
+            return True
+        origin_header = self.headers.get("Origin") or self.headers.get("Referer")
+        if not origin_header:
+            return True
+        parsed = urlparse(origin_header)
+        expected_host = self.headers.get("Host", "")
+        if parsed.netloc and parsed.netloc != expected_host:
+            self.send_json(403, {"error": "cross-origin request blocked"})
+            return False
+        return True
+
     def do_GET(self):
         if self.path == "/api/health":
             self.send_json(200, {"status": "ok"})
@@ -837,6 +881,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
 
     def do_POST(self):
         if self.path == "/api/auth/signup":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, SINGLE_USER_SESSION)
                 return
@@ -863,6 +909,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/login":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, SINGLE_USER_SESSION)
                 return
@@ -883,6 +931,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/auth/logout":
+            if not self.require_same_origin():
+                return
             if AUTH_MODE == "single-user":
                 self.send_json(200, {"ok": True})
                 return
@@ -893,6 +943,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/cycle"):
+            if not self.require_same_origin():
+                return
             if not self.require_session():
                 return
             try:
@@ -908,6 +960,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path.startswith("/api/company/") and self.path.endswith("/ask"):
+            if not self.require_same_origin():
+                return
             if not self.require_session():
                 return
             try:
@@ -936,6 +990,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             return
 
         if self.path == "/api/generate":
+            if not self.require_same_origin():
+                return
             if not self.require_session():
                 return
             if not allow_rate(f"generate:{self.client_address[0]}", 30, 60):

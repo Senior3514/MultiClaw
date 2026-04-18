@@ -404,10 +404,17 @@ async function startRuntime(forceBind = null) {
 
   if (bind === 'local') {
     runScript('start_local.sh', [port]);
-    return;
+  } else {
+    runScript('start_tailscale_only.sh', [port]);
   }
 
-  runScript('start_tailscale_only.sh', [port]);
+  if (process.exitCode) return;
+
+  const snapshot = await getRuntimeSnapshot();
+  if (snapshot.health && snapshot.health.status === 0) {
+    console.log('');
+    console.log(`Next: open ${snapshot.url} or run 'multiclaw verify'`);
+  }
 }
 
 async function upRuntime() {
@@ -453,8 +460,15 @@ async function getRuntimeSnapshot() {
 async function printStatus() {
   const snapshot = await getRuntimeSnapshot();
   const { config, running, bind, port, url, health } = snapshot;
+  const healthy = Boolean(health && health.status === 0);
+  const summary = !running
+    ? 'Runtime: not started'
+    : healthy
+      ? 'Runtime: ready'
+      : 'Runtime: started, health unreachable';
 
   console.log('MultiClaw runtime status');
+  console.log(`- ${summary}`);
   console.log(`- bind: ${bind}`);
   console.log(`- port: ${port}`);
   console.log(`- provider: ${config.provider}`);
@@ -465,6 +479,14 @@ async function printStatus() {
   console.log(`- pid: ${running || 'not running'}`);
   console.log(`- url: ${url}`);
   console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
+
+  if (!running) {
+    console.log('\nNext: multiclaw start');
+  } else if (healthy) {
+    console.log(`\nNext: open ${url} or run 'multiclaw verify'`);
+  } else {
+    console.log('\nNext: check the runtime log and rerun multiclaw status');
+  }
 }
 
 async function verifyRuntime() {

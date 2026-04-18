@@ -1,4 +1,4 @@
-import { getSession, mountSession, requireAuth } from './auth.js';
+import { getSession, isSingleUserSession, mountSession, requireAuth } from './auth.js';
 
 await requireAuth();
 mountSession();
@@ -17,7 +17,9 @@ const missionArtifactsCopyEl = document.getElementById('missionArtifactsCopy');
 const session = getSession();
 
 if (session?.email) {
-  titleEl.textContent = `Welcome back, ${session.email}`;
+  titleEl.textContent = isSingleUserSession(session)
+    ? 'Welcome to your MultiClaw workspace.'
+    : `Welcome back, ${session.email}`;
 }
 
 function escapeHtml(value) {

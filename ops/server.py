@@ -515,8 +515,9 @@ def build_stats():
         artifacts += len([path for path in company_dir.iterdir() if path.is_file()]) if company_dir.exists() else 0
     return {
         "companies": len(companies),
-        "users": len(users),
+        "users": 1 if AUTH_MODE == "single-user" else len(users),
         "artifacts": artifacts,
+        "mode": AUTH_MODE,
     }
 
 

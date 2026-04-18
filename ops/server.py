@@ -28,10 +28,10 @@ SESSION_COOKIE = "multiclaw_session"
 SESSION_TTL_SECONDS = 60 * 60 * 24 * 14
 AUTOPILOT_DEFAULT_INTERVAL_MINUTES = 30
 AUTOPILOT_LOOP_SECONDS = 30
+MAX_JSON_BODY_BYTES = 256 * 1024
 RATE_LIMITS = {}
 AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
 SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
-MAX_JSON_BODY_BYTES = 256 * 1024
 
 
 class BodyTooLargeError(Exception):
@@ -1208,6 +1208,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     return
                 result = run_company_cycle(company_id, company)
                 self.send_json(200, result)
+            except BodyTooLargeError:
+                return
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return

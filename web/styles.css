@@ -1556,6 +1556,159 @@ body.light-theme .quickstart-terminal {
   overflow: hidden;
 }
 
+.capability-grid,
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.capability-card,
+.resource-tile {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(243, 74, 120, 0.07), transparent 28%),
+    radial-gradient(circle at bottom right, rgba(86, 212, 209, 0.06), transparent 26%),
+    linear-gradient(180deg, rgba(10, 17, 34, 0.94), rgba(8, 12, 25, 0.92));
+}
+
+body.light-theme .capability-card,
+body.light-theme .resource-tile {
+  background:
+    radial-gradient(circle at top left, rgba(124, 92, 255, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 244, 255, 0.96));
+  border-color: rgba(124, 92, 255, 0.12);
+}
+
+.feature-icon,
+.resource-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  color: #ff6a78;
+  background: rgba(255, 107, 121, 0.08);
+  border: 1px solid rgba(255, 107, 121, 0.18);
+  font-weight: 800;
+  font-size: 22px;
+}
+
+.capability-card h3,
+.resource-tile strong {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.08;
+}
+
+.capability-card p,
+.resource-tile span:last-child {
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.integrations-section {
+  overflow: hidden;
+}
+
+.integration-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.integration-pills span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  box-shadow: 0 10px 24px rgba(4, 6, 18, 0.12);
+}
+
+body.light-theme .integration-pills span {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(124, 92, 255, 0.12);
+  box-shadow: 0 10px 22px rgba(112, 87, 196, 0.08);
+}
+
+.section-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+}
+
+.section-links a {
+  color: #ff7a84;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.resource-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.resource-tile {
+  text-decoration: none;
+  color: var(--text);
+  align-content: start;
+}
+
+.loop-section {
+  overflow: hidden;
+}
+
+.loop-cta-shell {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top left, rgba(243, 74, 120, 0.12), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(255, 166, 94, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(12, 17, 36, 0.96), rgba(8, 12, 26, 0.94));
+}
+
+body.light-theme .loop-cta-shell {
+  background:
+    radial-gradient(circle at top left, rgba(243, 74, 120, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 244, 255, 0.98));
+  border-color: rgba(124, 92, 255, 0.12);
+}
+
+.loop-cta-copy {
+  display: grid;
+  gap: 8px;
+  text-align: center;
+}
+
+.loop-cta-copy strong {
+  font-size: clamp(24px, 3vw, 36px);
+}
+
+.loop-cta-copy span {
+  color: var(--muted);
+}
+
+.loop-cta-actions {
+  justify-content: center;
+}
+
 .showcase-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1674,11 +1827,27 @@ body.light-theme .showcase-card {
     grid-template-columns: 1fr;
   }
 
+  .capability-grid,
+  .resource-grid {
+    grid-template-columns: 1fr;
+  }
+
   .showcase-card {
     padding: 22px;
   }
 
+  .capability-card,
+  .resource-tile,
+  .loop-cta-shell {
+    padding: 22px;
+  }
+
   .showcase-card p {
+    font-size: 17px;
+  }
+
+  .capability-card p,
+  .resource-tile span:last-child {
     font-size: 17px;
   }
 }

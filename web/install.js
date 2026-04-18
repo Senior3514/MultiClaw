@@ -29,7 +29,7 @@ const platformNotes = {
 
 const bindModeNotes = {
   local: 'Local mode is optimized toward a simpler single-user product flow on your own machine.',
-  tailscale: 'Tailscale mode is optimized toward a protected workspace flow with cleaner private access.',
+  tailscale: 'Private-network mode is optimized toward a protected workspace flow with cleaner private access.',
 };
 
 function renderCommand() {

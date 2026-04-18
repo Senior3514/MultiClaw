@@ -756,7 +756,7 @@ body.light-theme .hero-graphic {
   transform: translate(calc(-50% + var(--hero-drift-x)), calc(-50% + var(--hero-drift-y)));
   width: 340px;
   height: 340px;
-  z-index: 3;
+  z-index: 20;
   border-radius: 50%;
   display: grid;
   place-items: center;
@@ -1034,7 +1034,7 @@ body.light-theme .hero-graphic {
   position: absolute;
   inset: 50% auto auto 50%;
   padding: 11px 14px;
-  z-index: 4;
+  z-index: 6;
   border-radius: 999px;
   background: rgba(10, 24, 31, 0.74);
   border: 1px solid rgba(86, 212, 209, 0.12);
@@ -1157,7 +1157,7 @@ body.light-theme .graphic-node {
 .graphic-planet {
   position: absolute;
   inset: 50% auto auto 50%;
-  z-index: 2;
+  z-index: 3;
   border-radius: 50%;
   transform: translate(-50%, -50%);
   background:
@@ -2684,83 +2684,83 @@ button:hover {
 }
 
 @keyframes orbitNode1 {
-  from { transform: translate(-50%, -50%) rotate(0deg) translateY(-196px) rotate(0deg); }
-  to { transform: translate(-50%, -50%) rotate(360deg) translateY(-196px) rotate(-360deg); }
+  from { transform: translate(-50%, -50%) rotate(0deg) translateY(-266px) rotate(0deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg) translateY(-266px) rotate(-360deg); }
 }
 
 @keyframes orbitNode2 {
-  from { transform: translate(-50%, -50%) rotate(90deg) translateY(-220px) rotate(-90deg); }
-  to { transform: translate(-50%, -50%) rotate(450deg) translateY(-220px) rotate(-450deg); }
+  from { transform: translate(-50%, -50%) rotate(90deg) translateY(-292px) rotate(-90deg); }
+  to { transform: translate(-50%, -50%) rotate(450deg) translateY(-292px) rotate(-450deg); }
 }
 
 @keyframes orbitNode3 {
-  from { transform: translate(-50%, -50%) rotate(180deg) translateY(-200px) rotate(-180deg); }
-  to { transform: translate(-50%, -50%) rotate(540deg) translateY(-200px) rotate(-540deg); }
+  from { transform: translate(-50%, -50%) rotate(180deg) translateY(-278px) rotate(-180deg); }
+  to { transform: translate(-50%, -50%) rotate(540deg) translateY(-278px) rotate(-540deg); }
 }
 
 @keyframes orbitNode4 {
-  from { transform: translate(-50%, -50%) rotate(270deg) translateY(-224px) rotate(-270deg); }
-  to { transform: translate(-50%, -50%) rotate(630deg) translateY(-224px) rotate(-630deg); }
+  from { transform: translate(-50%, -50%) rotate(270deg) translateY(-306px) rotate(-270deg); }
+  to { transform: translate(-50%, -50%) rotate(630deg) translateY(-306px) rotate(-630deg); }
 }
 
 @keyframes orbitNode5 {
-  from { transform: translate(-50%, -50%) rotate(45deg) translateY(-286px) rotate(-45deg); }
-  to { transform: translate(-50%, -50%) rotate(405deg) translateY(-286px) rotate(-405deg); }
+  from { transform: translate(-50%, -50%) rotate(45deg) translateY(-372px) rotate(-45deg); }
+  to { transform: translate(-50%, -50%) rotate(405deg) translateY(-372px) rotate(-405deg); }
 }
 
 @keyframes orbitNode6 {
-  from { transform: translate(-50%, -50%) rotate(225deg) translateY(-286px) rotate(-225deg); }
-  to { transform: translate(-50%, -50%) rotate(585deg) translateY(-286px) rotate(-585deg); }
+  from { transform: translate(-50%, -50%) rotate(225deg) translateY(-372px) rotate(-225deg); }
+  to { transform: translate(-50%, -50%) rotate(585deg) translateY(-372px) rotate(-585deg); }
 }
 
 @keyframes orbitNode7 {
-  from { transform: translate(-50%, -50%) rotate(28deg) translateY(-362px) rotate(-28deg); }
-  to { transform: translate(-50%, -50%) rotate(388deg) translateY(-362px) rotate(-388deg); }
+  from { transform: translate(-50%, -50%) rotate(28deg) translateY(-458px) rotate(-28deg); }
+  to { transform: translate(-50%, -50%) rotate(388deg) translateY(-458px) rotate(-388deg); }
 }
 
 @keyframes orbitNode8 {
-  from { transform: translate(-50%, -50%) rotate(208deg) translateY(-362px) rotate(-208deg); }
-  to { transform: translate(-50%, -50%) rotate(568deg) translateY(-362px) rotate(-568deg); }
+  from { transform: translate(-50%, -50%) rotate(208deg) translateY(-458px) rotate(-208deg); }
+  to { transform: translate(-50%, -50%) rotate(568deg) translateY(-458px) rotate(-568deg); }
 }
 
 @keyframes orbitNode9 {
-  from { transform: translate(-50%, -50%) rotate(134deg) translateY(-168px) rotate(-134deg); }
-  to { transform: translate(-50%, -50%) rotate(494deg) translateY(-168px) rotate(-494deg); }
+  from { transform: translate(-50%, -50%) rotate(134deg) translateY(-252px) rotate(-134deg); }
+  to { transform: translate(-50%, -50%) rotate(494deg) translateY(-252px) rotate(-494deg); }
 }
 
 @keyframes orbitNode10 {
-  from { transform: translate(-50%, -50%) rotate(332deg) translateY(-258px) rotate(-332deg); }
-  to { transform: translate(-50%, -50%) rotate(692deg) translateY(-258px) rotate(-692deg); }
+  from { transform: translate(-50%, -50%) rotate(332deg) translateY(-344px) rotate(-332deg); }
+  to { transform: translate(-50%, -50%) rotate(692deg) translateY(-344px) rotate(-692deg); }
 }
 
 @keyframes orbitNode11 {
-  from { transform: translate(-50%, -50%) rotate(18deg) translateY(-318px) rotate(-18deg); }
-  to { transform: translate(-50%, -50%) rotate(378deg) translateY(-318px) rotate(-378deg); }
+  from { transform: translate(-50%, -50%) rotate(18deg) translateY(-404px) rotate(-18deg); }
+  to { transform: translate(-50%, -50%) rotate(378deg) translateY(-404px) rotate(-378deg); }
 }
 
 @keyframes orbitNode12 {
-  from { transform: translate(-50%, -50%) rotate(156deg) translateY(-414px) rotate(-156deg); }
-  to { transform: translate(-50%, -50%) rotate(516deg) translateY(-414px) rotate(-516deg); }
+  from { transform: translate(-50%, -50%) rotate(156deg) translateY(-506px) rotate(-156deg); }
+  to { transform: translate(-50%, -50%) rotate(516deg) translateY(-506px) rotate(-516deg); }
 }
 
 @keyframes orbitNode13 {
-  from { transform: translate(-50%, -50%) rotate(72deg) translateY(-486px) rotate(-72deg); }
-  to { transform: translate(-50%, -50%) rotate(432deg) translateY(-486px) rotate(-432deg); }
+  from { transform: translate(-50%, -50%) rotate(72deg) translateY(-592px) rotate(-72deg); }
+  to { transform: translate(-50%, -50%) rotate(432deg) translateY(-592px) rotate(-432deg); }
 }
 
 @keyframes orbitNode14 {
-  from { transform: translate(-50%, -50%) rotate(252deg) translateY(-486px) rotate(-252deg); }
-  to { transform: translate(-50%, -50%) rotate(612deg) translateY(-486px) rotate(-612deg); }
+  from { transform: translate(-50%, -50%) rotate(252deg) translateY(-624px) rotate(-252deg); }
+  to { transform: translate(-50%, -50%) rotate(612deg) translateY(-624px) rotate(-612deg); }
 }
 
 @keyframes orbitNode15 {
-  from { transform: translate(-50%, -50%) rotate(298deg) translateY(-566px) rotate(-298deg); }
-  to { transform: translate(-50%, -50%) rotate(658deg) translateY(-566px) rotate(-658deg); }
+  from { transform: translate(-50%, -50%) rotate(298deg) translateY(-724px) rotate(-298deg); }
+  to { transform: translate(-50%, -50%) rotate(658deg) translateY(-724px) rotate(-658deg); }
 }
 
 @keyframes orbitNode16 {
-  from { transform: translate(-50%, -50%) rotate(118deg) translateY(-566px) rotate(-118deg); }
-  to { transform: translate(-50%, -50%) rotate(478deg) translateY(-566px) rotate(-478deg); }
+  from { transform: translate(-50%, -50%) rotate(118deg) translateY(-724px) rotate(-118deg); }
+  to { transform: translate(-50%, -50%) rotate(478deg) translateY(-724px) rotate(-478deg); }
 }
 
 @keyframes sparkPulse {
@@ -2769,43 +2769,43 @@ button:hover {
 }
 
 @keyframes orbDrift1 {
-  from { transform: translate(-50%, -50%) rotate(10deg) translateY(-198px) rotate(-10deg); }
-  to { transform: translate(-50%, -50%) rotate(370deg) translateY(-198px) rotate(-370deg); }
+  from { transform: translate(-50%, -50%) rotate(10deg) translateY(-254px) rotate(-10deg); }
+  to { transform: translate(-50%, -50%) rotate(370deg) translateY(-254px) rotate(-370deg); }
 }
 
 @keyframes orbDrift2 {
-  from { transform: translate(-50%, -50%) rotate(140deg) translateY(-236px) rotate(-140deg); }
-  to { transform: translate(-50%, -50%) rotate(500deg) translateY(-236px) rotate(-500deg); }
+  from { transform: translate(-50%, -50%) rotate(140deg) translateY(-292px) rotate(-140deg); }
+  to { transform: translate(-50%, -50%) rotate(500deg) translateY(-292px) rotate(-500deg); }
 }
 
 @keyframes orbDrift3 {
-  from { transform: translate(-50%, -50%) rotate(250deg) translateY(-236px) rotate(-250deg); }
-  to { transform: translate(-50%, -50%) rotate(610deg) translateY(-236px) rotate(-610deg); }
+  from { transform: translate(-50%, -50%) rotate(250deg) translateY(-292px) rotate(-250deg); }
+  to { transform: translate(-50%, -50%) rotate(610deg) translateY(-292px) rotate(-610deg); }
 }
 
 @keyframes orbDrift4 {
-  from { transform: translate(-50%, -50%) rotate(70deg) translateY(-304px) rotate(-70deg); }
-  to { transform: translate(-50%, -50%) rotate(430deg) translateY(-304px) rotate(-430deg); }
+  from { transform: translate(-50%, -50%) rotate(70deg) translateY(-366px) rotate(-70deg); }
+  to { transform: translate(-50%, -50%) rotate(430deg) translateY(-366px) rotate(-430deg); }
 }
 
 @keyframes orbDrift5 {
-  from { transform: translate(-50%, -50%) rotate(188deg) translateY(-340px) rotate(-188deg); }
-  to { transform: translate(-50%, -50%) rotate(548deg) translateY(-340px) rotate(-548deg); }
+  from { transform: translate(-50%, -50%) rotate(188deg) translateY(-418px) rotate(-188deg); }
+  to { transform: translate(-50%, -50%) rotate(548deg) translateY(-418px) rotate(-548deg); }
 }
 
 @keyframes orbDrift6 {
-  from { transform: translate(-50%, -50%) rotate(320deg) translateY(-384px) rotate(-320deg); }
-  to { transform: translate(-50%, -50%) rotate(680deg) translateY(-384px) rotate(-680deg); }
+  from { transform: translate(-50%, -50%) rotate(320deg) translateY(-474px) rotate(-320deg); }
+  to { transform: translate(-50%, -50%) rotate(680deg) translateY(-474px) rotate(-680deg); }
 }
 
 @keyframes orbDrift7 {
-  from { transform: translate(-50%, -50%) rotate(96deg) translateY(-438px) rotate(-96deg); }
-  to { transform: translate(-50%, -50%) rotate(456deg) translateY(-438px) rotate(-456deg); }
+  from { transform: translate(-50%, -50%) rotate(96deg) translateY(-532px) rotate(-96deg); }
+  to { transform: translate(-50%, -50%) rotate(456deg) translateY(-532px) rotate(-456deg); }
 }
 
 @keyframes orbDrift8 {
-  from { transform: translate(-50%, -50%) rotate(212deg) translateY(-492px) rotate(-212deg); }
-  to { transform: translate(-50%, -50%) rotate(572deg) translateY(-492px) rotate(-572deg); }
+  from { transform: translate(-50%, -50%) rotate(212deg) translateY(-588px) rotate(-212deg); }
+  to { transform: translate(-50%, -50%) rotate(572deg) translateY(-588px) rotate(-572deg); }
 }
 
 @keyframes orbDrift9 {

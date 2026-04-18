@@ -58,7 +58,7 @@ if [[ "$AUTH_MODE" == "multi-user" ]]; then
 fi
 
 echo "[7/17] dashboard page"
-check_page "$BASE_URL/dashboard.html" "Mission control" auth
+check_page "$BASE_URL/dashboard.html" "Company pulse" auth
 
 echo "[8/17] generator page"
 check_page "$BASE_URL/generator.html" "Generate company" auth

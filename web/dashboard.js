@@ -18,7 +18,7 @@ const session = getSession();
 
 if (session?.email) {
   titleEl.textContent = isSingleUserSession(session)
-    ? 'Welcome to your MultiClaw workspace.'
+    ? 'Welcome to your MultiClaw command center.'
     : `Welcome back, ${session.email}`;
 }
 
@@ -57,12 +57,19 @@ async function loadStats() {
     statsUsersEl.textContent = stats.users;
     statsArtifactsEl.textContent = stats.artifacts;
 
-    if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
-    if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = 'Workspace flow active across install, steering, and company generation.';
-    if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} generated compan${stats.companies === 1 ? 'y' : 'ies'}`;
-    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is visible through topology, execution state, activity feed, and company control surfaces.';
-    if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `${stats.artifacts} artifacts live`;
-    if (missionArtifactsCopyEl) missionArtifactsCopyEl.textContent = 'Generated outputs are accumulating as tangible proof that the product is doing real work.';
+    const cognitiveDepth = stats.artifacts >= 24
+      ? 'Deepening'
+      : stats.artifacts >= 8 || stats.companies >= 1
+        ? 'Execution-visible'
+        : 'Surface-only';
+    if (missionWorkspaceStateEl) missionWorkspaceStateEl.textContent = stats.mode === 'single-user' ? 'Single-user command center online' : `${stats.users} workspace user${stats.users === 1 ? '' : 's'} online`;
+    if (missionWorkspaceCopyEl) missionWorkspaceCopyEl.textContent = stats.mode === 'single-user'
+      ? 'Low-friction operator access is active. The command surface is ready for steering and verification.'
+      : 'Workspace flow active across install, steering, and company generation.';
+    if (missionCompaniesStateEl) missionCompaniesStateEl.textContent = `${stats.companies} company cell${stats.companies === 1 ? '' : 's'} live`;
+    if (missionCompaniesCopyEl) missionCompaniesCopyEl.textContent = 'The company layer is visible through topology, execution state, activity feed, and operator control surfaces.';
+    if (missionArtifactsStateEl) missionArtifactsStateEl.textContent = `Cognitive depth: ${cognitiveDepth}`;
+    if (missionArtifactsCopyEl) missionArtifactsCopyEl.textContent = `${stats.artifacts} artifacts are currently shaping visible execution memory inside the workspace.`;
   } catch (error) {
     console.error(error);
     statsCompaniesEl.textContent = '-';

@@ -18,6 +18,19 @@ const runtimeDir = path.join(cwd, '.multiclaw');
 const runtimeConfigPath = path.join(runtimeDir, 'config.json');
 const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
 const generatedLiveRoot = path.join(repoRoot, 'generated-live');
+const supportsAnsi = Boolean(process.stdout.isTTY);
+const ANSI = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  gray: '\x1b[90m',
+};
 
 function runtimeFileSuffix(bind) {
   return bind === 'local' ? 'local' : 'tailscale';
@@ -35,6 +48,42 @@ function processExists(pid) {
   if (!pid) return false;
   const result = spawnSync('kill', ['-0', String(pid)], { encoding: 'utf8' });
   return result.status === 0;
+}
+
+function tint(text, ...codes) {
+  if (!supportsAnsi) return text;
+  return `${codes.join('')}${text}${ANSI.reset}`;
+}
+
+function successMark() {
+  return tint('[✓]', ANSI.green, ANSI.bold);
+}
+
+function warningMark() {
+  return tint('[!]', ANSI.yellow, ANSI.bold);
+}
+
+function failureMark() {
+  return tint('[!]', ANSI.red, ANSI.bold);
+}
+
+function printCliHeader(label = 'COMPANY OPERATOR RUNTIME') {
+  console.log(tint('███╗   ███╗██╗   ██╗██╗  ████████╗██╗ ██████╗██╗      █████╗ ██╗    ██╗', ANSI.cyan, ANSI.bold));
+  console.log(tint('████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔════╝██║     ██╔══██╗██║    ██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('██╔████╔██║██║   ██║██║     ██║   ██║██║     ██║     ███████║██║ █╗ ██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('██║╚██╔╝██║██║   ██║██║     ██║   ██║██║     ██║     ██╔══██║██║███╗██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║╚██████╗███████╗██║  ██║╚███╔███╔╝', ANSI.cyan, ANSI.bold));
+  console.log(tint('╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ', ANSI.cyan, ANSI.bold));
+  console.log(tint(` ${label}`, ANSI.gray));
+  console.log('');
+}
+
+function printCommandSection(title, lines, color = ANSI.cyan) {
+  console.log(tint(`[${title}]`, color, ANSI.bold));
+  for (const line of lines) {
+    console.log(`  ${line}`);
+  }
+  console.log('');
 }
 
 function slugify(value) {
@@ -447,6 +496,44 @@ async function upRuntime() {
   await startRuntime(config.bind);
 }
 
+async function getWorkspaceTelemetry() {
+  const companyEntries = await fs.readdir(generatedLiveRoot, { withFileTypes: true }).catch(() => []);
+  const companies = companyEntries.filter((entry) => entry.isDirectory() && entry.name !== '.auth');
+  let artifacts = 0;
+  let events = 0;
+  let cycles = 0;
+
+  for (const company of companies) {
+    const companyDir = path.join(generatedLiveRoot, company.name);
+    const files = await fs.readdir(companyDir, { withFileTypes: true }).catch(() => []);
+    for (const file of files) {
+      if (!file.isFile()) continue;
+      artifacts += 1;
+      if (file.name === 'events.json') {
+        const payload = await fs.readFile(path.join(companyDir, file.name), 'utf8').then((raw) => JSON.parse(raw)).catch(() => []);
+        events += Array.isArray(payload) ? payload.length : 0;
+      }
+      if (/^CYCLE-\d+\.md$/i.test(file.name)) {
+        cycles += 1;
+      }
+    }
+  }
+
+  const memoryDepth = events >= 8 || cycles >= 3
+    ? 'deepening'
+    : events >= 1 || cycles >= 1 || companies.length >= 1
+      ? 'execution-visible'
+      : 'surface-only';
+
+  return {
+    companies: companies.length,
+    artifacts,
+    events,
+    cycles,
+    memoryDepth,
+  };
+}
+
 async function getRuntimeSnapshot() {
   const config = await loadRuntimeConfig();
   const bind = config.bind;
@@ -467,6 +554,7 @@ async function getRuntimeSnapshot() {
 
 async function printStatus() {
   const snapshot = await getRuntimeSnapshot();
+  const telemetry = await getWorkspaceTelemetry();
   const { config, rawPid, running, bind, port, url, health, staleState } = snapshot;
   const healthy = Boolean(health && health.status === 0);
   const summary = staleState
@@ -476,29 +564,33 @@ async function printStatus() {
       : healthy
         ? 'Runtime: ready'
         : 'Runtime: started, health unreachable';
+  const recommendation = staleState
+    ? 'Clear stale runtime state, then relaunch the command center.'
+    : !running
+      ? 'Start the runtime, then run multiclaw verify.'
+      : healthy && telemetry.companies === 0
+        ? 'Generate the first company to activate the command center.'
+        : healthy
+          ? 'Open the workspace and steer the strongest company.'
+          : 'Inspect the runtime log and restore a healthy state before continuing.';
 
-  console.log('MultiClaw runtime status');
-  console.log(`- ${summary}`);
+  printCliHeader('OPERATOR STATUS');
+  console.log(`${staleState ? warningMark() : healthy ? successMark() : running ? warningMark() : failureMark()} ${summary}`);
   console.log(`- bind: ${bind}`);
   console.log(`- port: ${port}`);
   console.log(`- provider: ${config.provider}`);
   console.log(`- model: ${config.model}`);
   console.log(`- api key env: ${config.apiKeyEnv}`);
-  console.log(`- config: ${runtimeConfigPath}`);
-  console.log(`- runtime env: ${runtimeEnvPath}`);
   console.log(`- pid: ${running || rawPid || 'not running'}`);
   console.log(`- url: ${url}`);
   console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
-
-  if (staleState) {
-    console.log('\nNext: run multiclaw stop to clear stale state, then multiclaw start');
-  } else if (!running) {
-    console.log('\nNext: multiclaw start');
-  } else if (healthy) {
-    console.log(`\nNext: open ${url} or run 'multiclaw verify'`);
-  } else {
-    console.log('\nNext: check the runtime log and rerun multiclaw status');
-  }
+  console.log(`- company pulse: ${telemetry.companies} companies, ${telemetry.artifacts} artifacts, ${telemetry.events} events, ${telemetry.cycles} cycles`);
+  console.log(`- memory depth: ${telemetry.memoryDepth}`);
+  console.log(`- config: ${runtimeConfigPath}`);
+  console.log(`- runtime env: ${runtimeEnvPath}`);
+  console.log('');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  console.log(`  ${recommendation}`);
 }
 
 async function verifyRuntime() {
@@ -643,23 +735,28 @@ async function printDoctor() {
     ['python3', ['--version']],
     ['curl', ['--version']],
   ];
+  const results = [];
+  const pushResult = (label, ok, detail) => {
+    results.push({ label, ok, detail });
+    console.log(`${ok ? successMark() : failureMark()} ${label}: ${detail}`);
+  };
 
-  console.log('MultiClaw doctor');
+  printCliHeader('INFRASTRUCTURE DOCTOR');
   for (const [commandName, args] of checks) {
     const result = spawnSync(commandName, args, { encoding: 'utf8' });
     const ok = result.status === 0;
     const output = (result.stdout || result.stderr || '').trim().split(/\r?\n/)[0] || 'not available';
-    console.log(`- ${commandName}: ${ok ? 'ok' : 'missing'} (${output})`);
+    pushResult(commandName, ok, output);
   }
 
   const tailscale = spawnSync('tailscale', ['status'], { encoding: 'utf8' });
-  console.log(`- tailscale: ${tailscale.status === 0 ? 'available' : 'not available or not connected'}`);
+  pushResult('tailscale', tailscale.status === 0, tailscale.status === 0 ? 'available' : 'not available or not connected');
 
   const config = await loadRuntimeConfig();
-  console.log(`- runtime config: ${runtimeConfigPath} (${config.bind}:${config.port}, ${config.provider}/${config.model})`);
+  pushResult('runtime config', true, `${config.bind}:${config.port}, ${config.provider}/${config.model}`);
 
   const runtimeEnv = await fs.readFile(runtimeEnvPath, 'utf8').then(() => 'present').catch(() => 'missing');
-  console.log(`- runtime env: ${runtimeEnv}`);
+  pushResult('runtime env', runtimeEnv === 'present', runtimeEnv);
 
   const requiredPaths = [
     path.join(repoRoot, 'ops', 'start_local.sh'),
@@ -671,52 +768,66 @@ async function printDoctor() {
 
   for (const requiredPath of requiredPaths) {
     const exists = await fs.access(requiredPath).then(() => true).catch(() => false);
-    console.log(`- path ${path.relative(repoRoot, requiredPath)}: ${exists ? 'ok' : 'missing'}`);
+    pushResult(`path ${path.relative(repoRoot, requiredPath)}`, exists, exists ? 'ok' : 'missing');
   }
 
   const generatedRootPath = path.join(repoRoot, 'generated-live');
   const generatedRootExists = await fs.access(generatedRootPath).then(() => true).catch(() => false);
   if (generatedRootExists) {
     const generatedRootWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(generatedRootPath)}' ]`]);
-    console.log(`- generated-live writable: ${generatedRootWritable.status === 0 ? 'yes' : 'no'}`);
+    pushResult('generated-live writable', generatedRootWritable.status === 0, generatedRootWritable.status === 0 ? 'yes' : 'no');
   } else {
     const repoWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(repoRoot)}' ]`]);
-    console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
+    pushResult('generated-live', repoWritable.status === 0, repoWritable.status === 0 ? 'not created yet, repo writable' : 'not created yet, repo not writable');
   }
 
   const snapshot = await getRuntimeSnapshot();
   if (snapshot.staleState) {
-    console.log('- runtime state: stale files detected');
+    pushResult('runtime state', false, 'stale files detected');
   }
   if (snapshot.health) {
-    console.log(`- runtime health: ${snapshot.health.status === 0 ? `ok (${snapshot.health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
+    pushResult('runtime health', snapshot.health.status === 0, snapshot.health.status === 0 ? snapshot.health.stdout.trim() || 'reachable' : 'unreachable');
   } else {
-    console.log('- runtime health: runtime not started');
+    pushResult('runtime health', false, 'runtime not started');
   }
+
+  const passed = results.filter((item) => item.ok).length;
+  const score = Math.round((passed / results.length) * 100);
+  const verdict = score >= 90 ? 'SYSTEM READY' : score >= 70 ? 'SYSTEM STABILIZING' : 'SYSTEM NOT READY';
+  console.log('');
+  console.log(tint(`${verdict}: ${score}%`, score >= 90 ? ANSI.green : score >= 70 ? ANSI.yellow : ANSI.red, ANSI.bold));
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  console.log(`  ${snapshot.health && snapshot.health.status === 0 ? 'Run multiclaw verify, then steer the workspace from the dashboard.' : 'Restore a healthy runtime and close missing prerequisites before deeper work.'}`);
 }
 
 function printHelp() {
-  console.log(`MultiClaw
-
-Fast path:
-  multiclaw guide
-  multiclaw start
-  multiclaw verify
-  multiclaw stop
-
-Core commands:
-  multiclaw walkthrough
-  multiclaw doctor
-  multiclaw status
-  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw configure
-  multiclaw ask [--company <companyId>] "your question"
-
-Notes:
-  - start uses the saved config and prints the URL
-  - up saves config and starts in one command
-  - verify checks doctor, status, and smoke when the runtime is up
-`);
+  printCliHeader('HIGH-DENSITY COMMAND MAP');
+  printCommandSection('OPERATOR CONTROL', [
+    'multiclaw start',
+    'multiclaw stop',
+    'multiclaw status',
+    'multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]',
+  ], ANSI.green);
+  printCommandSection('COMPANY ARCHITECTURE', [
+    'multiclaw init',
+    'multiclaw ask [--company <companyId>] "your question"',
+  ], ANSI.cyan);
+  printCommandSection('SETUP AND GUIDANCE', [
+    'multiclaw guide',
+    'multiclaw walkthrough',
+    'multiclaw configure',
+  ], ANSI.blue);
+  printCommandSection('INFRASTRUCTURE', [
+    'multiclaw doctor',
+    'multiclaw verify',
+  ], ANSI.yellow);
+  console.log(tint('Notes', ANSI.bold));
+  console.log('  - start uses the saved config and prints the URL');
+  console.log('  - up saves config and starts in one command');
+  console.log('  - verify checks doctor, status, and smoke when the runtime is up');
+  console.log('');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  console.log('  Run multiclaw guide, then configure the runtime and verify the full path.');
 }
 
 async function main() {

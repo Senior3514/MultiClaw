@@ -35,8 +35,15 @@ export function mountThemeToggleOnly() {
 
 applyTheme();
 
-function setLocalSession(email) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify({ email, signedInAt: new Date().toISOString() }));
+function setLocalSession(email, mode) {
+  localStorage.setItem(
+    SESSION_KEY,
+    JSON.stringify({ email, mode: mode || null, signedInAt: new Date().toISOString() }),
+  );
+}
+
+export function isSingleUserSession(session) {
+  return session?.mode === 'single-user';
 }
 
 export function getSession() {
@@ -88,26 +95,21 @@ async function signUp(email, password, confirmPassword) {
   if (password !== confirmPassword) throw new Error('Passwords do not match.');
 
   const data = await request('/api/auth/signup', { email, password });
-  setLocalSession(data.email);
+  setLocalSession(data.email, data.mode);
 }
 
 async function logIn(email, password) {
   if (!email || !password) throw new Error('Email and password are required.');
   const data = await request('/api/auth/login', { email, password });
-  setLocalSession(data.email);
+  setLocalSession(data.email, data.mode);
 }
 
 export async function requireAuth() {
   document.body?.classList.add('auth-pending');
-  const session = getSession();
-  if (!session?.email) {
-    window.location.href = './login.html';
-    throw new Error('Authentication required');
-  }
 
   try {
     const serverSession = await request('/api/auth/me');
-    setLocalSession(serverSession.email);
+    setLocalSession(serverSession.email, serverSession.mode);
     document.body?.classList.remove('auth-pending');
     return serverSession;
   } catch {
@@ -120,7 +122,7 @@ export async function requireAuth() {
 export async function hasServerSession() {
   try {
     const serverSession = await request('/api/auth/me');
-    setLocalSession(serverSession.email);
+    setLocalSession(serverSession.email, serverSession.mode);
     return serverSession;
   } catch {
     clearSession();
@@ -139,12 +141,18 @@ export function mountSession() {
     return;
   }
 
+  const isSingleUser = isSingleUserSession(session);
+  const label = isSingleUser ? 'Local workspace' : session.email;
+  const controlHtml = isSingleUser
+    ? ''
+    : '<button id="logoutBtn" type="button">Log out</button>';
+
   sessionArea.innerHTML = `
     <div class="session-chip">
       <span class="status-dot"></span>
-      <span>${session.email}</span>
+      <span>${label}</span>
       <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
-      <button id="logoutBtn" type="button">Log out</button>
+      ${controlHtml}
     </div>
   `;
 

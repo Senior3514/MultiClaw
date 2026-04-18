@@ -1,4 +1,4 @@
-import { hasServerSession, logOut, bindThemeToggles } from './auth.js';
+import { hasServerSession, logOut, bindThemeToggles, isSingleUserSession } from './auth.js';
 
 const session = await hasServerSession();
 const sessionArea = document.getElementById('sessionArea');
@@ -9,13 +9,18 @@ if (sessionArea) {
   const isLanding = window.location.pathname.endsWith('/index.html') || window.location.pathname === '/' || window.location.pathname === '';
 
   if (session?.email) {
+    const singleUser = isSingleUserSession(session);
+    const logoutHtml = singleUser
+      ? ''
+      : '<button id="publicLogoutBtn" type="button">Log out</button>';
+
     sessionArea.innerHTML = isLanding
       ? `
         <div class="session-chip">
           <span class="status-dot"></span>
           <a class="button-link secondary" href="./dashboard.html">Workspace</a>
           <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
-          <button id="publicLogoutBtn" type="button">Log out</button>
+          ${logoutHtml}
         </div>
       `
       : `
@@ -24,7 +29,7 @@ if (sessionArea) {
           <span>${healthLabel}</span>
           <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
           <a class="button-link secondary" href="./dashboard.html">Workspace</a>
-          <button id="publicLogoutBtn" type="button">Log out</button>
+          ${logoutHtml}
         </div>
       `;
 

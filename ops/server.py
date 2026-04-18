@@ -363,10 +363,12 @@ def build_stats():
     for company in companies:
         company_dir = GENERATED_ROOT / company["companyId"]
         artifacts += len([path for path in company_dir.iterdir() if path.is_file()]) if company_dir.exists() else 0
+    user_count = 1 if AUTH_MODE == "single-user" else len(users)
     return {
         "companies": len(companies),
-        "users": len(users),
+        "users": user_count,
         "artifacts": artifacts,
+        "mode": AUTH_MODE,
     }
 
 

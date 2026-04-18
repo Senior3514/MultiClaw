@@ -77,3 +77,41 @@ test('router skips providers marked as not ready by default', () => {
   const result = router.select({ capability: 'chat' });
   assert.equal(result.provider.id, 'online-good');
 });
+
+test('execution plan returns primary provider with fallback chain', () => {
+  const router = buildRouter();
+  const plan = router.plan({ capability: 'chat', priority: 'quality', privacy: 'standard', maxFallbacks: 2 });
+  assert.ok(plan.primary);
+  assert.ok(Array.isArray(plan.fallbacks));
+  assert.ok(plan.fallbacks.length <= 2);
+  assert.ok(plan.fallbacks.every((provider) => provider.id !== plan.primary.id));
+});
+
+test('execution plan normalizes retries, timeout, and malformed output handling', () => {
+  const router = buildRouter();
+  const plan = router.plan({
+    capability: 'reasoning',
+    retries: 9,
+    timeoutMs: 999999,
+    structuredOutput: 'strict-json',
+    failurePolicy: 'retry-then-fallback',
+  });
+  assert.equal(plan.execution.retries, 4);
+  assert.equal(plan.execution.timeoutMs, 180000);
+  assert.equal(plan.execution.structuredOutput, 'strict-json');
+  assert.equal(plan.execution.malformedOutputAction, 'retry-then-fallback');
+});
+
+test('execution plan returns no primary when capability is unsupported', () => {
+  const router = buildRouter();
+  const plan = router.plan({ capability: 'quantum-planning', structuredOutput: 'json' });
+  assert.equal(plan.primary, null);
+  assert.equal(plan.fallbacks.length, 0);
+  assert.equal(plan.execution.structuredOutput, 'json');
+});
+
+test('preferred deployments can boost local providers in fallback planning', () => {
+  const router = buildRouter();
+  const plan = router.plan({ capability: 'chat', preferredDeployments: ['local'], privacy: 'standard' });
+  assert.equal(plan.primary.id, 'ollama');
+});

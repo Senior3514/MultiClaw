@@ -3722,6 +3722,92 @@ body.light-theme .install-command {
   }
 }
 
+@media (max-width: 760px) {
+  .landing-hero {
+    gap: 4px;
+    padding-block: 4px 10px;
+  }
+
+  .hero-graphic {
+    min-height: 560px;
+    width: min(100%, 720px);
+    padding: 4px;
+  }
+
+  .graphic-core {
+    width: 236px;
+    height: 236px;
+  }
+
+  .graphic-avatar {
+    width: 152px;
+    height: 152px;
+  }
+
+  .graphic-core strong {
+    font-size: 18px;
+  }
+
+  .graphic-core span,
+  .hero-stage-brand span {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+  }
+
+  .hero-stage-brand strong {
+    font-size: 14px;
+  }
+
+  .hero-copy h1 {
+    font-size: 30px;
+    max-width: 11ch;
+  }
+
+  .hero-copy p {
+    font-size: 16px;
+    max-width: 34ch;
+  }
+
+  .hero-announcement {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .hero-primary-actions {
+    width: 100%;
+  }
+
+  .hero-primary-actions .button-link {
+    flex: 1 1 100%;
+  }
+
+  .graphic-node {
+    font-size: 10px;
+    padding: 6px 8px;
+    gap: 4px;
+  }
+
+  .claw-dot {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+
+  .node-4,
+  .node-5,
+  .node-7,
+  .node-8,
+  .node-12,
+  .node-13,
+  .node-16,
+  .planet-4,
+  .planet-5,
+  .orb-17,
+  .orb-18 {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .command-hero::before,
   .pulse-dot,

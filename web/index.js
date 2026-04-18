@@ -187,8 +187,8 @@ if (session?.email) {
   }
 } else {
   if (tryGeneratorBtn) {
-    tryGeneratorBtn.href = './platform.html';
-    tryGeneratorBtn.textContent = 'See platform';
+    tryGeneratorBtn.href = './integrations.html';
+    tryGeneratorBtn.textContent = 'View integrations';
   }
   if (openWorkspaceBtn) {
     openWorkspaceBtn.href = './install.html';

@@ -483,6 +483,30 @@ video {
   width: min(100%, 920px);
 }
 
+.hero-stage-caption {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  margin-top: -12px;
+  margin-bottom: 18px;
+}
+
+.hero-stage-brand {
+  display: grid;
+  gap: 6px;
+}
+
+.hero-stage-brand strong {
+  font-size: 16px;
+}
+
+.hero-stage-brand span {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
 .hero-announcement {
   display: inline-flex;
   align-items: center;
@@ -3217,7 +3241,12 @@ body.light-theme .install-command {
   }
 
   .landing-copy {
-    margin-top: -10px;
+    margin-top: 18px;
+  }
+
+  .hero-stage-caption {
+    margin-top: 0;
+    margin-bottom: 12px;
   }
 
   .hero-brand {

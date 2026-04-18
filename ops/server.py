@@ -521,6 +521,47 @@ def build_stats():
     }
 
 
+def build_pulse():
+    companies = list_companies()
+    total_artifacts = 0
+    total_events = 0
+    latest_activity = None
+    latest_company = None
+
+    for company in companies:
+        company_id = company.get("companyId")
+        if not company_id:
+            continue
+        company_dir = GENERATED_ROOT / company_id
+        if company_dir.exists():
+            total_artifacts += len([p for p in company_dir.iterdir() if p.is_file()])
+        events = load_company_events(company_id)
+        total_events += len(events)
+        candidate = None
+        if events:
+            candidate = parse_utc_timestamp(events[0].get("timestamp"))
+        if not candidate:
+            candidate = parse_utc_timestamp(company.get("generatedAt"))
+        if candidate and (latest_activity is None or candidate > latest_activity):
+            latest_activity = candidate
+            latest_company = {
+                "companyId": company_id,
+                "projectName": company.get("projectName", company_id),
+            }
+
+    mode = AUTH_MODE
+    return {
+        "mode": mode,
+        "companies": len(companies),
+        "artifacts": total_artifacts,
+        "events": total_events,
+        "cognitiveLoad": "idle (0 in-flight)",
+        "latestActivityAt": latest_activity.strftime("%Y-%m-%d %H:%M:%S UTC") if latest_activity else None,
+        "latestCompany": latest_company,
+        "pulseAt": now_utc(),
+    }
+
+
 def load_company(company_id: str):
     company_file = GENERATED_ROOT / company_id / "company.json"
     if not company_file.exists():
@@ -789,6 +830,12 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if not self.require_session():
                 return
             self.send_json(200, build_stats())
+            return
+
+        if self.path == "/api/pulse":
+            if not self.require_session():
+                return
+            self.send_json(200, build_pulse())
             return
 
         if self.path == "/api/companies":

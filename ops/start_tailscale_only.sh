@@ -41,11 +41,6 @@ for _ in $(seq 1 20); do
     echo "URL: http://$TS_IP:$PORT/"
     echo "Health: $HEALTH_URL"
     echo "Log: $LOG_FILE"
-    echo ""
-    echo "Next:"
-    echo "  1. Open http://$TS_IP:$PORT/"
-    echo "  2. Run multiclaw verify"
-    echo "  3. Stop with multiclaw stop"
     exit 0
   fi
   sleep 1

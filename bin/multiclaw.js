@@ -19,6 +19,44 @@ const runtimeConfigPath = path.join(runtimeDir, 'config.json');
 const runtimeEnvPath = path.join(runtimeDir, 'runtime.env');
 const generatedLiveRoot = path.join(repoRoot, 'generated-live');
 
+const useColor = Boolean(process.stdout.isTTY) && !process.env.NO_COLOR;
+const ANSI = useColor
+  ? {
+      reset: '\x1b[0m',
+      bold: '\x1b[1m',
+      dim: '\x1b[2m',
+      red: '\x1b[31m',
+      green: '\x1b[32m',
+      yellow: '\x1b[33m',
+      cyan: '\x1b[36m',
+      gray: '\x1b[90m',
+    }
+  : { reset: '', bold: '', dim: '', red: '', green: '', yellow: '', cyan: '', gray: '' };
+
+const MARK_OK = `${ANSI.green}[✓]${ANSI.reset}`;
+const MARK_FAIL = `${ANSI.red}[!]${ANSI.reset}`;
+const MARK_WARN = `${ANSI.yellow}[~]${ANSI.reset}`;
+const MARK_INFO = `${ANSI.cyan}[·]${ANSI.reset}`;
+
+function paintBanner() {
+  const l = `${ANSI.cyan}${ANSI.bold}`;
+  const r = ANSI.reset;
+  const d = ANSI.dim;
+  console.log(`${l}  ╔══════════════════════════════════════════════════════╗${r}`);
+  console.log(`${l}  ║  MULTICLAW · AI COMPANY RUNTIME                      ║${r}`);
+  console.log(`${l}  ║${r}  ${d}Operator command · Company architecture layer${r}      ${l}║${r}`);
+  console.log(`${l}  ╚══════════════════════════════════════════════════════╝${r}`);
+}
+
+function sectionHeader(title) {
+  return `${ANSI.bold}${ANSI.cyan}${title}${ANSI.reset}`;
+}
+
+function nextLine(text) {
+  return `${ANSI.bold}${ANSI.yellow}Next:${ANSI.reset} ${text}`;
+}
+
+
 function runtimeFileSuffix(bind) {
   return bind === 'local' ? 'local' : 'tailscale';
 }
@@ -410,10 +448,18 @@ async function startRuntime(forceBind = null) {
 
   if (process.exitCode) return;
 
-  const snapshot = await getRuntimeSnapshot();
+  const snapshot = await getRuntimeSnapshot(bind);
   if (snapshot.health && snapshot.health.status === 0) {
+    const memory = await computeMemoryDepth();
     console.log('');
-    console.log(`Next: open ${snapshot.url} or run 'multiclaw verify'`);
+    console.log(`  ${MARK_OK} runtime online   ${ANSI.dim}${snapshot.url}${ANSI.reset}`);
+    console.log(`  ${MARK_INFO} memory depth    ${ANSI.dim}${memory.companies} compan${memory.companies === 1 ? 'y' : 'ies'} · ${memory.artifacts} artifacts${ANSI.reset}`);
+    console.log('');
+    if (memory.companies === 0) {
+      console.log(nextLine(`open ${ANSI.bold}${snapshot.url}${ANSI.reset} or run ${ANSI.bold}multiclaw init${ANSI.reset} to generate the first company`));
+    } else {
+      console.log(nextLine(`open ${ANSI.bold}${snapshot.url}${ANSI.reset} or run ${ANSI.bold}multiclaw verify${ANSI.reset}`));
+    }
   }
 }
 
@@ -441,9 +487,23 @@ async function upRuntime() {
   await startRuntime(config.bind);
 }
 
-async function getRuntimeSnapshot() {
+async function detectActiveBind(fallbackBind) {
+  for (const candidate of ['local', 'tailscale']) {
+    const pid = await fs.readFile(runtimePidPath(candidate), 'utf8').then((value) => value.trim()).catch(() => null);
+    if (!pid) continue;
+    try {
+      process.kill(Number(pid), 0);
+      return candidate;
+    } catch {
+      // stale pid file
+    }
+  }
+  return fallbackBind;
+}
+
+async function getRuntimeSnapshot(forceBind = null) {
   const config = await loadRuntimeConfig();
-  const bind = config.bind;
+  const bind = forceBind || await detectActiveBind(config.bind);
   const running = await fs.readFile(runtimePidPath(bind), 'utf8').then((value) => value.trim()).catch(() => null);
   const state = await fs.readFile(runtimeStatePath(bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
   const host = state?.host || (bind === 'local' ? '127.0.0.1' : (getTailscaleIp() || 'tailscale-unavailable'));
@@ -461,31 +521,40 @@ async function printStatus() {
   const snapshot = await getRuntimeSnapshot();
   const { config, running, bind, port, url, health } = snapshot;
   const healthy = Boolean(health && health.status === 0);
-  const summary = !running
-    ? 'Runtime: not started'
+  const runtimeMark = !running ? MARK_WARN : healthy ? MARK_OK : MARK_FAIL;
+  const runtimeLabel = !running
+    ? 'not started'
     : healthy
-      ? 'Runtime: ready'
-      : 'Runtime: started, health unreachable';
+      ? 'ready'
+      : 'started, health unreachable';
+  const cognitiveLoad = !running ? 'idle' : healthy ? 'active (0 in-flight)' : 'stalled';
+  const memory = await computeMemoryDepth();
 
-  console.log('MultiClaw runtime status');
-  console.log(`- ${summary}`);
-  console.log(`- bind: ${bind}`);
-  console.log(`- port: ${port}`);
-  console.log(`- provider: ${config.provider}`);
-  console.log(`- model: ${config.model}`);
-  console.log(`- api key env: ${config.apiKeyEnv}`);
-  console.log(`- config: ${runtimeConfigPath}`);
-  console.log(`- runtime env: ${runtimeEnvPath}`);
-  console.log(`- pid: ${running || 'not running'}`);
-  console.log(`- url: ${url}`);
-  console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
+  paintBanner();
+  console.log('');
+  console.log(sectionHeader('RUNTIME STATE'));
+  console.log(`  ${runtimeMark} ${'runtime'.padEnd(12)} ${ANSI.dim}${runtimeLabel}${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'bind'.padEnd(12)} ${ANSI.dim}${bind}:${port}${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'provider'.padEnd(12)} ${ANSI.dim}${config.provider} / ${config.model}${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'api key env'.padEnd(12)} ${ANSI.dim}${config.apiKeyEnv}${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'pid'.padEnd(12)} ${ANSI.dim}${running || 'not running'}${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'url'.padEnd(12)} ${ANSI.dim}${url}${ANSI.reset}`);
+  console.log('');
+  console.log(sectionHeader('COMPANY TELEMETRY'));
+  console.log(`  ${MARK_INFO} ${'memory depth'.padEnd(14)} ${ANSI.dim}${memory.companies} compan${memory.companies === 1 ? 'y' : 'ies'} · ${memory.artifacts} artifacts${ANSI.reset}`);
+  console.log(`  ${MARK_INFO} ${'cognitive load'.padEnd(14)} ${ANSI.dim}${cognitiveLoad}${ANSI.reset}`);
 
+  console.log('');
   if (!running) {
-    console.log('\nNext: multiclaw start');
+    console.log(nextLine(`run ${ANSI.bold}multiclaw start${ANSI.reset}`));
   } else if (healthy) {
-    console.log(`\nNext: open ${url} or run 'multiclaw verify'`);
+    if (memory.companies === 0) {
+      console.log(nextLine(`open ${ANSI.bold}${url}${ANSI.reset} or run ${ANSI.bold}multiclaw init${ANSI.reset} to generate the first company`));
+    } else {
+      console.log(nextLine(`open ${ANSI.bold}${url}${ANSI.reset} or run ${ANSI.bold}multiclaw verify${ANSI.reset}`));
+    }
   } else {
-    console.log('\nNext: check the runtime log and rerun multiclaw status');
+    console.log(nextLine(`check ops/multiclaw-web.${runtimeFileSuffix(bind)}.log`));
   }
 }
 
@@ -623,8 +692,25 @@ Uninstall:
 `);
 }
 
+async function computeMemoryDepth() {
+  const entries = await fs.readdir(generatedLiveRoot, { withFileTypes: true }).catch(() => []);
+  let companies = 0;
+  let artifacts = 0;
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) continue;
+    companies += 1;
+    const files = await fs.readdir(path.join(generatedLiveRoot, entry.name), { withFileTypes: true }).catch(() => []);
+    artifacts += files.filter((f) => f.isFile()).length;
+  }
+  return { companies, artifacts };
+}
+
 async function printDoctor() {
-  const checks = [
+  paintBanner();
+  console.log('');
+  console.log(sectionHeader('READINESS REPORT'));
+
+  const binaries = [
     ['git', ['--version']],
     ['node', ['--version']],
     ['npm', ['--version']],
@@ -632,22 +718,22 @@ async function printDoctor() {
     ['curl', ['--version']],
   ];
 
-  console.log('MultiClaw doctor');
-  for (const [commandName, args] of checks) {
+  let passed = 0;
+  let total = 0;
+
+  for (const [commandName, args] of binaries) {
     const result = spawnSync(commandName, args, { encoding: 'utf8' });
     const ok = result.status === 0;
-    const output = (result.stdout || result.stderr || '').trim().split(/\r?\n/)[0] || 'not available';
-    console.log(`- ${commandName}: ${ok ? 'ok' : 'missing'} (${output})`);
+    const versionLine = (result.stdout || result.stderr || '').trim().split(/\r?\n/)[0] || 'not available';
+    total += 1;
+    if (ok) passed += 1;
+    const mark = ok ? MARK_OK : MARK_FAIL;
+    console.log(`  ${mark} ${commandName.padEnd(10)} ${ANSI.dim}${versionLine}${ANSI.reset}`);
   }
 
   const tailscale = spawnSync('tailscale', ['status'], { encoding: 'utf8' });
-  console.log(`- tailscale: ${tailscale.status === 0 ? 'available' : 'not available or not connected'}`);
-
-  const config = await loadRuntimeConfig();
-  console.log(`- runtime config: ${runtimeConfigPath} (${config.bind}:${config.port}, ${config.provider}/${config.model})`);
-
-  const runtimeEnv = await fs.readFile(runtimeEnvPath, 'utf8').then(() => 'present').catch(() => 'missing');
-  console.log(`- runtime env: ${runtimeEnv}`);
+  const tailscaleOk = tailscale.status === 0;
+  console.log(`  ${tailscaleOk ? MARK_OK : MARK_WARN} ${'tailscale'.padEnd(10)} ${ANSI.dim}${tailscaleOk ? 'connected' : 'optional, not connected'}${ANSI.reset}`);
 
   const requiredPaths = [
     path.join(repoRoot, 'ops', 'start_local.sh'),
@@ -659,50 +745,91 @@ async function printDoctor() {
 
   for (const requiredPath of requiredPaths) {
     const exists = await fs.access(requiredPath).then(() => true).catch(() => false);
-    console.log(`- path ${path.relative(repoRoot, requiredPath)}: ${exists ? 'ok' : 'missing'}`);
+    total += 1;
+    if (exists) passed += 1;
+    const mark = exists ? MARK_OK : MARK_FAIL;
+    console.log(`  ${mark} ${'path'.padEnd(10)} ${ANSI.dim}${path.relative(repoRoot, requiredPath)}${ANSI.reset}`);
   }
 
   const generatedRootPath = path.join(repoRoot, 'generated-live');
   const generatedRootExists = await fs.access(generatedRootPath).then(() => true).catch(() => false);
+  let writable;
   if (generatedRootExists) {
-    const generatedRootWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(generatedRootPath)}' ]`]);
-    console.log(`- generated-live writable: ${generatedRootWritable.status === 0 ? 'yes' : 'no'}`);
+    writable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(generatedRootPath)}' ]`]).status === 0;
   } else {
-    const repoWritable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(repoRoot)}' ]`]);
-    console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
+    writable = spawnSync('bash', ['-lc', `[ -w '${shellEscapeSingle(repoRoot)}' ]`]).status === 0;
   }
+  total += 1;
+  if (writable) passed += 1;
+  console.log(`  ${writable ? MARK_OK : MARK_FAIL} ${'writable'.padEnd(10)} ${ANSI.dim}${generatedRootExists ? 'generated-live' : 'repo (generated-live pending)'}${ANSI.reset}`);
+
+  const config = await loadRuntimeConfig();
+  const runtimeEnvPresent = await fs.access(runtimeEnvPath).then(() => true).catch(() => false);
+  console.log(`  ${MARK_INFO} ${'config'.padEnd(10)} ${ANSI.dim}${config.bind}:${config.port} · ${config.provider}/${config.model}${ANSI.reset}`);
+  console.log(`  ${runtimeEnvPresent ? MARK_OK : MARK_WARN} ${'api key'.padEnd(10)} ${ANSI.dim}${runtimeEnvPresent ? 'runtime.env present' : 'not saved yet (optional)'}${ANSI.reset}`);
 
   const state = await fs.readFile(runtimeStatePath(config.bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
+  let runtimeHealthy = false;
   if (state?.url) {
     const health = spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', `${state.url.replace(/\/$/, '')}/api/health`], { encoding: 'utf8' });
-    console.log(`- runtime health: ${health.status === 0 ? `ok (${health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
+    runtimeHealthy = health.status === 0;
+    const mark = runtimeHealthy ? MARK_OK : MARK_WARN;
+    console.log(`  ${mark} ${'runtime'.padEnd(10)} ${ANSI.dim}${runtimeHealthy ? `healthy at ${state.url}` : 'started but health unreachable'}${ANSI.reset}`);
   } else {
-    console.log('- runtime health: runtime not started');
+    console.log(`  ${MARK_INFO} ${'runtime'.padEnd(10)} ${ANSI.dim}not started${ANSI.reset}`);
+  }
+
+  const score = Math.round((passed / total) * 100);
+  const band = score === 100 ? 'READY' : score >= 80 ? 'MOSTLY READY' : 'NEEDS SETUP';
+  const color = score === 100 ? ANSI.green : score >= 80 ? ANSI.yellow : ANSI.red;
+  console.log('');
+  console.log(`  ${ANSI.bold}${color}SYSTEM ${band}: ${score}% (${passed}/${total})${ANSI.reset}`);
+
+  const memory = await computeMemoryDepth();
+  console.log(`  ${ANSI.dim}Memory depth: ${memory.companies} compan${memory.companies === 1 ? 'y' : 'ies'} · ${memory.artifacts} artifacts${ANSI.reset}`);
+
+  console.log('');
+  if (score < 100) {
+    console.log(nextLine(`resolve the ${MARK_FAIL} items above, then rerun ${ANSI.bold}multiclaw doctor${ANSI.reset}`));
+  } else if (!state?.url) {
+    console.log(nextLine(`run ${ANSI.bold}multiclaw start${ANSI.reset} to bring the runtime online`));
+  } else if (!runtimeHealthy) {
+    console.log(nextLine(`check ops/multiclaw-web logs and rerun ${ANSI.bold}multiclaw doctor${ANSI.reset}`));
+  } else {
+    console.log(nextLine(`run ${ANSI.bold}multiclaw verify${ANSI.reset} for the end-to-end smoke`));
   }
 }
 
 function printHelp() {
-  console.log(`MultiClaw
-
-Fast path:
-  multiclaw guide
-  multiclaw start
-  multiclaw verify
-  multiclaw stop
-
-Core commands:
-  multiclaw walkthrough
-  multiclaw doctor
-  multiclaw status
-  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw configure
-  multiclaw ask [--company <companyId>] "your question"
-
-Notes:
-  - start uses the saved config and prints the URL
-  - up saves config and starts in one command
-  - verify checks doctor, status, and smoke when the runtime is up
-`);
+  paintBanner();
+  console.log('');
+  console.log(sectionHeader('OPERATOR CONTROL'));
+  console.log(`  ${ANSI.bold}start${ANSI.reset}        Start the runtime using the saved bind mode`);
+  console.log(`  ${ANSI.bold}dev${ANSI.reset}          Start on 127.0.0.1 for local work`);
+  console.log(`  ${ANSI.bold}stop${ANSI.reset}         Stop the runtime cleanly`);
+  console.log(`  ${ANSI.bold}status${ANSI.reset}       Runtime readiness, bind, and memory depth`);
+  console.log(`  ${ANSI.bold}up${ANSI.reset}           Save config and start in one command`);
+  console.log('');
+  console.log(sectionHeader('COMPANY ARCHITECTURE'));
+  console.log(`  ${ANSI.bold}init${ANSI.reset}         Generate a company package under ./generated/`);
+  console.log(`  ${ANSI.bold}ask${ANSI.reset}          Talk to the latest generated company`);
+  console.log(`  ${ANSI.bold}configure${ANSI.reset}    Guided runtime setup (bind, port, provider, model)`);
+  console.log('');
+  console.log(sectionHeader('INFRASTRUCTURE'));
+  console.log(`  ${ANSI.bold}doctor${ANSI.reset}       Environment readiness with score`);
+  console.log(`  ${ANSI.bold}verify${ANSI.reset}       Doctor + status + end-to-end smoke`);
+  console.log(`  ${ANSI.bold}guide${ANSI.reset}        Short step-by-step setup`);
+  console.log(`  ${ANSI.bold}walkthrough${ANSI.reset}  Full command walkthrough`);
+  console.log('');
+  console.log(sectionHeader('FLAGS'));
+  console.log(`  ${ANSI.dim}--tailscale | --local     bind mode${ANSI.reset}`);
+  console.log(`  ${ANSI.dim}--port <port>             runtime port (default 8813)${ANSI.reset}`);
+  console.log(`  ${ANSI.dim}--provider <name>         openai | anthropic | openrouter | groq | ollama${ANSI.reset}`);
+  console.log(`  ${ANSI.dim}--model <name>            model id${ANSI.reset}`);
+  console.log(`  ${ANSI.dim}--api-key-env <name>      env var name to persist${ANSI.reset}`);
+  console.log(`  ${ANSI.dim}--api-key <value>         api key value to save${ANSI.reset}`);
+  console.log('');
+  console.log(nextLine(`run ${ANSI.bold}multiclaw doctor${ANSI.reset} to see system readiness`));
 }
 
 async function main() {
@@ -772,13 +899,21 @@ async function main() {
     return;
   }
 
+  paintBanner();
+  console.log('');
+  console.log(sectionHeader('COMPANY BIRTH'));
   const data = await collectInput();
   const result = await generateProject(data);
+  const relPath = path.relative(cwd, result.outputDir) || result.outputDir;
 
-  console.log(`Generated company for ${data.projectName}`);
-  console.log(`Path: ${result.outputDir}`);
-  console.log(`Archetype: ${result.archetype}`);
-  console.log(`Roles: ${result.roles.map((role) => role.title).join(', ')}`);
+  console.log('');
+  console.log(`  ${MARK_OK} project        ${ANSI.dim}${data.projectName}${ANSI.reset}`);
+  console.log(`  ${MARK_OK} archetype      ${ANSI.dim}${result.archetype}${ANSI.reset}`);
+  console.log(`  ${MARK_OK} roster         ${ANSI.dim}${result.roles.length} lead roles${ANSI.reset}`);
+  console.log(`  ${MARK_OK} artifacts      ${ANSI.dim}README · BRAND · COMPANY · ORG-CHART · CHARTER · MISSION · ROADMAP${ANSI.reset}`);
+  console.log(`  ${MARK_OK} output         ${ANSI.dim}${relPath}${ANSI.reset}`);
+  console.log('');
+  console.log(nextLine(`start the runtime with ${ANSI.bold}multiclaw start${ANSI.reset} and open the dashboard`));
 }
 
 main().catch((error) => {

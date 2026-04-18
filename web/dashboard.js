@@ -89,5 +89,56 @@ async function loadRecentCompanies() {
   }
 }
 
+const pulseMemoryEl = document.getElementById('pulseMemory');
+const pulseLoadEl = document.getElementById('pulseLoad');
+const pulseLatestEl = document.getElementById('pulseLatest');
+const pulseLatestDetailEl = document.getElementById('pulseLatestDetail');
+const pulseRecommendationEl = document.getElementById('pulseRecommendation');
+const pulseTimestampEl = document.getElementById('pulseTimestamp');
+
+function buildRecommendation(pulse) {
+  if (!pulse.companies) {
+    return 'Generate the first company to bring the workspace to life.';
+  }
+  if (!pulse.events) {
+    return 'Open the latest company and run a cycle to create visible activity.';
+  }
+  return 'Refine the latest company, run another cycle, or start a new one.';
+}
+
+async function loadPulse() {
+  if (!pulseMemoryEl) return;
+  try {
+    const response = await fetch('/api/pulse');
+    if (!response.ok) throw new Error(`Failed with status ${response.status}`);
+    const pulse = await response.json();
+
+    pulseMemoryEl.textContent = `${pulse.companies} compan${pulse.companies === 1 ? 'y' : 'ies'} · ${pulse.artifacts} artifacts`;
+    pulseLoadEl.textContent = pulse.cognitiveLoad || 'idle';
+    if (pulse.latestCompany) {
+      pulseLatestEl.textContent = pulse.latestCompany.projectName;
+      pulseLatestDetailEl.textContent = pulse.latestActivityAt
+        ? `Last activity ${pulse.latestActivityAt}.`
+        : 'No timestamped activity yet.';
+    } else {
+      pulseLatestEl.textContent = 'None yet';
+      pulseLatestDetailEl.textContent = 'No company has been generated on this runtime.';
+    }
+    pulseRecommendationEl.textContent = buildRecommendation(pulse);
+    if (pulseTimestampEl) {
+      pulseTimestampEl.textContent = pulse.pulseAt
+        ? `Pulse ${pulse.pulseAt}`
+        : 'Live telemetry';
+    }
+  } catch (error) {
+    console.error(error);
+    pulseMemoryEl.textContent = '-';
+    pulseLoadEl.textContent = '-';
+    pulseLatestEl.textContent = '-';
+    pulseRecommendationEl.textContent = 'Pulse unavailable. Retry shortly.';
+  }
+}
+
 loadStats();
 loadRecentCompanies();
+loadPulse();

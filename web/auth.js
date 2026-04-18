@@ -11,7 +11,8 @@ export function applyTheme(theme = getStoredTheme()) {
   document.body?.classList.toggle('light-theme', theme === 'light');
   localStorage.setItem(THEME_KEY, theme);
   document.querySelectorAll('[data-theme-toggle]').forEach((button) => {
-    button.textContent = theme === 'light' ? 'Dark mode' : 'Light mode';
+    button.textContent = theme === 'light' ? 'Dark' : 'Light';
+    button.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
   });
 }
 
@@ -29,7 +30,7 @@ export function bindThemeToggles(scope = document) {
 export function mountThemeToggleOnly() {
   const sessionArea = document.getElementById('sessionArea');
   if (!sessionArea || sessionArea.children.length) return;
-  sessionArea.innerHTML = '<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button></div>';
+  sessionArea.innerHTML = '<div class="session-tools"><button class="header-toggle" type="button" data-theme-toggle>Light</button></div>';
   bindThemeToggles(sessionArea);
 }
 
@@ -140,17 +141,16 @@ export function mountSession() {
 
   const session = getSession();
   if (!session?.email) {
-    sessionArea.innerHTML = '<div class="session-chip"><span class="status-dot"></span><span>System check</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Workspace</a><a class="button-link secondary" href="./login.html">Sign in</a></div>';
+    sessionArea.innerHTML = '<div class="session-tools"><span class="header-status"><span class="status-dot"></span>System check</span><button class="header-toggle" type="button" data-theme-toggle>Light</button><a class="button-link secondary" href="./dashboard.html">Workspace</a><a class="button-link secondary" href="./login.html">Sign in</a></div>';
     bindThemeToggles(sessionArea);
     return;
   }
 
   const isSingleUser = isSingleUserSession(session);
   sessionArea.innerHTML = `
-    <div class="session-chip">
-      <span class="status-dot"></span>
-      <span>${isSingleUser ? 'Local workspace' : session.email}</span>
-      <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
+    <div class="session-tools">
+      <span class="header-status"><span class="status-dot"></span>${isSingleUser ? 'Local workspace' : session.email}</span>
+      <button class="header-toggle" type="button" data-theme-toggle>Light</button>
       <a class="button-link secondary" href="./dashboard.html">Workspace</a>
       ${isSingleUser ? '<span class="button-link secondary">Single-user</span>' : '<button id="logoutBtn" type="button">Log out</button>'}
     </div>

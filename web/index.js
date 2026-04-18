@@ -5,6 +5,11 @@ const openWorkspaceBtn = document.getElementById('openWorkspaceBtn');
 const homeInstallCommandEl = document.getElementById('homeInstallCommand');
 const copyHomeInstallButton = document.getElementById('copyHomeInstallCommand');
 const homePlatformNoteEl = document.getElementById('homePlatformNote');
+const landingFinalCommandEl = document.getElementById('landingFinalCommand');
+const copyLandingFinalCommandButton = document.getElementById('copyLandingFinalCommand');
+
+let secretToggleCount = 0;
+let secretToggleTimer = null;
 
 const homeInstallState = {
   platform: 'ubuntu',
@@ -42,6 +47,34 @@ async function copyWithFeedback(button, text, successText) {
 copyHomeInstallButton?.setAttribute('data-default-label', 'Copy install');
 copyHomeInstallButton?.addEventListener('click', async () => {
   await copyWithFeedback(copyHomeInstallButton, homeInstallCommandEl.textContent, 'Copied');
+});
+
+copyLandingFinalCommandButton?.setAttribute('data-default-label', 'Copy install');
+copyLandingFinalCommandButton?.addEventListener('click', async () => {
+  await copyWithFeedback(copyLandingFinalCommandButton, landingFinalCommandEl.textContent, 'Copied');
+});
+
+document.querySelectorAll('[data-copy-text]').forEach((button) => {
+  button.dataset.defaultLabel = 'Copy';
+  button.addEventListener('click', async () => {
+    await copyWithFeedback(button, button.dataset.copyText, 'Copied');
+  });
+});
+
+document.querySelectorAll('[data-secret-toggle]').forEach((button) => {
+  button.addEventListener('click', () => {
+    secretToggleCount += 1;
+    clearTimeout(secretToggleTimer);
+    secretToggleTimer = setTimeout(() => {
+      secretToggleCount = 0;
+    }, 1200);
+
+    if (secretToggleCount >= 3) {
+      document.body.classList.toggle('secret-fire-mode');
+      secretToggleCount = 0;
+      clearTimeout(secretToggleTimer);
+    }
+  });
 });
 
 document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) => {

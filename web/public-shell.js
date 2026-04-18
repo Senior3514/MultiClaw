@@ -10,19 +10,17 @@ if (sessionArea) {
   const isSingleUser = session?.mode === 'single-user';
   sessionArea.innerHTML = session?.email
     ? `
-      <div class="session-chip">
-        <span class="status-dot"></span>
-        <span>${healthLabel}</span>
-        <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
+      <div class="session-tools">
+        <span class="header-status"><span class="status-dot"></span>${healthLabel}</span>
+        <button class="header-toggle" type="button" data-theme-toggle>Light</button>
         <a class="button-link secondary" href="./dashboard.html">Workspace</a>
         ${isSingleUser ? '<span class="button-link secondary">Single-user</span>' : '<button id="publicLogoutBtn" type="button">Log out</button>'}
       </div>
     `
     : `
-      <div class="session-chip">
-        <span class="status-dot"></span>
-        <span>${healthLabel}</span>
-        <button class="button-link secondary" type="button" data-theme-toggle>Light mode</button>
+      <div class="session-tools">
+        <span class="header-status"><span class="status-dot"></span>${healthLabel}</span>
+        <button class="header-toggle" type="button" data-theme-toggle>Light</button>
         <a class="button-link secondary" href="./dashboard.html">Workspace</a>
         <a class="button-link secondary" href="./login.html">Sign in</a>
       </div>

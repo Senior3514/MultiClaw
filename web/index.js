@@ -5,6 +5,7 @@ const openWorkspaceBtn = document.getElementById('openWorkspaceBtn');
 const homeInstallCommandEl = document.getElementById('homeInstallCommand');
 const copyHomeInstallButton = document.getElementById('copyHomeInstallCommand');
 const homePlatformNoteEl = document.getElementById('homePlatformNote');
+const homeCommandHintEl = document.getElementById('homeCommandHint');
 const landingFinalCommandEl = document.getElementById('landingFinalCommand');
 const copyLandingFinalCommandButton = document.getElementById('copyLandingFinalCommand');
 const landingHeroGraphic = document.getElementById('landingHeroGraphic');
@@ -14,6 +15,7 @@ let secretToggleTimer = null;
 
 const homeInstallState = {
   platform: 'ubuntu',
+  mode: 'one-liner',
 };
 
 const homePlatformNotes = {
@@ -22,12 +24,46 @@ const homePlatformNotes = {
   windows: 'Windows should use WSL for the cleanest current runtime experience.',
 };
 
+function getHomeCommandConfig() {
+  const { platform, mode } = homeInstallState;
+
+  if (mode === 'workspace') {
+    return {
+      hint: '# What you run after install',
+      note: 'Use the product itself after install: start, verify, then operate from the workspace.',
+      command: platform === 'windows'
+        ? 'multiclaw start\nmulticlaw verify\nmulticlaw stop'
+        : 'multiclaw start\nmulticlaw verify\nmulticlaw stop',
+    };
+  }
+
+  if (mode === 'source') {
+    return {
+      hint: '# Open source path',
+      note: platform === 'windows'
+        ? 'Use WSL if you want the hackable source path on Windows.'
+        : 'Use the source path when you want to read, modify, or extend the runtime directly.',
+      command: platform === 'windows'
+        ? 'wsl bash -lc "git clone https://github.com/Senior3514/MultiClaw.git && cd MultiClaw && npm install && node ./bin/multiclaw.js start"'
+        : 'git clone https://github.com/Senior3514/MultiClaw.git\ncd MultiClaw\nnpm install\nnode ./bin/multiclaw.js start',
+    };
+  }
+
+  return {
+    hint: '# Install the base runtime',
+    note: homePlatformNotes[platform],
+    command: platform === 'windows'
+      ? 'wsl bash -lc "curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash"'
+      : 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash',
+  };
+}
+
 function renderHomeInstallCommand() {
-  if (!homeInstallCommandEl || !homePlatformNoteEl) return;
-  homeInstallCommandEl.textContent = homeInstallState.platform === 'windows'
-    ? 'wsl bash -lc "curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash"'
-    : 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
-  homePlatformNoteEl.textContent = homePlatformNotes[homeInstallState.platform];
+  if (!homeInstallCommandEl || !homePlatformNoteEl || !homeCommandHintEl) return;
+  const config = getHomeCommandConfig();
+  homeCommandHintEl.textContent = config.hint;
+  homeInstallCommandEl.textContent = config.command;
+  homePlatformNoteEl.textContent = config.note;
 }
 
 async function copyWithFeedback(button, text, successText) {
@@ -45,7 +81,7 @@ async function copyWithFeedback(button, text, successText) {
   }
 }
 
-copyHomeInstallButton?.setAttribute('data-default-label', 'Copy install');
+copyHomeInstallButton?.setAttribute('data-default-label', 'Copy command');
 copyHomeInstallButton?.addEventListener('click', async () => {
   await copyWithFeedback(copyHomeInstallButton, homeInstallCommandEl.textContent, 'Copied');
 });
@@ -113,11 +149,20 @@ function bindHeroAtmosphere() {
   resetHeroAtmosphere();
 }
 
+document.querySelectorAll('#homePlatformTabs [data-platform]').forEach((button) => {
+  button.addEventListener('click', () => {
+    document.querySelectorAll('#homePlatformTabs [data-platform]').forEach((item) => item.classList.remove('selected'));
+    button.classList.add('selected');
+    homeInstallState.platform = button.dataset.platform;
+    renderHomeInstallCommand();
+  });
+});
+
 document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) => {
   button.addEventListener('click', () => {
     document.querySelectorAll('#homePlatformChoices .choice-card').forEach((item) => item.classList.remove('selected'));
     button.classList.add('selected');
-    homeInstallState.platform = button.dataset.platform;
+    homeInstallState.mode = button.dataset.mode;
     renderHomeInstallCommand();
   });
 });

@@ -88,6 +88,10 @@
             <p>
               One runtime. One workspace. One visible operator layer with claws, routing, missions, proof, and control.
             </p>
+            <div class="hero-announcement">
+              <span class="hero-announcement-badge">VERIFIED</span>
+              <span>Ready on the verified path, shaped as a real MultiClaw operator runtime.</span>
+            </div>
             <div class="cta-row hero-primary-actions">
               <a id="openWorkspaceBtn" class="button-link primary" href="./install.html">Install MultiClaw</a>
               <a class="button-link secondary" href="./dashboard.html">Open workspace</a>
@@ -105,54 +109,79 @@
           </div>
         </section>
 
-        <section class="panel section-block landing-section">
-          <div class="section-heading">
+        <section class="panel section-block landing-section quickstart-section">
+          <div class="section-heading quickstart-heading">
             <div>
-              <div class="eyebrow">Install</div>
-              <h2>Start from one command.</h2>
-              <p>Copy, paste, run. Then use the product itself.</p>
+              <div class="eyebrow">Quick Start</div>
+              <h2>Start from one clean command.</h2>
+              <p>Install the base runtime, then let the product guide the rest.</p>
             </div>
           </div>
-          <div id="homePlatformChoices" class="choice-grid">
-            <button class="choice-card selected" type="button" data-platform="ubuntu">
-              <strong>Linux / VPS</strong>
-              <span>Best current path.</span>
-            </button>
-            <button class="choice-card" type="button" data-platform="macos">
-              <strong>macOS</strong>
-              <span>Same calm bootstrap flow.</span>
-            </button>
-            <button class="choice-card" type="button" data-platform="windows">
-              <strong>Windows / WSL</strong>
-              <span>Use WSL for now.</span>
-            </button>
-          </div>
-          <div class="panel install-panel">
-            <pre class="install-command" id="homeInstallCommand">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
-            <div class="cta-row">
-              <button class="button-link secondary button-reset" id="copyHomeInstallCommand">Copy install</button>
+          <div class="quickstart-shell panel panel-strong">
+            <div class="quickstart-window-bar">
+              <div class="quickstart-lights" aria-hidden="true">
+                <span class="window-dot dot-red"></span>
+                <span class="window-dot dot-yellow"></span>
+                <span class="window-dot dot-green"></span>
+              </div>
+              <div id="homePlatformTabs" class="quickstart-platform-tabs">
+                <button class="quickstart-chip selected" type="button" data-platform="ubuntu">Linux / VPS</button>
+                <button class="quickstart-chip" type="button" data-platform="macos">macOS</button>
+                <button class="quickstart-chip" type="button" data-platform="windows">Windows / WSL</button>
+              </div>
+              <span class="quickstart-status">verified path</span>
+            </div>
+            <div id="homePlatformChoices" class="quickstart-mode-tabs">
+              <button class="choice-card selected" type="button" data-mode="one-liner">
+                <strong>One-liner</strong>
+                <span>Fastest current path.</span>
+              </button>
+              <button class="choice-card" type="button" data-mode="workspace">
+                <strong>Workspace</strong>
+                <span>What you run after install.</span>
+              </button>
+              <button class="choice-card" type="button" data-mode="source">
+                <strong>Hackable</strong>
+                <span>Open source path.</span>
+              </button>
+            </div>
+            <div class="quickstart-terminal">
+              <div class="quickstart-comment" id="homeCommandHint"># Install the base runtime</div>
+              <pre class="install-command quickstart-command" id="homeInstallCommand">curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash</pre>
+            </div>
+            <div class="cta-row quickstart-actions">
+              <button class="button-link secondary button-reset" id="copyHomeInstallCommand">Copy command</button>
               <a class="button-link secondary" href="./install.html">Install details</a>
             </div>
-            <p id="homePlatformNote" class="install-subtitle">Ubuntu/VPS is the cleanest path right now.</p>
+            <p id="homePlatformNote" class="install-subtitle quickstart-note">Ubuntu/VPS is the cleanest path right now.</p>
+            <p class="quickstart-footnote">Works on Linux, macOS, and Windows through WSL. Start simple, then let MultiClaw guide the rest.</p>
           </div>
         </section>
 
-        <section class="cards-grid landing-cards">
-          <article class="panel feature-card hover-lift">
-            <div class="eyebrow">01</div>
-            <h2>From target to company</h2>
-            <p>Start from one repo, product, app, or machine and build a real company around it.</p>
-          </article>
-          <article class="panel feature-card hover-lift">
-            <div class="eyebrow">02</div>
-            <h2>Operator layer</h2>
-            <p>Run the system through one company-shaped control layer instead of scattered tools.</p>
-          </article>
-          <article class="panel feature-card hover-lift">
-            <div class="eyebrow">03</div>
-            <h2>Visible execution</h2>
-            <p>See events, cycles, artifacts, autopilot, and proof instead of vague AI promises.</p>
-          </article>
+        <section class="panel section-block landing-section what-it-does-section">
+          <div class="section-heading">
+            <div>
+              <div class="eyebrow">What It Does</div>
+              <h2>Build a visible AI company around real work.</h2>
+            </div>
+          </div>
+          <div class="cards-grid landing-cards">
+            <article class="panel feature-card hover-lift">
+              <div class="eyebrow">01</div>
+              <h2>Runs like a company</h2>
+              <p>Attach MultiClaw to one repo, product, app, or machine and give it a real operating structure.</p>
+            </article>
+            <article class="panel feature-card hover-lift">
+              <div class="eyebrow">02</div>
+              <h2>One operator layer</h2>
+              <p>Keep one company-shaped control layer instead of scattered tools, prompts, and disconnected agents.</p>
+            </article>
+            <article class="panel feature-card hover-lift">
+              <div class="eyebrow">03</div>
+              <h2>Visible proof</h2>
+              <p>See events, cycles, artifacts, autopilot, and next actions instead of vague AI promises.</p>
+            </article>
+          </div>
         </section>
 
         <section class="panel section-block landing-section">

@@ -31,6 +31,11 @@ AUTOPILOT_LOOP_SECONDS = 30
 RATE_LIMITS = {}
 AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
 SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
+MAX_JSON_BODY_BYTES = 256 * 1024
+
+
+class BodyTooLargeError(Exception):
+    pass
 
 
 def now_utc():
@@ -66,6 +71,23 @@ def slugify(value: str) -> str:
     slug = re.sub(r"[^a-z0-9]+", "-", value.strip().lower())
     slug = re.sub(r"^-+|-+$", "", slug)
     return slug or "multiclaw-project"
+
+
+_COMPANY_ID_PATTERN = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
+
+
+def sanitize_company_id(raw_id):
+    if not isinstance(raw_id, str):
+        return None
+    candidate = raw_id.strip().lower()
+    if not _COMPANY_ID_PATTERN.match(candidate):
+        return None
+    target = (GENERATED_ROOT / candidate).resolve()
+    try:
+        target.relative_to(GENERATED_ROOT.resolve())
+    except ValueError:
+        return None
+    return candidate
 
 
 def read_json(path: Path, default):
@@ -910,8 +932,15 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         super().end_headers()
 
     def read_json_body(self):
-        content_length = int(self.headers.get("Content-Length", "0"))
-        raw = self.rfile.read(content_length)
+        raw_length = self.headers.get("Content-Length", "0") or "0"
+        try:
+            content_length = int(raw_length)
+        except (TypeError, ValueError):
+            content_length = 0
+        if content_length < 0 or content_length > MAX_JSON_BODY_BYTES:
+            self.send_json(413, {"error": "request body too large"})
+            raise BodyTooLargeError()
+        raw = self.rfile.read(content_length) if content_length else b""
         return json.loads(raw.decode("utf-8") or "{}")
 
     def get_session(self):
@@ -984,7 +1013,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/") and self.path.endswith("/download"):
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].split("/download", 1)[0].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/download", 1)[0])
+            if not company_id:
+                self.send_json(404, {"error": "company not found"})
+                return
             company_dir = GENERATED_ROOT / company_id
             if not company_dir.exists() or not company_dir.is_dir():
                 self.send_json(404, {"error": "company not found"})
@@ -1008,9 +1040,15 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/") and "/artifact/" in self.path:
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].split("/artifact/", 1)[0].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/artifact/", 1)[0])
+            if not company_id:
+                self.send_json(404, {"error": "artifact not found"})
+                return
             artifact_name = self.path.rsplit("/artifact/", 1)[1].strip()
             safe_name = Path(artifact_name).name
+            if not safe_name or safe_name.startswith("."):
+                self.send_json(404, {"error": "artifact not found"})
+                return
             artifact_file = GENERATED_ROOT / company_id / safe_name
             if artifact_file.exists() and artifact_file.is_file():
                 self.send_response(200)
@@ -1028,7 +1066,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/") and self.path.endswith("/artifacts"):
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].split("/artifacts", 1)[0].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/artifacts", 1)[0])
+            if not company_id:
+                self.send_json(404, {"error": "company not found"})
+                return
             company_dir = GENERATED_ROOT / company_id
             if company_dir.exists():
                 artifacts = []
@@ -1043,7 +1084,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/") and self.path.endswith("/events"):
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].split("/events", 1)[0].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/events", 1)[0])
+            if not company_id:
+                self.send_json(404, {"error": "company not found"})
+                return
             company = load_company(company_id)
             if company is None:
                 self.send_json(404, {"error": "company not found"})
@@ -1054,7 +1098,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/") and self.path.endswith("/autopilot"):
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0])
+            if not company_id:
+                self.send_json(404, {"error": "company not found"})
+                return
             company = load_company(company_id)
             if company is None:
                 self.send_json(404, {"error": "company not found"})
@@ -1065,7 +1112,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
         if self.path.startswith("/api/company/"):
             if not self.require_session():
                 return
-            company_id = self.path.split("/api/company/", 1)[1].strip()
+            company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1])
+            if not company_id:
+                self.send_json(404, {"error": "company not found"})
+                return
             company = load_company(company_id)
             if company is not None:
                 self.send_json(200, company)
@@ -1098,6 +1148,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 create_user(email, password)
                 token = create_session(email)
                 self.send_json(200, {"email": email}, f"{SESSION_COOKIE}={token}; HttpOnly; Path=/; SameSite=Lax")
+            except BodyTooLargeError:
+                return
             except ValueError as exc:
                 self.send_json(400, {"error": str(exc)})
             except Exception as exc:
@@ -1122,6 +1174,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     return
                 token = create_session(email)
                 self.send_json(200, {"email": email}, f"{SESSION_COOKIE}={token}; HttpOnly; Path=/; SameSite=Lax")
+            except BodyTooLargeError:
+                return
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return
@@ -1144,7 +1198,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if not self.require_session():
                 return
             try:
-                company_id = self.path.split("/api/company/", 1)[1].split("/cycle", 1)[0].strip()
+                company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/cycle", 1)[0])
+                if not company_id:
+                    self.send_json(404, {"error": "company not found"})
+                    return
                 company = load_company(company_id)
                 if company is None:
                     self.send_json(404, {"error": "company not found"})
@@ -1161,7 +1218,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if not self.require_session():
                 return
             try:
-                company_id = self.path.split("/api/company/", 1)[1].split("/ask", 1)[0].strip()
+                company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/ask", 1)[0])
+                if not company_id:
+                    self.send_json(404, {"error": "company not found"})
+                    return
                 company = load_company(company_id)
                 if company is None:
                     self.send_json(404, {"error": "company not found"})
@@ -1181,6 +1241,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 )
                 update_company_execution_state(company_id, company)
                 self.send_json(200, result)
+            except BodyTooLargeError:
+                return
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return
@@ -1191,7 +1253,10 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             if not self.require_session():
                 return
             try:
-                company_id = self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0].strip()
+                company_id = sanitize_company_id(self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0])
+                if not company_id:
+                    self.send_json(404, {"error": "company not found"})
+                    return
                 payload = self.read_json_body()
                 result = configure_company_autopilot(
                     company_id,
@@ -1203,6 +1268,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                     self.send_json(404, {"error": "company not found"})
                     return
                 self.send_json(200, result)
+            except BodyTooLargeError:
+                return
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return
@@ -1219,6 +1286,8 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 payload = self.read_json_body()
                 result = generate_company(payload)
                 self.send_json(200, result)
+            except BodyTooLargeError:
+                return
             except Exception as exc:
                 self.send_json(500, {"error": str(exc)})
             return

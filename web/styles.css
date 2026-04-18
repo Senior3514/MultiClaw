@@ -2097,3 +2097,283 @@ body.light-theme .panel-strong {
     gap: 8px;
   }
 }
+
+/* Command center premium upgrade */
+.command-hero {
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+  gap: 28px;
+  border: 1px solid rgba(86, 212, 209, 0.22);
+  background:
+    radial-gradient(circle at 85% -10%, rgba(86, 212, 209, 0.22), transparent 55%),
+    radial-gradient(circle at 0% 110%, rgba(243, 74, 120, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(10, 24, 31, 0.92), rgba(9, 21, 28, 0.98));
+}
+
+.command-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(86, 212, 209, 0.06) 0px,
+    rgba(86, 212, 209, 0.06) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: overlay;
+  animation: scanline 7s linear infinite;
+}
+
+.command-hero .hero-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.command-hero .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ed7bd;
+  box-shadow: 0 0 0 0 rgba(46, 215, 189, 0.7);
+  animation: pulseRing 2.1s ease-out infinite;
+}
+
+.hero-tag {
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: rgba(86, 212, 209, 0.14);
+  border: 1px solid rgba(86, 212, 209, 0.28);
+  color: #c6f2ef;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.readiness-panel {
+  position: relative;
+  z-index: 1;
+  padding: 22px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(13, 31, 42, 0.95), rgba(9, 22, 30, 0.98));
+  border: 1px solid rgba(86, 212, 209, 0.22);
+  box-shadow: 0 20px 48px rgba(2, 8, 12, 0.45);
+  display: grid;
+  gap: 14px;
+}
+
+.readiness-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.readiness-head small {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--muted);
+}
+
+.readiness-head strong {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  background: linear-gradient(120deg, #56d4d1 0%, #f7d7a0 45%, #f34a78 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-variant-numeric: tabular-nums;
+}
+
+.readiness-bar,
+.micro-bar {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(86, 212, 209, 0.1);
+  overflow: hidden;
+}
+
+.readiness-bar span,
+.micro-bar span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #56d4d1, #f7d7a0 50%, #f34a78);
+  box-shadow: 0 0 14px rgba(86, 212, 209, 0.4);
+  transition: width 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.readiness-bar span::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  animation: shimmer 2.4s linear infinite;
+  pointer-events: none;
+}
+
+.readiness-caption {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.readiness-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.readiness-grid > div {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(8, 19, 25, 0.75);
+  border: 1px solid rgba(86, 212, 209, 0.14);
+}
+
+.readiness-grid small {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.readiness-grid strong {
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.strategic-banner {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px;
+  border-radius: 18px;
+  border: 1px solid rgba(247, 215, 160, 0.26);
+  background: linear-gradient(120deg, rgba(243, 74, 120, 0.16), rgba(247, 215, 160, 0.08) 45%, rgba(86, 212, 209, 0.16));
+}
+
+.strategic-banner::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 20% 0%, rgba(247, 215, 160, 0.24), transparent 40%);
+}
+
+.strategic-glow {
+  position: absolute;
+  inset: auto -40px -40px auto;
+  width: 220px;
+  height: 220px;
+  background: radial-gradient(circle, rgba(86, 212, 209, 0.35), transparent 60%);
+  filter: blur(28px);
+  pointer-events: none;
+  animation: breathe 6.5s ease-in-out infinite;
+}
+
+.strategic-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.strategic-content small {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.strategic-content strong {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.strategic-content p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.strategic-banner .button-link.primary {
+  position: relative;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+@keyframes pulseRing {
+  0% { box-shadow: 0 0 0 0 rgba(46, 215, 189, 0.75); }
+  70% { box-shadow: 0 0 0 12px rgba(46, 215, 189, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(46, 215, 189, 0); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-6%); }
+  100% { transform: translateY(6%); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.08); opacity: 1; }
+}
+
+@media (max-width: 900px) {
+  .command-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .strategic-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command-hero::before,
+  .pulse-dot,
+  .readiness-bar span::after,
+  .strategic-glow {
+    animation: none;
+  }
+
+  .readiness-bar span,
+  .micro-bar span {
+    transition: none;
+  }
+}
+

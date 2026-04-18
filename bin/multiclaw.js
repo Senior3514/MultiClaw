@@ -68,14 +68,37 @@ function failureMark() {
 }
 
 function printCliHeader(label = 'COMPANY OPERATOR RUNTIME') {
-  console.log(tint('███╗   ███╗██╗   ██╗██╗  ████████╗██╗ ██████╗██╗      █████╗ ██╗    ██╗', ANSI.cyan, ANSI.bold));
-  console.log(tint('████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔════╝██║     ██╔══██╗██║    ██║', ANSI.cyan, ANSI.bold));
-  console.log(tint('██╔████╔██║██║   ██║██║     ██║   ██║██║     ██║     ███████║██║ █╗ ██║', ANSI.cyan, ANSI.bold));
-  console.log(tint('██║╚██╔╝██║██║   ██║██║     ██║   ██║██║     ██║     ██╔══██║██║███╗██║', ANSI.cyan, ANSI.bold));
-  console.log(tint('██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║╚██████╗███████╗██║  ██║╚███╔███╔╝', ANSI.cyan, ANSI.bold));
-  console.log(tint('╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ', ANSI.cyan, ANSI.bold));
-  console.log(tint(` ${label}`, ANSI.gray));
+  console.log(tint('╔══════════════════════════════════════════════════════════════════════════╗', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ███╗   ███╗██╗   ██╗██╗  ████████╗██╗ ██████╗██╗      █████╗ ██╗    ██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ████╗ ████║██║   ██║██║  ╚══██╔══╝██║██╔════╝██║     ██╔══██╗██║    ██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ██╔████╔██║██║   ██║██║     ██║   ██║██║     ██║     ███████║██║ █╗ ██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ██║╚██╔╝██║██║   ██║██║     ██║   ██║██║     ██║     ██╔══██║██║███╗██║', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ██║ ╚═╝ ██║╚██████╔╝███████╗██║   ██║╚██████╗███████╗██║  ██║╚███╔███╔╝', ANSI.cyan, ANSI.bold));
+  console.log(tint('║  ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝   ╚═╝ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚══╝╚══╝ ║', ANSI.cyan, ANSI.bold));
+  console.log(tint('║          COMPANY · OPERATOR · RUNTIME                                   ║', ANSI.gray));
+  console.log(tint('╚══════════════════════════════════════════════════════════════════════════╝', ANSI.cyan, ANSI.bold));
+  console.log(tint(` ▸ ${label}`, ANSI.magenta, ANSI.bold));
   console.log('');
+}
+
+function renderProgressBar(progress, width = 32) {
+  const clamped = Math.max(0, Math.min(1, Number(progress) || 0));
+  const filled = Math.round(clamped * width);
+  const bar = `${'█'.repeat(filled)}${'░'.repeat(width - filled)}`;
+  return `${tint(bar, ANSI.cyan, ANSI.bold)} ${Math.round(clamped * 100)}%`;
+}
+
+function printProgressStep(label, progress, detail = '') {
+  const bar = renderProgressBar(progress);
+  const tail = detail ? tint(detail, ANSI.gray) : '';
+  console.log(`  ${bar}  ${tint(label, ANSI.bold)} ${tail}`.trimEnd());
+}
+
+function cognitiveLoadFromTelemetry(telemetry) {
+  const signal = (telemetry?.events || 0) * 3 + (telemetry?.cycles || 0) * 6 + (telemetry?.companies || 0) * 12 + (telemetry?.artifacts || 0);
+  const saturation = Math.min(100, Math.round((signal / 120) * 100));
+  const label = saturation >= 75 ? 'saturated' : saturation >= 40 ? 'engaged' : saturation >= 10 ? 'warming' : 'idle';
+  return { saturation, label };
 }
 
 function printCommandSection(title, lines, color = ANSI.cyan) {
@@ -332,26 +355,53 @@ async function generateProject(data) {
   const slug = slugify(data.projectName);
   const outputDir = path.join(cwd, 'generated', slug);
 
+  const steps = [
+    { label: 'Scaffold workspace tree', detail: slug },
+    { label: 'Render brief and README', detail: 'brief.json + README.md' },
+    { label: 'Compose brand DNA', detail: 'BRAND.md' },
+    { label: 'Assemble company + org chart', detail: `${roles.length} roles` },
+    { label: 'Lock charter and mission', detail: 'CHARTER.md + MISSION-001.md' },
+    { label: 'Project 30-day roadmap', detail: 'ROADMAP-30.md' },
+    { label: 'Spawn role files', detail: `${roles.length} leads` },
+    { label: 'Seed workspaces and dashboards', detail: 'scaffolds ready' },
+  ];
+
+  const emitStep = (index) => printProgressStep(steps[index].label, (index + 1) / steps.length, steps[index].detail);
+
+  printCliHeader('COMPANY ARCHITECTURE · BUILD PIPELINE');
+
   await mkdirp(outputDir);
   await mkdirp(path.join(outputDir, 'roles'));
   await mkdirp(path.join(outputDir, 'workspaces'));
   await mkdirp(path.join(outputDir, 'dashboards'));
+  emitStep(0);
 
   await writeFile(path.join(outputDir, 'brief.json'), JSON.stringify({ ...data, archetype }, null, 2));
   await writeFile(path.join(outputDir, 'README.md'), renderReadme(data, roles, archetype));
+  emitStep(1);
+
   await writeFile(path.join(outputDir, 'BRAND.md'), renderBrand(data, brand));
+  emitStep(2);
+
   await writeFile(path.join(outputDir, 'COMPANY.md'), renderCompany(data, roles));
   await writeFile(path.join(outputDir, 'ORG-CHART.md'), renderOrgChart(roles));
+  emitStep(3);
+
   await writeFile(path.join(outputDir, 'CHARTER.md'), renderCharterFile(charter));
   await writeFile(path.join(outputDir, 'MISSION-001.md'), renderMissionFile(mission));
+  emitStep(4);
+
   await writeFile(path.join(outputDir, 'ROADMAP-30.md'), renderRoadmapFile(roadmap));
+  emitStep(5);
 
   for (const role of roles) {
     await writeFile(path.join(outputDir, 'roles', `${role.key}.md`), renderRoleFile(role, data));
   }
+  emitStep(6);
 
   await writeFile(path.join(outputDir, 'workspaces', 'README.md'), '# Workspaces\n\nCreate one isolated workspace per generated lead role when activating this company.\n');
   await writeFile(path.join(outputDir, 'dashboards', 'README.md'), '# Dashboards\n\nDashboard stubs live here. Add status, priorities, and team visibility surfaces here.\n');
+  emitStep(7);
 
   return { outputDir, archetype, roles };
 }
@@ -384,24 +434,63 @@ async function setupRuntime() {
 
   const rl = readline.createInterface({ input, output });
   const ask = async (label, fallback, hint = '') => {
-    const suffix = fallback ? ` [${fallback}]` : '';
-    const prompt = hint ? `${label}${suffix} - ${hint}: ` : `${label}${suffix}: `;
+    const suffix = fallback ? ` ${tint(`(${fallback})`, ANSI.gray)}` : '';
+    const hintText = hint ? `  ${tint(hint, ANSI.gray)}\n` : '';
+    const prompt = `${hintText}${tint('▸', ANSI.cyan, ANSI.bold)} ${label}${suffix}: `;
     const answer = await rl.question(prompt);
     return answer.trim() || fallback;
   };
 
-  try {
-    console.log('MultiClaw configure');
-    console.log('Choose the cleanest runtime path for this machine. Press Enter to keep defaults.');
+  const pickOne = async (label, options, fallback) => {
     console.log('');
-    const bindAnswer = (await ask('1. Access mode', existing.bind, 'tailscale or local')).toLowerCase();
-    const bind = bindAnswer === 'local' ? 'local' : 'tailscale';
-    const port = Number(await ask('2. Port', String(existing.port), 'default web port')) || existing.port;
-    const provider = await ask('3. Provider', existing.provider, 'openai, anthropic, google, openrouter, groq, ollama');
-    const model = await ask('4. Model', existing.model, 'for example gpt-5.4');
-    const apiKeyEnv = await ask('5. API key env var', existing.apiKeyEnv, 'env name to save/read');
-    const apiKey = await ask('6. API key value', '', 'optional, press Enter to skip for now');
-    const config = { bind, port, provider, model, apiKeyEnv };
+    console.log(`${tint('▸', ANSI.cyan, ANSI.bold)} ${tint(label, ANSI.bold)}`);
+    options.forEach((option, index) => {
+      const selected = option === fallback ? tint('●', ANSI.green, ANSI.bold) : tint('○', ANSI.gray);
+      console.log(`    ${tint(String(index + 1), ANSI.cyan)}) ${selected} ${option}`);
+    });
+    const answer = await rl.question(`  ${tint('select', ANSI.gray)} ${tint(`(1-${options.length} or name)`, ANSI.gray)} ${tint(`[${fallback}]`, ANSI.gray)}: `);
+    const trimmed = answer.trim();
+    if (!trimmed) return fallback;
+    const numeric = Number(trimmed);
+    if (Number.isInteger(numeric) && numeric >= 1 && numeric <= options.length) return options[numeric - 1];
+    const match = options.find((option) => option.toLowerCase() === trimmed.toLowerCase());
+    return match || fallback;
+  };
+
+  const pickMany = async (label, options, defaults = []) => {
+    console.log('');
+    console.log(`${tint('▸', ANSI.cyan, ANSI.bold)} ${tint(label, ANSI.bold)} ${tint('(comma-separated numbers, blank = keep defaults)', ANSI.gray)}`);
+    options.forEach((option, index) => {
+      const selected = defaults.includes(option) ? tint('●', ANSI.green, ANSI.bold) : tint('○', ANSI.gray);
+      console.log(`    ${tint(String(index + 1), ANSI.cyan)}) ${selected} ${option}`);
+    });
+    const answer = await rl.question(`  ${tint('select', ANSI.gray)} ${tint(`[${defaults.map((value) => options.indexOf(value) + 1).filter((n) => n > 0).join(',') || 'none'}]`, ANSI.gray)}: `);
+    const trimmed = answer.trim();
+    if (!trimmed) return defaults;
+    const picks = trimmed.split(/[,\s]+/).map((token) => Number(token)).filter((n) => Number.isInteger(n) && n >= 1 && n <= options.length);
+    return [...new Set(picks.map((index) => options[index - 1]))];
+  };
+
+  try {
+    printCliHeader('INTERACTIVE CONFIGURATION');
+    console.log(tint('  Shape the runtime for this machine. Press Enter to keep defaults.', ANSI.gray));
+
+    const bind = await pickOne('1. Access mode', ['tailscale', 'local'], existing.bind);
+    const port = Number(await ask(`2. Port`, String(existing.port), 'TCP port exposed by the web runtime')) || existing.port;
+    const provider = await pickOne(
+      '3. Model provider',
+      ['openai', 'anthropic', 'google', 'openrouter', 'groq', 'ollama'],
+      existing.provider,
+    );
+    const model = await ask('4. Default model', existing.model, 'e.g. gpt-5.4, claude-opus-4-7, gemini-2.5-pro');
+    const apiKeyEnv = await ask('5. API key env var', existing.apiKeyEnv, 'environment variable name MultiClaw will read');
+    const apiKey = await ask('6. API key value', '', 'optional — leave blank to configure later');
+
+    const pluginCatalog = ['web-dashboard', 'cli-operator', 'vector-memory', 'autopilot-loop', 'telegram-bridge'];
+    const defaultPlugins = ['web-dashboard', 'cli-operator', 'autopilot-loop'];
+    const plugins = await pickMany('7. Activate plugin surfaces', pluginCatalog, defaultPlugins);
+
+    const config = { bind, port, provider, model, apiKeyEnv, plugins };
     await saveRuntimeConfig(config);
     if (apiKey) {
       await saveRuntimeEnv(config.apiKeyEnv, apiKey);
@@ -431,24 +520,22 @@ function getTailscaleIp() {
 }
 
 function printConfigSummary(config, hasApiKey) {
-  console.log('MultiClaw configure');
-  console.log(`- bind: ${config.bind}`);
-  console.log(`- port: ${config.port}`);
-  console.log(`- provider: ${config.provider}`);
-  console.log(`- model: ${config.model}`);
-  console.log(`- api key env: ${config.apiKeyEnv}`);
-  console.log(`- config: ${runtimeConfigPath}`);
-  console.log(`- runtime env: ${hasApiKey ? 'saved' : 'not saved yet'}`);
+  const plugins = Array.isArray(config.plugins) && config.plugins.length ? config.plugins.join(', ') : 'default set';
+  console.log(tint('[CONFIGURATION SAVED]', ANSI.green, ANSI.bold));
+  console.log(`  ${successMark()} bind          ${tint(config.bind, ANSI.bold)}`);
+  console.log(`  ${successMark()} port          ${tint(String(config.port), ANSI.bold)}`);
+  console.log(`  ${successMark()} provider      ${tint(config.provider, ANSI.bold)}`);
+  console.log(`  ${successMark()} model         ${tint(config.model, ANSI.bold)}`);
+  console.log(`  ${successMark()} api key env   ${tint(config.apiKeyEnv, ANSI.bold)}`);
+  console.log(`  ${successMark()} plugins       ${tint(plugins, ANSI.bold)}`);
+  console.log(`  ${hasApiKey ? successMark() : warningMark()} runtime env   ${hasApiKey ? tint('saved', ANSI.green) : tint('not saved yet', ANSI.yellow)}`);
+  console.log(`  ${tint('•', ANSI.gray)} config file   ${tint(runtimeConfigPath, ANSI.gray)}`);
   console.log('');
-  console.log('Next:');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
   if (hasApiKey) {
-    console.log('  1. multiclaw start');
-    console.log('  2. multiclaw verify');
-    console.log('  3. multiclaw stop');
+    console.log(`  Next: ${tint('multiclaw start', ANSI.cyan, ANSI.bold)} → ${tint('multiclaw verify', ANSI.cyan, ANSI.bold)} to close the loop.`);
   } else {
-    console.log('  1. multiclaw start');
-    console.log('  2. Open the URL it prints');
-    console.log('  3. If you want AI immediately: multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY');
+    console.log(`  Next: ${tint('multiclaw up --provider ' + config.provider + ' --model ' + config.model + ' --api-key <KEY>', ANSI.cyan, ANSI.bold)}`);
   }
 }
 
@@ -552,6 +639,80 @@ async function getRuntimeSnapshot() {
   return { config, rawPid, running, bind, host, port, url, health, staleState };
 }
 
+async function readCompanyEntries() {
+  const companyEntries = await fs.readdir(generatedLiveRoot, { withFileTypes: true }).catch(() => []);
+  return companyEntries.filter((entry) => entry.isDirectory() && entry.name !== '.auth');
+}
+
+async function printRoster() {
+  printCliHeader('COMPANY ROSTER');
+  const entries = await readCompanyEntries();
+  if (!entries.length) {
+    console.log(`${warningMark()} No companies found under ${tint('generated-live/', ANSI.bold)}`);
+    console.log('');
+    console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+    console.log(`  Run ${tint('multiclaw init', ANSI.cyan, ANSI.bold)} to generate the first operating company.`);
+    return;
+  }
+
+  console.log(tint('[ACTIVE COMPANIES]', ANSI.cyan, ANSI.bold));
+  for (const entry of entries) {
+    const companyJsonPath = path.join(generatedLiveRoot, entry.name, 'company.json');
+    const company = await fs.readFile(companyJsonPath, 'utf8').then((raw) => JSON.parse(raw)).catch(() => null);
+    const name = company?.projectName || entry.name;
+    const archetype = company?.archetype || 'unknown archetype';
+    const roleCount = Array.isArray(company?.roles) ? company.roles.length : 0;
+    console.log(`  ${successMark()} ${tint(name, ANSI.bold)} ${tint(`— ${archetype}`, ANSI.gray)}`);
+    console.log(`    ${tint('id', ANSI.gray)} ${entry.name}   ${tint('roles', ANSI.gray)} ${roleCount}`);
+  }
+  console.log('');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  console.log(`  Steer the strongest company with ${tint('multiclaw recall --company <id> "next move"', ANSI.cyan, ANSI.bold)}.`);
+}
+
+async function printArtifacts() {
+  printCliHeader('ARTIFACT LEDGER');
+  const entries = await readCompanyEntries();
+  if (!entries.length) {
+    console.log(`${warningMark()} No generated companies yet.`);
+    return;
+  }
+
+  let total = 0;
+  for (const entry of entries) {
+    const companyDir = path.join(generatedLiveRoot, entry.name);
+    const files = await fs.readdir(companyDir, { withFileTypes: true }).catch(() => []);
+    const names = files.filter((file) => file.isFile()).map((file) => file.name);
+    total += names.length;
+    console.log(`${tint('▸', ANSI.cyan, ANSI.bold)} ${tint(entry.name, ANSI.bold)} ${tint(`(${names.length} artifacts)`, ANSI.gray)}`);
+    for (const name of names.slice(0, 6)) {
+      console.log(`    ${tint('•', ANSI.gray)} ${name}`);
+    }
+    if (names.length > 6) console.log(`    ${tint(`• … +${names.length - 6} more`, ANSI.gray)}`);
+  }
+  console.log('');
+  console.log(tint(`Total artifacts: ${total}`, ANSI.bold));
+}
+
+async function printNetwork() {
+  printCliHeader('NETWORK POSTURE');
+  const config = await loadRuntimeConfig();
+  const tailscaleIp = getTailscaleIp();
+  console.log(`  bind          ${tint(config.bind, ANSI.bold)}`);
+  console.log(`  port          ${tint(String(config.port), ANSI.bold)}`);
+  console.log(`  local host    ${tint('127.0.0.1', ANSI.bold)}`);
+  console.log(`  tailscale ip  ${tailscaleIp ? tint(tailscaleIp, ANSI.green) : tint('not detected', ANSI.yellow)}`);
+  const snapshot = await getRuntimeSnapshot();
+  console.log(`  runtime url   ${tint(snapshot.url, ANSI.bold)}`);
+  console.log('');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  if (!tailscaleIp && config.bind === 'tailscale') {
+    console.log(`  ${warningMark()} Tailscale not detected. Switch to ${tint('multiclaw configure', ANSI.cyan, ANSI.bold)} and pick ${tint('local', ANSI.bold)}, or bring Tailscale up.`);
+  } else {
+    console.log(`  Network posture is healthy. Run ${tint('multiclaw verify', ANSI.cyan, ANSI.bold)} to lock it in.`);
+  }
+}
+
 async function printStatus() {
   const snapshot = await getRuntimeSnapshot();
   const telemetry = await getWorkspaceTelemetry();
@@ -574,20 +735,31 @@ async function printStatus() {
           ? 'Open the workspace and steer the strongest company.'
           : 'Inspect the runtime log and restore a healthy state before continuing.';
 
+  const cognitive = cognitiveLoadFromTelemetry(telemetry);
+  const statusMark = staleState ? warningMark() : healthy ? successMark() : running ? warningMark() : failureMark();
+
   printCliHeader('OPERATOR STATUS');
-  console.log(`${staleState ? warningMark() : healthy ? successMark() : running ? warningMark() : failureMark()} ${summary}`);
-  console.log(`- bind: ${bind}`);
-  console.log(`- port: ${port}`);
-  console.log(`- provider: ${config.provider}`);
-  console.log(`- model: ${config.model}`);
-  console.log(`- api key env: ${config.apiKeyEnv}`);
-  console.log(`- pid: ${running || rawPid || 'not running'}`);
-  console.log(`- url: ${url}`);
-  console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
-  console.log(`- company pulse: ${telemetry.companies} companies, ${telemetry.artifacts} artifacts, ${telemetry.events} events, ${telemetry.cycles} cycles`);
-  console.log(`- memory depth: ${telemetry.memoryDepth}`);
-  console.log(`- config: ${runtimeConfigPath}`);
-  console.log(`- runtime env: ${runtimeEnvPath}`);
+  console.log(`${statusMark} ${tint(summary, ANSI.bold)}`);
+  console.log('');
+  console.log(tint('[RUNTIME]', ANSI.cyan, ANSI.bold));
+  console.log(`  bind          ${tint(bind, ANSI.bold)}`);
+  console.log(`  port          ${tint(String(port), ANSI.bold)}`);
+  console.log(`  pid           ${running ? tint(String(running), ANSI.green) : rawPid ? tint(`${rawPid} (stale)`, ANSI.yellow) : tint('not running', ANSI.gray)}`);
+  console.log(`  url           ${tint(url, ANSI.bold)}`);
+  console.log(`  health        ${health ? (health.status === 0 ? tint(health.stdout.trim() || 'ok', ANSI.green) : tint('unreachable', ANSI.red)) : tint('runtime not started', ANSI.gray)}`);
+  console.log('');
+  console.log(tint('[MODEL LAYER]', ANSI.blue, ANSI.bold));
+  console.log(`  provider      ${tint(config.provider, ANSI.bold)}`);
+  console.log(`  model         ${tint(config.model, ANSI.bold)}`);
+  console.log(`  api key env   ${tint(config.apiKeyEnv, ANSI.bold)}`);
+  console.log('');
+  console.log(tint('[AGI CORE · COGNITIVE TELEMETRY]', ANSI.magenta, ANSI.bold));
+  console.log(`  companies     ${tint(String(telemetry.companies), ANSI.bold)}`);
+  console.log(`  artifacts     ${tint(String(telemetry.artifacts), ANSI.bold)}`);
+  console.log(`  events        ${tint(String(telemetry.events), ANSI.bold)}`);
+  console.log(`  cycles        ${tint(String(telemetry.cycles), ANSI.bold)}`);
+  console.log(`  memory depth  ${tint(telemetry.memoryDepth, ANSI.bold)}`);
+  console.log(`  cognitive load ${renderProgressBar(cognitive.saturation / 100, 24)} ${tint(cognitive.label, ANSI.gray)}`);
   console.log('');
   console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
   console.log(`  ${recommendation}`);
@@ -803,31 +975,38 @@ async function printDoctor() {
 function printHelp() {
   printCliHeader('HIGH-DENSITY COMMAND MAP');
   printCommandSection('OPERATOR CONTROL', [
-    'multiclaw start',
-    'multiclaw stop',
-    'multiclaw status',
-    'multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]',
+    `${tint('multiclaw start', ANSI.bold)}                    launch the command center with saved config`,
+    `${tint('multiclaw stop', ANSI.bold)}                     shut the runtime down cleanly`,
+    `${tint('multiclaw status', ANSI.bold)}                   live runtime, model, and cognitive telemetry`,
+    `${tint('multiclaw up', ANSI.bold)} [--tailscale|--local] [--provider <p>] [--model <m>] [--api-key <K>]`,
   ], ANSI.green);
   printCommandSection('COMPANY ARCHITECTURE', [
-    'multiclaw init',
-    'multiclaw ask [--company <companyId>] "your question"',
+    `${tint('multiclaw init', ANSI.bold)}                     generate a full operating company from a brief`,
+    `${tint('multiclaw roster', ANSI.bold)}                   show live company roster and archetype summary`,
+    `${tint('multiclaw artifacts', ANSI.bold)}                inspect generated artifacts across all companies`,
   ], ANSI.cyan);
-  printCommandSection('SETUP AND GUIDANCE', [
-    'multiclaw guide',
-    'multiclaw walkthrough',
-    'multiclaw configure',
-  ], ANSI.blue);
+  printCommandSection('AGI CORE / MEMORY', [
+    `${tint('multiclaw ingest', ANSI.bold)} ${tint('(alias of init)', ANSI.gray)}  import a brief and seed vector memory`,
+    `${tint('multiclaw recall', ANSI.bold)} [--company <id>] "question"  recall via the company operator`,
+    `${tint('multiclaw evolve', ANSI.bold)} ${tint('(alias of verify)', ANSI.gray)}   sweep memory health and run a smoke cycle`,
+  ], ANSI.magenta);
   printCommandSection('INFRASTRUCTURE', [
-    'multiclaw doctor',
-    'multiclaw verify',
+    `${tint('multiclaw doctor', ANSI.bold)}                   readiness score + prerequisite audit`,
+    `${tint('multiclaw verify', ANSI.bold)}                   doctor + status + end-to-end smoke`,
+    `${tint('multiclaw network', ANSI.bold)}                  network posture (bind, host, reachability)`,
   ], ANSI.yellow);
+  printCommandSection('SETUP AND GUIDANCE', [
+    `${tint('multiclaw configure', ANSI.bold)}                interactive configure with multi-select`,
+    `${tint('multiclaw guide', ANSI.bold)}                    minimum-viable install and start`,
+    `${tint('multiclaw walkthrough', ANSI.bold)}              fuller walkthrough for new operators`,
+  ], ANSI.blue);
   console.log(tint('Notes', ANSI.bold));
-  console.log('  - start uses the saved config and prints the URL');
-  console.log('  - up saves config and starts in one command');
-  console.log('  - verify checks doctor, status, and smoke when the runtime is up');
+  console.log(`  ${tint('•', ANSI.gray)} start uses the saved config and prints the URL`);
+  console.log(`  ${tint('•', ANSI.gray)} up saves config and starts in one command`);
+  console.log(`  ${tint('•', ANSI.gray)} verify runs doctor, status, and smoke when the runtime is up`);
   console.log('');
   console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
-  console.log('  Run multiclaw guide, then configure the runtime and verify the full path.');
+  console.log(`  Run ${tint('multiclaw configure', ANSI.cyan, ANSI.bold)}, then ${tint('multiclaw up --api-key <KEY>', ANSI.cyan, ANSI.bold)}, then ${tint('multiclaw verify', ANSI.cyan, ANSI.bold)}.`);
 }
 
 async function main() {
@@ -841,8 +1020,23 @@ async function main() {
     return;
   }
 
-  if (command === 'ask') {
+  if (command === 'ask' || command === 'recall') {
     await askCompanyCli();
+    return;
+  }
+
+  if (command === 'roster') {
+    await printRoster();
+    return;
+  }
+
+  if (command === 'artifacts') {
+    await printArtifacts();
+    return;
+  }
+
+  if (command === 'network') {
+    await printNetwork();
     return;
   }
 
@@ -856,7 +1050,7 @@ async function main() {
     return;
   }
 
-  if (command === 'verify') {
+  if (command === 'verify' || command === 'evolve') {
     await verifyRuntime();
     return;
   }
@@ -891,7 +1085,7 @@ async function main() {
     return;
   }
 
-  if (command !== 'init') {
+  if (command !== 'init' && command !== 'ingest') {
     printHelp();
     process.exitCode = 1;
     return;
@@ -900,10 +1094,15 @@ async function main() {
   const data = await collectInput();
   const result = await generateProject(data);
 
-  console.log(`Generated company for ${data.projectName}`);
-  console.log(`Path: ${result.outputDir}`);
-  console.log(`Archetype: ${result.archetype}`);
-  console.log(`Roles: ${result.roles.map((role) => role.title).join(', ')}`);
+  console.log('');
+  console.log(tint('[COMPANY SYNTHESIZED]', ANSI.green, ANSI.bold));
+  console.log(`  ${successMark()} project       ${tint(data.projectName, ANSI.bold)}`);
+  console.log(`  ${successMark()} archetype     ${tint(result.archetype, ANSI.bold)}`);
+  console.log(`  ${successMark()} roles         ${tint(String(result.roles.length), ANSI.bold)}  ${tint(`(${result.roles.map((role) => role.title).join(', ')})`, ANSI.gray)}`);
+  console.log(`  ${successMark()} artifacts at  ${tint(result.outputDir, ANSI.bold)}`);
+  console.log('');
+  console.log(tint('Strategic recommendation:', ANSI.magenta, ANSI.bold));
+  console.log(`  Review the charter and mission, then run ${tint('multiclaw up --api-key <KEY>', ANSI.cyan, ANSI.bold)} to activate the first claw.`);
 }
 
 main().catch((error) => {

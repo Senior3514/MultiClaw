@@ -52,7 +52,7 @@ The first real version should stay simple to install, clear to operate, and stro
 ### Install and run
 
 ```bash
-cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 ```
 
 Then continue from inside the product.
@@ -86,7 +86,7 @@ The default private flow is single-user and should not force account friction on
 Uninstall:
 
 ```bash
-cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
 ```
 
 The base install keeps MultiClaw itself simple. Provider, model, channel, and networking choices can be layered on after install.

@@ -34,11 +34,11 @@ const bindModeNotes = {
 
 function renderCommand() {
   const bindFlag = state.bind === 'local' ? '--local' : '--tailscale';
-  baseInstallCommandEl.textContent = 'cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
+  baseInstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
   if (advancedInstallCommandEl) {
     advancedInstallCommandEl.textContent = `Continue inside MultiClaw after install. Bind: ${state.bind}. Provider: ${state.provider}.`;
   }
-  uninstallCommandEl.textContent = 'cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
+  uninstallCommandEl.textContent = 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash';
   if (quickStartCommandEl) quickStartCommandEl.textContent = 'multiclaw start';
   if (quickVerifyCommandEl) quickVerifyCommandEl.textContent = 'multiclaw verify';
   if (quickStopCommandEl) quickStopCommandEl.textContent = 'multiclaw stop';

@@ -120,7 +120,7 @@ The strongest currently verified path is the private-VPS/private-network path.
 The public/product-facing installation story is intentionally calm:
 
 ```bash
-cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 ```
 
 Then:

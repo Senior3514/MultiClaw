@@ -3,7 +3,7 @@
 ## Base install
 
 ```bash
-cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 ```
 
 ## Guided steps after install
@@ -41,7 +41,7 @@ multiclaw stop
 ### 6. Uninstall if needed
 
 ```bash
-cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
 ```
 
 ## Standard

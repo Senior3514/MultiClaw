@@ -24,8 +24,8 @@ const homePlatformNotes = {
 function renderHomeInstallCommand() {
   if (!homeInstallCommandEl || !homePlatformNoteEl) return;
   homeInstallCommandEl.textContent = homeInstallState.platform === 'windows'
-    ? 'wsl bash -lc "cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash"'
-    : 'cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
+    ? 'wsl bash -lc "curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash"'
+    : 'curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash';
   homePlatformNoteEl.textContent = homePlatformNotes[homeInstallState.platform];
 }
 

@@ -447,9 +447,12 @@ video {
 .landing-page .site-main > .landing-hero {
   width: 100%;
   margin-inline: calc(50% - 50vw);
+  border: 0;
   border-left: 0;
   border-right: 0;
   border-radius: 0;
+  box-shadow: none;
+  background: transparent;
   padding-inline: max(24px, env(safe-area-inset-left)) max(24px, env(safe-area-inset-right));
 }
 
@@ -464,7 +467,7 @@ video {
   background: transparent;
 }
 
-.landing-hero.panel::before {
+.landing-hero::before {
   display: none;
 }
 

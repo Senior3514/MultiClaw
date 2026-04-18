@@ -349,6 +349,10 @@ video {
   margin-inline: auto;
 }
 
+.landing-page .site-main > .landing-hero {
+  width: min(100%, 1280px);
+}
+
 .landing-hero {
   display: grid;
   grid-template-columns: 1fr;
@@ -467,8 +471,8 @@ video {
 .hero-graphic {
   position: relative;
   overflow: hidden;
-  min-height: clamp(560px, 72vw, 980px);
-  width: min(100%, 980px);
+  min-height: clamp(620px, 76vw, 1120px);
+  width: min(100%, 1120px);
   aspect-ratio: 1 / 1;
   display: grid;
   place-items: center;
@@ -541,6 +545,18 @@ video {
   width: 500px;
   height: 500px;
   background: rgba(86, 212, 209, 0.2);
+}
+
+.glow-c {
+  width: 660px;
+  height: 660px;
+  background: rgba(124, 92, 255, 0.12);
+}
+
+.glow-d {
+  width: 820px;
+  height: 820px;
+  background: rgba(247, 215, 160, 0.08);
 }
 
 .graphic-core {
@@ -639,6 +655,13 @@ video {
   border-color: rgba(243, 74, 120, 0.08);
 }
 
+.orbit-g {
+  width: 790px;
+  height: 790px;
+  border-style: dashed;
+  border-color: rgba(124, 92, 255, 0.07);
+}
+
 .graphic-orb {
   position: absolute;
   inset: 50% auto auto 50%;
@@ -684,6 +707,18 @@ video {
   width: 14px;
   height: 14px;
   animation: orbDrift6 28s linear infinite;
+}
+
+.orb-7 {
+  width: 26px;
+  height: 26px;
+  animation: orbDrift7 26s linear infinite reverse;
+}
+
+.orb-8 {
+  width: 12px;
+  height: 12px;
+  animation: orbDrift8 32s linear infinite;
 }
 
 .graphic-node {
@@ -777,6 +812,8 @@ video {
 .node-4 { animation: orbitNode4 20s linear infinite reverse; }
 .node-5 { animation: orbitNode5 17s linear infinite; }
 .node-6 { animation: orbitNode6 22s linear infinite reverse; }
+.node-7 { animation: orbitNode7 19s linear infinite; }
+.node-8 { animation: orbitNode8 24s linear infinite reverse; }
 
 .cards-grid,
 .logic-grid,
@@ -1537,6 +1574,16 @@ button:hover {
   to { transform: translate(-50%, -50%) rotate(585deg) translateY(-224px) rotate(-585deg); }
 }
 
+@keyframes orbitNode7 {
+  from { transform: translate(-50%, -50%) rotate(28deg) translateY(-288px) rotate(-28deg); }
+  to { transform: translate(-50%, -50%) rotate(388deg) translateY(-288px) rotate(-388deg); }
+}
+
+@keyframes orbitNode8 {
+  from { transform: translate(-50%, -50%) rotate(208deg) translateY(-288px) rotate(-208deg); }
+  to { transform: translate(-50%, -50%) rotate(568deg) translateY(-288px) rotate(-568deg); }
+}
+
 @keyframes sparkPulse {
   0%, 100% { opacity: 0.45; }
   50% { opacity: 1; }
@@ -1570,6 +1617,16 @@ button:hover {
 @keyframes orbDrift6 {
   from { transform: translate(-50%, -50%) rotate(320deg) translateY(-404px) rotate(-320deg); }
   to { transform: translate(-50%, -50%) rotate(680deg) translateY(-404px) rotate(-680deg); }
+}
+
+@keyframes orbDrift7 {
+  from { transform: translate(-50%, -50%) rotate(96deg) translateY(-462px) rotate(-96deg); }
+  to { transform: translate(-50%, -50%) rotate(456deg) translateY(-462px) rotate(-456deg); }
+}
+
+@keyframes orbDrift8 {
+  from { transform: translate(-50%, -50%) rotate(212deg) translateY(-520px) rotate(-212deg); }
+  to { transform: translate(-50%, -50%) rotate(572deg) translateY(-520px) rotate(-572deg); }
 }
 
 @keyframes pulseDot {
@@ -1738,9 +1795,9 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 420px;
+    min-height: 480px;
     width: 100%;
-    padding: 30px 18px;
+    padding: 32px 18px;
   }
 }
 
@@ -1909,10 +1966,10 @@ body.light-theme .panel-strong {
   }
 
   .hero-graphic {
-    min-height: 420px;
-    width: min(100%, 560px);
+    min-height: 480px;
+    width: min(100%, 620px);
     aspect-ratio: 1 / 1;
-    padding: 16px;
+    padding: 18px;
   }
 
   .graphic-core {
@@ -1957,6 +2014,11 @@ body.light-theme .panel-strong {
   .orbit-f {
     width: 452px;
     height: 452px;
+  }
+
+  .orbit-g {
+    width: 520px;
+    height: 520px;
   }
 
   .graphic-node {

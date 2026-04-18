@@ -542,19 +542,19 @@ async function askCompanyCli() {
 function printGuide() {
   console.log(`MultiClaw guide
 
-1. Install the base product
-   curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+Most people should do this:
 
-2. Start the runtime
+1. Install
+   cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+
+2. Start
    multiclaw start
 
-3. Verify the runtime
+3. Verify
    multiclaw verify
 
-4. Check status
-   multiclaw status
-
-5. Open the URL and continue in the product UI
+4. Stop when done
+   multiclaw stop
 `);
 }
 
@@ -562,16 +562,18 @@ function printWalkthrough() {
   console.log(`MultiClaw walkthrough
 
 Base install:
-  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
+  cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/bootstrap.sh | bash
 
 Then:
   multiclaw start
   multiclaw verify
-  multiclaw status
   multiclaw stop
 
+If you want to save the API key and start in one command:
+  multiclaw up --provider openai --model gpt-5.4 --api-key YOUR_KEY
+
 Uninstall:
-  curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
+  cd ~ && curl -fsSL https://raw.githubusercontent.com/Senior3514/MultiClaw/main/scripts/uninstall.sh | bash
 `);
 }
 
@@ -636,36 +638,24 @@ async function printDoctor() {
 function printHelp() {
   console.log(`MultiClaw
 
-Usage:
-  multiclaw help
+Fast path:
   multiclaw guide
+  multiclaw start
+  multiclaw verify
+  multiclaw stop
+
+Core commands:
   multiclaw walkthrough
   multiclaw doctor
-  multiclaw verify
-  multiclaw ask [--company <companyId>] "your question"
-  multiclaw init
-  multiclaw init --demo
-  multiclaw configure
-  multiclaw setup [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
-  multiclaw start [--port 8813]
-  multiclaw dev [--port 8813]
-  multiclaw stop
   multiclaw status
+  multiclaw up [--tailscale|--local] [--port 8813] [--provider openai] [--model gpt-5.4] [--api-key-env OPENAI_API_KEY] [--api-key YOUR_KEY]
+  multiclaw configure
+  multiclaw ask [--company <companyId>] "your question"
 
 Notes:
-  - guide prints the clean step-by-step setup flow
-  - walkthrough prints the full command walkthrough
-  - doctor checks the local environment for the core runtime prerequisites
-  - verify runs doctor, status, and the end-to-end smoke flow when the runtime is up
-  - ask lets you talk to the latest generated company from the CLI, or target a specific one with --company
-  - init generates a company package under ./generated/
-  - configure opens the interactive runtime setup flow
-  - setup creates a local runtime config under ./.multiclaw/config.json
-  - setup/up can also save the API key into ./.multiclaw/runtime.env
-  - up is the one-command way to configure and start the runtime
-  - start uses the configured bind mode (tailscale by default)
-  - dev forces local bind on 127.0.0.1
+  - start uses the saved config and prints the URL
+  - up saves config and starts in one command
+  - verify checks doctor, status, and smoke when the runtime is up
 `);
 }
 

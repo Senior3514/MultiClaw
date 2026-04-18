@@ -1,5 +1,6 @@
 const SESSION_KEY = 'multiclaw-session';
 const THEME_KEY = 'multiclaw-theme';
+const SECRET_MODE_KEY = 'multiclaw-secret-mode';
 
 function getStoredTheme() {
   const stored = localStorage.getItem(THEME_KEY);
@@ -14,6 +15,21 @@ export function applyTheme(theme = getStoredTheme()) {
     button.textContent = theme === 'light' ? 'Dark' : 'Light';
     button.setAttribute('aria-label', theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode');
   });
+}
+
+function getStoredSecretMode() {
+  return localStorage.getItem(SECRET_MODE_KEY) === 'on';
+}
+
+export function applySecretMode(enabled = getStoredSecretMode()) {
+  document.body?.classList.toggle('secret-fire-mode', enabled);
+  localStorage.setItem(SECRET_MODE_KEY, enabled ? 'on' : 'off');
+}
+
+export function toggleSecretMode() {
+  const next = !document.body?.classList.contains('secret-fire-mode');
+  applySecretMode(next);
+  return next;
 }
 
 export function toggleTheme() {
@@ -35,6 +51,7 @@ export function mountThemeToggleOnly() {
 }
 
 applyTheme();
+applySecretMode();
 
 function setLocalSession(sessionOrEmail, modeOverride = null) {
   const session = typeof sessionOrEmail === 'string'

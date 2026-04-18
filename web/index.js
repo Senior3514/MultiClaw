@@ -1,4 +1,4 @@
-import { hasServerSession, mountThemeToggleOnly } from './auth.js';
+import { hasServerSession, mountThemeToggleOnly, toggleSecretMode } from './auth.js';
 
 const tryGeneratorBtn = document.getElementById('tryGeneratorBtn');
 const openWorkspaceBtn = document.getElementById('openWorkspaceBtn');
@@ -70,7 +70,7 @@ document.querySelectorAll('[data-secret-toggle]').forEach((button) => {
     }, 1200);
 
     if (secretToggleCount >= 3) {
-      document.body.classList.toggle('secret-fire-mode');
+      toggleSecretMode();
       secretToggleCount = 0;
       clearTimeout(secretToggleTimer);
     }

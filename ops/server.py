@@ -4,6 +4,7 @@ from http.cookies import SimpleCookie
 from pathlib import Path
 from datetime import datetime, timezone
 from urllib.parse import urlparse
+import threading
 import hashlib
 import io
 import json
@@ -25,6 +26,8 @@ HOST = sys.argv[1] if len(sys.argv) > 1 else "127.0.0.1"
 PORT = int(sys.argv[2]) if len(sys.argv) > 2 else 8813
 SESSION_COOKIE = "multiclaw_session"
 SESSION_TTL_SECONDS = 60 * 60 * 24 * 14
+AUTOPILOT_DEFAULT_INTERVAL_MINUTES = 30
+AUTOPILOT_LOOP_SECONDS = 30
 RATE_LIMITS = {}
 AUTH_MODE = (os.getenv("MULTICLAW_AUTH_MODE", "multi-user") or "multi-user").strip().lower()
 SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
@@ -32,6 +35,10 @@ SINGLE_USER_SESSION = {"email": "local@multiclaw", "mode": "single-user"}
 
 def now_utc():
     return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def utc_now_datetime():
+    return datetime.now(timezone.utc)
 
 
 def allow_rate(key: str, limit: int, window_seconds: int):
@@ -75,6 +82,42 @@ def write_json(path: Path, payload):
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def autopilot_state_path(company_id: str):
+    return GENERATED_ROOT / company_id / "AUTOPILOT.json"
+
+
+def build_autopilot_state(enabled=True, interval_minutes=AUTOPILOT_DEFAULT_INTERVAL_MINUTES, last_run_at=None, run_count=0, next_run_at=None, last_result=None):
+    normalized_interval = max(5, min(24 * 60, int(interval_minutes or AUTOPILOT_DEFAULT_INTERVAL_MINUTES)))
+    if enabled and not next_run_at:
+        next_run_at = now_utc()
+    return {
+        "enabled": bool(enabled),
+        "intervalMinutes": normalized_interval,
+        "lastRunAt": last_run_at,
+        "nextRunAt": next_run_at if enabled else None,
+        "runCount": max(0, int(run_count or 0)),
+        "lastResult": last_result or "Autopilot is waiting for its next background cycle.",
+    }
+
+
+def load_autopilot_state(company_id: str):
+    state = read_json(autopilot_state_path(company_id), None)
+    if state is None:
+        state = build_autopilot_state()
+        write_json(autopilot_state_path(company_id), state)
+    return state
+
+
+def save_autopilot_state(company_id: str, state):
+    write_json(autopilot_state_path(company_id), state)
+    return state
+
+
+def compute_next_run_at(interval_minutes: int):
+    future = utc_now_datetime().timestamp() + (interval_minutes * 60)
+    return datetime.fromtimestamp(future, timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
 def append_company_event(company_id: str, kind: str, title: str, detail: str, payload=None):
     events_path = GENERATED_ROOT / company_id / "events.json"
     events = read_json(events_path, [])
@@ -92,14 +135,19 @@ def load_company_events(company_id: str):
     return read_json(GENERATED_ROOT / company_id / "events.json", [])
 
 
-def build_execution_state(company, events=None):
+def build_execution_state(company, events=None, autopilot=None):
     events = events or []
+    autopilot = autopilot or build_autopilot_state()
     next_steps = company.get("nextSteps") or []
     missions = company.get("missions") or []
     last_event = events[0] if events else None
     has_operator_input = any(event.get("kind") == "operator-ask" for event in events)
+    has_autopilot_activity = any(event.get("kind") == "autopilot-cycle" for event in events)
 
-    if has_operator_input:
+    if has_autopilot_activity and autopilot.get("enabled"):
+        status = "autonomous"
+        summary = "The company is running visible background execution through autopilot."
+    elif has_operator_input:
         status = "active"
         summary = "The company has operator input and visible execution activity."
     elif events:
@@ -133,6 +181,14 @@ def build_execution_state(company, events=None):
         "lastActivityAt": last_event.get("timestamp") if last_event else company.get("generatedAt"),
         "missionBoard": mission_board,
         "nextStepBoard": next_step_board,
+        "autopilot": {
+            "enabled": autopilot.get("enabled", False),
+            "intervalMinutes": autopilot.get("intervalMinutes", AUTOPILOT_DEFAULT_INTERVAL_MINUTES),
+            "nextRunAt": autopilot.get("nextRunAt"),
+            "lastRunAt": autopilot.get("lastRunAt"),
+            "runCount": autopilot.get("runCount", 0),
+            "lastResult": autopilot.get("lastResult", "Autopilot has not reported yet."),
+        },
     }
 
 
@@ -141,7 +197,8 @@ def update_company_execution_state(company_id: str, company=None):
     if company is None:
         return None
     events = load_company_events(company_id)
-    state = build_execution_state(company, events)
+    autopilot = load_autopilot_state(company_id)
+    state = build_execution_state(company, events, autopilot)
     write_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", state)
     return state
 
@@ -186,6 +243,129 @@ def run_company_cycle(company_id: str, company=None):
         "status": state.get("status") if state else "active",
         "summary": state.get("summary") if state else "Execution cycle completed.",
     }
+
+
+def run_company_autopilot_cycle(company_id: str, company=None, trigger="scheduled"):
+    company = company or load_company(company_id)
+    if company is None:
+        return None
+
+    autopilot = load_autopilot_state(company_id)
+    if not autopilot.get("enabled") and trigger == "scheduled":
+        return None
+
+    events = load_company_events(company_id)
+    cycle_number = sum(1 for event in events if event.get("kind") == "autopilot-cycle") + 1
+    state = read_json(GENERATED_ROOT / company_id / "EXECUTION-STATE.json", None) or build_execution_state(company, events, autopilot)
+    focus = state.get("focus") or (company.get("nextSteps") or company.get("missions") or ["Await first operator instruction."])[0]
+    artifact_name = f"AUTOPILOT-{cycle_number:03}.md"
+    cycle_time = now_utc()
+    interval_minutes = autopilot.get("intervalMinutes", AUTOPILOT_DEFAULT_INTERVAL_MINUTES)
+
+    (GENERATED_ROOT / company_id / artifact_name).write_text(
+        f"# Autopilot Cycle {cycle_number}\n\n"
+        f"- Company: {company.get('projectName', company_id)}\n"
+        f"- Trigger: {trigger}\n"
+        f"- Executed at: {cycle_time}\n"
+        f"- Focus: {focus}\n"
+        f"- Next scheduled run: {compute_next_run_at(interval_minutes)}\n",
+        encoding="utf-8",
+    )
+
+    append_company_event(
+        company_id,
+        "autopilot-cycle",
+        f"Autopilot cycle {cycle_number}",
+        f"Background execution advanced around: {focus}",
+        {"cycleNumber": cycle_number, "artifact": artifact_name, "focus": focus, "trigger": trigger},
+    )
+
+    autopilot["lastRunAt"] = cycle_time
+    autopilot["nextRunAt"] = compute_next_run_at(interval_minutes) if autopilot.get("enabled") else None
+    autopilot["runCount"] = int(autopilot.get("runCount", 0)) + 1
+    autopilot["lastResult"] = f"Completed autopilot cycle {cycle_number} via {trigger}."
+    save_autopilot_state(company_id, autopilot)
+    execution_state = update_company_execution_state(company_id, company)
+
+    return {
+        "cycleNumber": cycle_number,
+        "artifact": artifact_name,
+        "focus": focus,
+        "trigger": trigger,
+        "autopilot": autopilot,
+        "status": execution_state.get("status") if execution_state else "autonomous",
+    }
+
+
+def configure_company_autopilot(company_id: str, enabled=None, interval_minutes=None, run_now=False):
+    company = load_company(company_id)
+    if company is None:
+        return None
+
+    autopilot = load_autopilot_state(company_id)
+    if enabled is not None:
+        autopilot["enabled"] = bool(enabled)
+    if interval_minutes is not None:
+        autopilot["intervalMinutes"] = max(5, min(24 * 60, int(interval_minutes)))
+
+    autopilot["nextRunAt"] = compute_next_run_at(autopilot["intervalMinutes"]) if autopilot.get("enabled") else None
+    autopilot["lastResult"] = (
+        f"Autopilot enabled on a {autopilot['intervalMinutes']}-minute rhythm."
+        if autopilot.get("enabled")
+        else "Autopilot paused."
+    )
+    save_autopilot_state(company_id, autopilot)
+
+    append_company_event(
+        company_id,
+        "autopilot-configured",
+        "Autopilot updated",
+        autopilot["lastResult"],
+        {"enabled": autopilot.get("enabled"), "intervalMinutes": autopilot.get("intervalMinutes")},
+    )
+
+    result = {
+        "companyId": company_id,
+        "autopilot": autopilot,
+    }
+    if run_now:
+        result["run"] = run_company_autopilot_cycle(company_id, company, trigger="manual")
+
+    update_company_execution_state(company_id, company)
+    return result
+
+
+def process_due_autopilot_cycles():
+    for company in list_companies():
+        company_id = company.get("companyId")
+        autopilot = load_autopilot_state(company_id)
+        if not autopilot.get("enabled"):
+            continue
+        next_run = parse_utc_timestamp(autopilot.get("nextRunAt"))
+        if next_run is None or next_run <= utc_now_datetime():
+            try:
+                run_company_autopilot_cycle(company_id, company, trigger="scheduled")
+            except Exception:
+                append_company_event(
+                    company_id,
+                    "autopilot-error",
+                    "Autopilot cycle failed",
+                    "The background company loop encountered an execution error.",
+                )
+
+
+def start_autopilot_loop():
+    def worker():
+        while True:
+            try:
+                process_due_autopilot_cycles()
+            except Exception:
+                pass
+            time.sleep(AUTOPILOT_LOOP_SECONDS)
+
+    thread = threading.Thread(target=worker, name="multiclaw-autopilot", daemon=True)
+    thread.start()
+    return thread
 
 
 def hash_password(password: str, salt_hex: str) -> str:
@@ -500,6 +680,7 @@ def list_companies():
             if execution_state is None:
                 execution_state = update_company_execution_state(company_dir.name, company)
             company["executionState"] = execution_state
+            company["autopilotState"] = load_autopilot_state(company_dir.name)
             companies.append(company)
         except Exception:
             continue
@@ -548,6 +729,7 @@ def load_company(company_id: str):
     if execution_state is None:
         execution_state = update_company_execution_state(company_id, company)
     company["executionState"] = execution_state
+    company["autopilotState"] = load_autopilot_state(company_id)
     return company
 
 
@@ -632,8 +814,10 @@ def write_company_artifacts(output_dir: Path, result, roles, missions, next_step
         encoding="utf-8",
     )
     (output_dir / "ROUTING.json").write_text(json.dumps(routing, indent=2), encoding="utf-8")
+    autopilot = build_autopilot_state()
     write_json(output_dir / "events.json", [])
-    write_json(output_dir / "EXECUTION-STATE.json", build_execution_state(result, []))
+    write_json(output_dir / "AUTOPILOT.json", autopilot)
+    write_json(output_dir / "EXECUTION-STATE.json", build_execution_state(result, [], autopilot))
 
 
 def generate_company(payload):
@@ -867,6 +1051,17 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
             self.send_json(200, load_company_events(company_id))
             return
 
+        if self.path.startswith("/api/company/") and self.path.endswith("/autopilot"):
+            if not self.require_session():
+                return
+            company_id = self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0].strip()
+            company = load_company(company_id)
+            if company is None:
+                self.send_json(404, {"error": "company not found"})
+                return
+            self.send_json(200, load_autopilot_state(company_id))
+            return
+
         if self.path.startswith("/api/company/"):
             if not self.require_session():
                 return
@@ -990,6 +1185,28 @@ class MultiClawHandler(SimpleHTTPRequestHandler):
                 self.send_json(500, {"error": str(exc)})
             return
 
+        if self.path.startswith("/api/company/") and self.path.endswith("/autopilot"):
+            if not self.require_same_origin():
+                return
+            if not self.require_session():
+                return
+            try:
+                company_id = self.path.split("/api/company/", 1)[1].split("/autopilot", 1)[0].strip()
+                payload = self.read_json_body()
+                result = configure_company_autopilot(
+                    company_id,
+                    enabled=payload.get("enabled") if "enabled" in payload else None,
+                    interval_minutes=payload.get("intervalMinutes"),
+                    run_now=bool(payload.get("runNow")),
+                )
+                if result is None:
+                    self.send_json(404, {"error": "company not found"})
+                    return
+                self.send_json(200, result)
+            except Exception as exc:
+                self.send_json(500, {"error": str(exc)})
+            return
+
         if self.path == "/api/generate":
             if not self.require_same_origin():
                 return
@@ -1014,6 +1231,7 @@ if __name__ == "__main__":
     TMP_GENERATED_ROOT.mkdir(parents=True, exist_ok=True)
     AUTH_ROOT.mkdir(parents=True, exist_ok=True)
     init_db()
+    start_autopilot_loop()
     server = ThreadingHTTPServer((HOST, PORT), MultiClawHandler)
     print(f"Serving MultiClaw on http://{HOST}:{PORT}")
     server.serve_forever()

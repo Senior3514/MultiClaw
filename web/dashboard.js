@@ -33,6 +33,7 @@ function escapeHtml(value) {
 
 function renderCompany(company) {
   const execution = company.executionState || {};
+  const autopilot = company.autopilotState || execution.autopilot || {};
 
   return `
     <div class="route-card">
@@ -41,6 +42,7 @@ function renderCompany(company) {
       <p>${escapeHtml(company.archetype)}</p>
       <small>${escapeHtml(execution.status || 'unknown')}</small>
       <p>${escapeHtml(execution.focus || 'Awaiting visible focus')}</p>
+      <small>${escapeHtml(autopilot.enabled ? `Autopilot ${autopilot.intervalMinutes || 30}m` : 'Autopilot paused')}</small>
       <div class="cta-row">
         <a class="button-link secondary" href="./company.html?id=${encodeURIComponent(company.companyId)}">View company</a>
       </div>

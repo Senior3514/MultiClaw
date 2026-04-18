@@ -23,10 +23,14 @@ const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
 const refineCompanyBtn = document.getElementById('refineCompanyBtn');
 const runCompanyCycleBtn = document.getElementById('runCompanyCycleBtn');
+const toggleAutopilotBtn = document.getElementById('toggleAutopilotBtn');
+const runAutopilotBtn = document.getElementById('runAutopilotBtn');
 const companyCycleResult = document.getElementById('companyCycleResult');
+const companyAutopilotResult = document.getElementById('companyAutopilotResult');
 const companyAskInput = document.getElementById('companyAskInput');
 const companyAskBtn = document.getElementById('companyAskBtn');
 const companyAskResult = document.getElementById('companyAskResult');
+let currentAutopilotState = null;
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -57,6 +61,7 @@ function renderExecution(state) {
     return '<div class="route-card"><strong>Unknown</strong><p>Execution state is not available yet.</p></div>';
   }
 
+  const autopilot = state.autopilot || {};
   const missionBoard = (state.missionBoard || []).slice(0, 3).map((mission) => `${escapeHtml(mission.status)}: ${escapeHtml(mission.title)}`).join(' • ');
   const nextStepBoard = (state.nextStepBoard || []).slice(0, 2).map((step) => `${escapeHtml(step.status)}: ${escapeHtml(step.title)}`).join(' • ');
 
@@ -85,6 +90,12 @@ function renderExecution(state) {
       <small>Next-step board</small>
       <strong>Activation posture</strong>
       <p>${nextStepBoard || 'No next-step board yet.'}</p>
+    </div>
+    <div class="route-card">
+      <small>Background company loop</small>
+      <strong>${escapeHtml(autopilot.enabled ? 'Autopilot enabled' : 'Autopilot paused')}</strong>
+      <p>Runs: ${escapeHtml(autopilot.runCount ?? 0)} • Interval: ${escapeHtml(autopilot.intervalMinutes ?? 30)} min • Next run: ${escapeHtml(autopilot.nextRunAt || 'Not scheduled')}</p>
+      <small>${escapeHtml(autopilot.lastResult || 'No autopilot result yet.')}</small>
     </div>
   `;
 }
@@ -216,6 +227,59 @@ function renderCycleResult(result) {
   `;
 }
 
+function renderAutopilotResult(result) {
+  const autopilot = result.autopilot || result;
+  const run = result.run;
+  return `
+    <div class="mission-card">
+      <small>${escapeHtml(autopilot.enabled ? 'Autopilot enabled' : 'Autopilot paused')}</small>
+      <strong>${escapeHtml(autopilot.lastResult || 'Autopilot updated')}</strong>
+      <p>Interval: ${escapeHtml(autopilot.intervalMinutes)} min • Runs: ${escapeHtml(autopilot.runCount || 0)} • Next: ${escapeHtml(autopilot.nextRunAt || 'Not scheduled')}</p>
+      ${run ? `<small>Latest run: ${escapeHtml(run.focus)} (${escapeHtml(run.artifact)})</small>` : ''}
+    </div>
+  `;
+}
+
+function syncAutopilotControls() {
+  if (toggleAutopilotBtn) {
+    toggleAutopilotBtn.textContent = currentAutopilotState?.enabled ? 'Pause autopilot' : 'Enable autopilot';
+  }
+}
+
+async function updateAutopilot(payload) {
+  if (!toggleAutopilotBtn || !runAutopilotBtn) return;
+
+  toggleAutopilotBtn.disabled = true;
+  runAutopilotBtn.disabled = true;
+  if (companyAutopilotResult) {
+    companyAutopilotResult.innerHTML = '<div class="route-card"><strong>Updating autopilot...</strong><p>Applying background company execution changes.</p></div>';
+  }
+
+  try {
+    const response = await fetch(`/api/company/${encodeURIComponent(companyId)}/autopilot`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || `Failed with status ${response.status}`);
+    currentAutopilotState = result.autopilot;
+    syncAutopilotControls();
+    if (companyAutopilotResult) {
+      companyAutopilotResult.innerHTML = renderAutopilotResult(result);
+    }
+    await loadCompany();
+  } catch (error) {
+    console.error(error);
+    if (companyAutopilotResult) {
+      companyAutopilotResult.innerHTML = '<div class="route-card"><strong>Autopilot update failed</strong><p>The background execution layer could not be updated.</p></div>';
+    }
+  } finally {
+    toggleAutopilotBtn.disabled = false;
+    runAutopilotBtn.disabled = false;
+  }
+}
+
 async function runCompanyCycle() {
   if (!runCompanyCycleBtn) return;
 
@@ -306,6 +370,8 @@ async function loadCompany() {
       ['Generated', company.generatedAt],
     ]);
     if (executionEl) executionEl.innerHTML = renderExecution(company.executionState);
+    currentAutopilotState = company.autopilotState || company.executionState?.autopilot || null;
+    syncAutopilotControls();
     assetsEl.innerHTML = renderAssets(company.existingAssets);
     soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);
@@ -324,6 +390,8 @@ async function loadCompany() {
 }
 
 runCompanyCycleBtn?.addEventListener('click', runCompanyCycle);
+toggleAutopilotBtn?.addEventListener('click', () => updateAutopilot({ enabled: !currentAutopilotState?.enabled }));
+runAutopilotBtn?.addEventListener('click', () => updateAutopilot({ enabled: true, runNow: true }));
 companyAskBtn?.addEventListener('click', askCompany);
 companyAskInput?.addEventListener('keydown', (event) => {
   if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {

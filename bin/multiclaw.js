@@ -31,6 +31,12 @@ function runtimeStatePath(bind) {
   return path.join(repoRoot, 'ops', `multiclaw-web.${runtimeFileSuffix(bind)}.state.json`);
 }
 
+function processExists(pid) {
+  if (!pid) return false;
+  const result = spawnSync('kill', ['-0', String(pid)], { encoding: 'utf8' });
+  return result.status === 0;
+}
+
 function slugify(value) {
   return String(value || '')
     .trim()
@@ -444,28 +450,32 @@ async function upRuntime() {
 async function getRuntimeSnapshot() {
   const config = await loadRuntimeConfig();
   const bind = config.bind;
-  const running = await fs.readFile(runtimePidPath(bind), 'utf8').then((value) => value.trim()).catch(() => null);
+  const rawPid = await fs.readFile(runtimePidPath(bind), 'utf8').then((value) => value.trim()).catch(() => null);
   const state = await fs.readFile(runtimeStatePath(bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
+  const running = processExists(rawPid) ? rawPid : null;
+  const staleState = Boolean((rawPid && !running) || (!rawPid && state));
   const host = state?.host || (bind === 'local' ? '127.0.0.1' : (getTailscaleIp() || 'tailscale-unavailable'));
   const port = state?.port || config.port;
   const url = state?.url || `http://${host}:${port}/`;
   const healthUrl = `${url.replace(/\/$/, '')}/api/health`;
-  const health = running
+  const health = (running || staleState)
     ? spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', healthUrl], { encoding: 'utf8' })
     : null;
 
-  return { config, running, bind, host, port, url, health };
+  return { config, rawPid, running, bind, host, port, url, health, staleState };
 }
 
 async function printStatus() {
   const snapshot = await getRuntimeSnapshot();
-  const { config, running, bind, port, url, health } = snapshot;
+  const { config, rawPid, running, bind, port, url, health, staleState } = snapshot;
   const healthy = Boolean(health && health.status === 0);
-  const summary = !running
-    ? 'Runtime: not started'
-    : healthy
-      ? 'Runtime: ready'
-      : 'Runtime: started, health unreachable';
+  const summary = staleState
+    ? 'Runtime: stale state detected'
+    : !running
+      ? 'Runtime: not started'
+      : healthy
+        ? 'Runtime: ready'
+        : 'Runtime: started, health unreachable';
 
   console.log('MultiClaw runtime status');
   console.log(`- ${summary}`);
@@ -476,11 +486,13 @@ async function printStatus() {
   console.log(`- api key env: ${config.apiKeyEnv}`);
   console.log(`- config: ${runtimeConfigPath}`);
   console.log(`- runtime env: ${runtimeEnvPath}`);
-  console.log(`- pid: ${running || 'not running'}`);
+  console.log(`- pid: ${running || rawPid || 'not running'}`);
   console.log(`- url: ${url}`);
   console.log(`- health: ${health ? (health.status === 0 ? health.stdout.trim() || 'ok' : 'unreachable') : 'runtime not started'}`);
 
-  if (!running) {
+  if (staleState) {
+    console.log('\nNext: run multiclaw stop to clear stale state, then multiclaw start');
+  } else if (!running) {
     console.log('\nNext: multiclaw start');
   } else if (healthy) {
     console.log(`\nNext: open ${url} or run 'multiclaw verify'`);
@@ -672,10 +684,12 @@ async function printDoctor() {
     console.log(`- generated-live: not created yet (${repoWritable.status === 0 ? 'repo writable, will be created on first generation' : 'repo not writable'})`);
   }
 
-  const state = await fs.readFile(runtimeStatePath(config.bind), 'utf8').then((value) => JSON.parse(value)).catch(() => null);
-  if (state?.url) {
-    const health = spawnSync('curl', ['--silent', '--show-error', '--max-time', '5', `${state.url.replace(/\/$/, '')}/api/health`], { encoding: 'utf8' });
-    console.log(`- runtime health: ${health.status === 0 ? `ok (${health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
+  const snapshot = await getRuntimeSnapshot();
+  if (snapshot.staleState) {
+    console.log('- runtime state: stale files detected');
+  }
+  if (snapshot.health) {
+    console.log(`- runtime health: ${snapshot.health.status === 0 ? `ok (${snapshot.health.stdout.trim() || 'reachable'})` : 'unreachable'}`);
   } else {
     console.log('- runtime health: runtime not started');
   }

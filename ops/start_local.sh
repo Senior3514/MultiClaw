@@ -18,9 +18,14 @@ fi
 
 export MULTICLAW_AUTH_MODE="${MULTICLAW_AUTH_MODE:-single-user}"
 
-if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-  echo "MultiClaw web already running on http://$HOST:$PORT"
-  exit 0
+if [[ -f "$PID_FILE" ]]; then
+  PID="$(cat "$PID_FILE" 2>/dev/null || true)"
+  if [[ -n "$PID" ]] && kill -0 "$PID" 2>/dev/null; then
+    echo "MultiClaw web already running on http://$HOST:$PORT"
+    exit 0
+  fi
+  echo "Cleaning stale MultiClaw local runtime state"
+  rm -f "$PID_FILE" "$STATE_FILE"
 fi
 
 nohup python3 "$ROOT/ops/server.py" "$HOST" "$PORT" >"$LOG_FILE" 2>&1 &

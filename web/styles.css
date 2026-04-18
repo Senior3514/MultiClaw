@@ -1039,6 +1039,10 @@ body.light-theme .graphic-node {
   padding: 22px;
 }
 
+.landing-page .cards-grid.landing-cards {
+  gap: 24px;
+}
+
 .landing-cards .feature-card,
 .premium-card,
 .terminal-panel,
@@ -1488,6 +1492,11 @@ label span {
 .landing-page .logic-card strong,
 .landing-page .section-heading h2 {
   letter-spacing: -0.02em;
+}
+
+.landing-page .feature-card h2 {
+  font-size: 30px;
+  line-height: 1.04;
 }
 
 .status-banner {

@@ -440,7 +440,7 @@ video {
 }
 
 .landing-page .site-main > section {
-  width: min(100%, 1120px);
+  width: min(100%, 1200px);
   margin-inline: auto;
 }
 
@@ -633,6 +633,19 @@ body.light-theme .hero-graphic {
   background-size: 96px 96px, 152px 152px, 210px 210px, 280px 280px;
   background-position: 0 0, 34px 52px, 90px 30px, 120px 88px;
   animation: starDrift 26s linear infinite;
+}
+
+.hero-graphic .starfield::after {
+  content: '';
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background:
+    linear-gradient(24deg, transparent 46%, rgba(124, 92, 255, 0.09) 49%, transparent 52%),
+    linear-gradient(138deg, transparent 46%, rgba(86, 212, 209, 0.08) 49%, transparent 52%),
+    linear-gradient(84deg, transparent 47%, rgba(247, 215, 160, 0.06) 50%, transparent 53%);
+  opacity: 0.52;
+  filter: blur(0.2px);
 }
 
 .hero-graphic::before {
@@ -871,18 +884,20 @@ body.light-theme .hero-graphic {
 .graphic-node {
   position: absolute;
   inset: 50% auto auto 50%;
-  padding: 10px 14px;
+  padding: 9px 12px;
   z-index: 4;
   border-radius: 999px;
-  background: rgba(10, 24, 31, 0.94);
-  border: 1px solid rgba(86, 212, 209, 0.18);
+  background: rgba(10, 24, 31, 0.74);
+  border: 1px solid rgba(86, 212, 209, 0.12);
   color: var(--text);
-  box-shadow: 0 16px 34px rgba(6, 8, 18, 0.32);
+  box-shadow: 0 16px 34px rgba(6, 8, 18, 0.24);
   transform: translate(-50%, -50%);
   display: inline-flex;
   align-items: center;
   gap: 7px;
   white-space: nowrap;
+  font-size: 12px;
+  letter-spacing: 0.04em;
 }
 
 body.light-theme .graphic-node {
@@ -1017,6 +1032,11 @@ body.light-theme .graphic-node {
 .landing-section .logic-card,
 .landing-section .feature-card {
   text-align: center;
+}
+
+.landing-cards .feature-card,
+.landing-section .logic-card {
+  padding: 22px;
 }
 
 .landing-cards .feature-card,

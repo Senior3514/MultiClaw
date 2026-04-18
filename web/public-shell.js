@@ -36,8 +36,8 @@ if (sessionArea) {
     });
   } else {
     sessionArea.innerHTML = isLanding
-      ? `<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>`
-      : `<div class="session-chip"><span class="status-dot"></span><span>${healthLabel}</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Open workspace</a></div>`;
+      ? `<div class="session-chip"><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Workspace</a></div>`
+      : `<div class="session-chip"><span class="status-dot"></span><span>${healthLabel}</span><button class="button-link secondary" type="button" data-theme-toggle>Light mode</button><a class="button-link secondary" href="./dashboard.html">Workspace</a></div>`;
     bindThemeToggles(sessionArea);
   }
 }

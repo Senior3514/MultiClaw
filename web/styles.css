@@ -590,6 +590,25 @@ video {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.graphic-core::after {
+  content: '';
+  position: absolute;
+  inset: -42px;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 0deg,
+      rgba(243, 74, 120, 0.0),
+      rgba(243, 74, 120, 0.18),
+      rgba(124, 92, 255, 0.2),
+      rgba(86, 212, 209, 0.22),
+      rgba(247, 215, 160, 0.18),
+      rgba(243, 74, 120, 0.0));
+  filter: blur(18px);
+  opacity: 0.75;
+  z-index: -1;
+  animation: cosmicHaloSpin 24s linear infinite;
+}
+
 .graphic-avatar {
   width: 208px;
   height: 208px;
@@ -1542,6 +1561,12 @@ button:hover {
 @keyframes stagePulse {
   0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.8; }
   50% { transform: translate(-50%, -50%) scale(1.05); opacity: 1; }
+}
+
+@keyframes cosmicHaloSpin {
+  from { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.04); }
+  to { transform: rotate(360deg) scale(1); }
 }
 
 @keyframes orbitNode1 {

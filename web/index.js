@@ -64,11 +64,11 @@ if (session?.email) {
   });
   if (tryGeneratorBtn) {
     tryGeneratorBtn.href = './generator.html';
-    tryGeneratorBtn.textContent = 'Open generator';
+    tryGeneratorBtn.textContent = 'Generator';
   }
   if (openWorkspaceBtn) {
     openWorkspaceBtn.href = './dashboard.html';
-    openWorkspaceBtn.textContent = 'Open workspace';
+    openWorkspaceBtn.textContent = 'Workspace';
   }
 } else {
   if (tryGeneratorBtn) {

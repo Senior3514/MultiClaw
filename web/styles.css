@@ -588,6 +588,14 @@ body.light-theme .copy-mini {
 }
 
 .hero-graphic {
+  --hero-tilt-x: 0deg;
+  --hero-tilt-y: 0deg;
+  --hero-drift-x: 0px;
+  --hero-drift-y: 0px;
+  --hero-drift-soft-x: 0px;
+  --hero-drift-soft-y: 0px;
+  --hero-glow-x: 50%;
+  --hero-glow-y: 50%;
   position: relative;
   overflow: visible;
   min-height: clamp(640px, 80vw, 1120px);
@@ -598,14 +606,17 @@ body.light-theme .copy-mini {
   margin-inline: auto;
   padding: 20px;
   background:
-    radial-gradient(circle at 50% 50%, rgba(15, 30, 42, 0.52), rgba(7, 19, 26, 0.06) 58%, transparent 74%);
+    radial-gradient(circle at var(--hero-glow-x) var(--hero-glow-y), rgba(15, 30, 42, 0.64), rgba(7, 19, 26, 0.08) 58%, transparent 74%);
   border: 0;
   box-shadow: none;
+  transform: perspective(1500px) rotateX(var(--hero-tilt-x)) rotateY(var(--hero-tilt-y));
+  transform-style: preserve-3d;
+  transition: transform 220ms ease, filter 220ms ease, background 220ms ease;
 }
 
 body.light-theme .hero-graphic {
   background:
-    radial-gradient(circle at 50% 50%, rgba(138, 111, 255, 0.12), rgba(255, 255, 255, 0.08) 58%, transparent 76%);
+    radial-gradient(circle at var(--hero-glow-x) var(--hero-glow-y), rgba(138, 111, 255, 0.18), rgba(255, 255, 255, 0.08) 58%, transparent 76%);
 }
 
 .hero-graphic::before,
@@ -699,7 +710,7 @@ body.light-theme .hero-graphic {
 .graphic-core {
   position: absolute;
   inset: 50% auto auto 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--hero-drift-x)), calc(-50% + var(--hero-drift-y)));
   width: 306px;
   height: 306px;
   z-index: 3;
@@ -717,6 +728,7 @@ body.light-theme .hero-graphic {
     0 0 0 1px rgba(255, 255, 255, 0.04) inset,
     0 28px 70px rgba(12, 14, 28, 0.58),
     0 0 80px rgba(86, 212, 209, 0.16);
+  transition: transform 220ms ease, box-shadow 220ms ease, filter 220ms ease;
 }
 
 .graphic-core::before {
@@ -750,6 +762,18 @@ body.light-theme .hero-graphic {
   cursor: pointer;
 }
 
+.hero-graphic.hero-burst .graphic-core {
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 34px 86px rgba(12, 14, 28, 0.62),
+    0 0 120px rgba(255, 132, 82, 0.22);
+}
+
+.hero-graphic.hero-burst .graphic-core::after {
+  opacity: 0.98;
+  filter: blur(24px) saturate(1.16);
+}
+
 .graphic-avatar {
   width: 196px;
   height: 196px;
@@ -757,10 +781,12 @@ body.light-theme .hero-graphic {
     0 18px 42px rgba(0, 0, 0, 0.42),
     0 0 42px rgba(124, 92, 255, 0.26),
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  transition: transform 220ms ease, filter 220ms ease;
 }
 
 .graphic-core strong {
-  font-size: 26px;
+  font-size: 21px;
+  letter-spacing: 0.02em;
 }
 
 .graphic-core span {
@@ -891,13 +917,14 @@ body.light-theme .hero-graphic {
   border: 1px solid rgba(86, 212, 209, 0.12);
   color: var(--text);
   box-shadow: 0 16px 34px rgba(6, 8, 18, 0.24);
-  transform: translate(-50%, -50%);
+  transform: translate(calc(-50% + var(--hero-drift-soft-x)), calc(-50% + var(--hero-drift-soft-y)));
   display: inline-flex;
   align-items: center;
   gap: 7px;
   white-space: nowrap;
   font-size: 12px;
   letter-spacing: 0.04em;
+  transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease;
 }
 
 body.light-theme .graphic-node {
@@ -917,6 +944,39 @@ body.light-theme .graphic-node {
   box-shadow: 0 0 18px rgba(86, 212, 209, 0.22);
   transform: translate(-50%, -50%);
   animation: sparkPulse 4.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-graphic {
+    transform: none;
+  }
+
+  .graphic-core,
+  .graphic-node {
+    transition: none;
+    transform: translate(-50%, -50%);
+  }
+
+  .graphic-avatar {
+    transition: none;
+  }
+
+  .hero-graphic .starfield,
+  .graphic-core::after,
+  .graphic-glow,
+  .graphic-orbit,
+  .graphic-orb,
+  .graphic-spark,
+  .floating-core,
+  .floating-node,
+  .floating-node-delayed,
+  .animated-orbit,
+  .animated-orbit-slow,
+  .animated-panel,
+  .hero-brand,
+  .brand-mark {
+    animation: none !important;
+  }
 }
 
 .spark-1 { transform: translate(-50%, -50%) rotate(20deg) translateY(-236px); }

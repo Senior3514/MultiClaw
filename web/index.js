@@ -7,6 +7,7 @@ const copyHomeInstallButton = document.getElementById('copyHomeInstallCommand');
 const homePlatformNoteEl = document.getElementById('homePlatformNote');
 const landingFinalCommandEl = document.getElementById('landingFinalCommand');
 const copyLandingFinalCommandButton = document.getElementById('copyLandingFinalCommand');
+const landingHeroGraphic = document.getElementById('landingHeroGraphic');
 
 let secretToggleCount = 0;
 let secretToggleTimer = null;
@@ -71,11 +72,46 @@ document.querySelectorAll('[data-secret-toggle]').forEach((button) => {
 
     if (secretToggleCount >= 3) {
       toggleSecretMode();
+      landingHeroGraphic?.classList.add('hero-burst');
+      window.setTimeout(() => landingHeroGraphic?.classList.remove('hero-burst'), 900);
       secretToggleCount = 0;
       clearTimeout(secretToggleTimer);
     }
   });
 });
+
+function bindHeroAtmosphere() {
+  if (!landingHeroGraphic) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const resetHeroAtmosphere = () => {
+    landingHeroGraphic.style.setProperty('--hero-tilt-x', '0deg');
+    landingHeroGraphic.style.setProperty('--hero-tilt-y', '0deg');
+    landingHeroGraphic.style.setProperty('--hero-drift-x', '0px');
+    landingHeroGraphic.style.setProperty('--hero-drift-y', '0px');
+    landingHeroGraphic.style.setProperty('--hero-drift-soft-x', '0px');
+    landingHeroGraphic.style.setProperty('--hero-drift-soft-y', '0px');
+    landingHeroGraphic.style.setProperty('--hero-glow-x', '50%');
+    landingHeroGraphic.style.setProperty('--hero-glow-y', '50%');
+  };
+
+  landingHeroGraphic.addEventListener('pointermove', (event) => {
+    const rect = landingHeroGraphic.getBoundingClientRect();
+    const x = ((event.clientX - rect.left) / rect.width) - 0.5;
+    const y = ((event.clientY - rect.top) / rect.height) - 0.5;
+    landingHeroGraphic.style.setProperty('--hero-tilt-x', `${(-y * 7).toFixed(2)}deg`);
+    landingHeroGraphic.style.setProperty('--hero-tilt-y', `${(x * 8).toFixed(2)}deg`);
+    landingHeroGraphic.style.setProperty('--hero-drift-x', `${(x * 18).toFixed(1)}px`);
+    landingHeroGraphic.style.setProperty('--hero-drift-y', `${(y * 16).toFixed(1)}px`);
+    landingHeroGraphic.style.setProperty('--hero-drift-soft-x', `${(x * 10).toFixed(1)}px`);
+    landingHeroGraphic.style.setProperty('--hero-drift-soft-y', `${(y * 9).toFixed(1)}px`);
+    landingHeroGraphic.style.setProperty('--hero-glow-x', `${(50 + (x * 14)).toFixed(1)}%`);
+    landingHeroGraphic.style.setProperty('--hero-glow-y', `${(48 + (y * 12)).toFixed(1)}%`);
+  });
+
+  landingHeroGraphic.addEventListener('pointerleave', resetHeroAtmosphere);
+  resetHeroAtmosphere();
+}
 
 document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) => {
   button.addEventListener('click', () => {
@@ -88,6 +124,7 @@ document.querySelectorAll('#homePlatformChoices .choice-card').forEach((button) 
 
 renderHomeInstallCommand();
 mountThemeToggleOnly();
+bindHeroAtmosphere();
 
 const session = await hasServerSession();
 

@@ -333,7 +333,7 @@ body.light-theme .header-toggle {
 body.light-theme .brand-mark {
   background:
     radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.4), transparent 24%),
-    url('./multiclaw-avatar-bright-hybrid.png') center/cover no-repeat,
+    url('./multiclaw-avatar-light.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(124, 92, 255, 0.24), rgba(245, 240, 255, 0.94));
   border-color: rgba(124, 92, 255, 0.18);
   box-shadow:
@@ -1004,7 +1004,7 @@ body.light-theme .graphic-core {
 body.light-theme .graphic-avatar {
   background:
     radial-gradient(circle at 30% 22%, rgba(255, 255, 255, 0.42), transparent 24%),
-    url('./multiclaw-avatar-bright-hybrid.png') center/cover no-repeat,
+    url('./multiclaw-avatar-light.png') center/cover no-repeat,
     radial-gradient(circle at 50% 50%, rgba(124, 92, 255, 0.24), rgba(245, 240, 255, 0.96));
   box-shadow:
     0 18px 42px rgba(100, 76, 173, 0.18),

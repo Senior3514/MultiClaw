@@ -18,6 +18,7 @@
     "status": "node ./bin/multiclaw.js status",
     "e2e:smoke": "bash ./scripts/e2e-smoke.sh",
     "demo:router": "node ./src/demo/router-demo.js",
+    "demo:live-execution": "node ./src/demo/live-execution-demo.js",
     "test": "node --test"
   },
   "engines": {

@@ -462,6 +462,36 @@ video {
   background: var(--panel-strong);
 }
 
+.alert-card.alert-warning {
+  border-color: rgba(255, 166, 94, 0.26);
+  box-shadow:
+    0 18px 40px rgba(4, 6, 18, 0.18),
+    inset 0 0 0 1px rgba(255, 166, 94, 0.08);
+}
+
+.alert-card.alert-info {
+  border-color: rgba(86, 212, 209, 0.22);
+  box-shadow:
+    0 18px 40px rgba(4, 6, 18, 0.16),
+    inset 0 0 0 1px rgba(86, 212, 209, 0.08);
+}
+
+.alert-card.alert-ok {
+  border-color: rgba(46, 215, 189, 0.22);
+  box-shadow:
+    0 18px 40px rgba(4, 6, 18, 0.16),
+    inset 0 0 0 1px rgba(46, 215, 189, 0.08);
+}
+
+body.light-theme .alert-card.alert-warning {
+  border-color: rgba(255, 166, 94, 0.3);
+}
+
+body.light-theme .alert-card.alert-info,
+body.light-theme .alert-card.alert-ok {
+  border-color: rgba(124, 92, 255, 0.16);
+}
+
 .landing-page .site-main > section {
   width: min(100%, 1200px);
   margin-inline: auto;

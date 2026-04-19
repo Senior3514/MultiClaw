@@ -14,11 +14,14 @@ const assetsEl = document.getElementById('companyAssets');
 const soulEl = document.getElementById('companySoul');
 const routingEl = document.getElementById('companyRouting');
 const contactSurfacesEl = document.getElementById('companyContactSurfaces');
+const activityNowEl = document.getElementById('companyActivityNow');
+const alertsEl = document.getElementById('companyAlerts');
 const topologyEl = document.getElementById('companyTopology');
 const rolesEl = document.getElementById('companyRoles');
 const missionsEl = document.getElementById('companyMissions');
 const nextStepsEl = document.getElementById('companyNextSteps');
 const eventsEl = document.getElementById('companyEvents');
+const routingHistoryEl = document.getElementById('companyRoutingHistory');
 const artifactsEl = document.getElementById('companyArtifacts');
 const downloadCompanyPackBtn = document.getElementById('downloadCompanyPackBtn');
 const refineCompanyBtn = document.getElementById('refineCompanyBtn');
@@ -44,6 +47,23 @@ function escapeHtml(value) {
 function setStatus(message, kind = 'idle') {
   statusEl.textContent = message;
   statusEl.className = `status-banner status-${kind}`;
+}
+
+function parseUtcTimestamp(value) {
+  if (!value) return null;
+  const parsed = Date.parse(value.replace(' UTC', 'Z'));
+  return Number.isFinite(parsed) ? new Date(parsed) : null;
+}
+
+function formatAgeLabel(value) {
+  const stamp = parseUtcTimestamp(value);
+  if (!stamp) return 'Unknown';
+  const diffMinutes = Math.max(0, Math.round((Date.now() - stamp.getTime()) / 60000));
+  if (diffMinutes < 1) return 'just now';
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.round(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  return `${Math.round(diffHours / 24)}d ago`;
 }
 
 function renderRows(rows) {
@@ -137,6 +157,114 @@ function renderContactSurfaces(surfaces) {
       <strong>${escapeHtml(surface.name)}</strong>
       <p>${escapeHtml(surface.purpose)}</p>
       <small>${escapeHtml(surface.substrate)}</small>
+    </div>
+  `).join('');
+}
+
+function renderActivityNow(company, events) {
+  const executionState = company.executionState || {};
+  const autopilot = company.autopilotState || executionState.autopilot || {};
+  const lastEvent = events?.[0];
+  const currentFocus = executionState.focus || company.nextSteps?.[0] || company.missions?.[0] || 'Await first operator instruction.';
+  const nextMove = autopilot.enabled
+    ? `Autopilot will pulse again around ${escapeHtml(autopilot.nextRunAt || 'the next scheduled window')}.`
+    : 'Autopilot is paused, so the next move should come from an operator cycle or direct ask.';
+
+  return `
+    <div class="route-card">
+      <small>Current focus</small>
+      <strong>${escapeHtml(currentFocus)}</strong>
+      <p>${escapeHtml(executionState.summary || 'Execution state is still being established.')}</p>
+    </div>
+    <div class="route-card">
+      <small>Latest visible move</small>
+      <strong>${escapeHtml(lastEvent?.title || 'No visible move yet')}</strong>
+      <p>${escapeHtml(lastEvent?.detail || 'Run a cycle or ask the company to create the first visible action.')}</p>
+      <small>${escapeHtml(lastEvent?.timestamp ? `${lastEvent.timestamp} (${formatAgeLabel(lastEvent.timestamp)})` : 'Waiting')}</small>
+    </div>
+    <div class="route-card">
+      <small>Next expected move</small>
+      <strong>${escapeHtml(autopilot.enabled ? 'Background loop armed' : 'Operator action needed')}</strong>
+      <p>${nextMove}</p>
+    </div>
+  `;
+}
+
+function deriveAlerts(company, events, artifacts) {
+  const executionState = company.executionState || {};
+  const autopilot = company.autopilotState || executionState.autopilot || {};
+  const lastSeen = parseUtcTimestamp(events?.[0]?.timestamp || executionState.lastActivityAt);
+  const ageMinutes = lastSeen ? Math.round((Date.now() - lastSeen.getTime()) / 60000) : null;
+  const alerts = [];
+
+  if (!events?.length) {
+    alerts.push({
+      severity: 'warning',
+      title: 'No visible activity yet',
+      detail: 'The company exists, but it still needs its first live cycle or operator interaction.',
+    });
+  }
+
+  if (!autopilot.enabled) {
+    alerts.push({
+      severity: 'info',
+      title: 'Autopilot is paused',
+      detail: 'Background execution proof is currently paused. Enable autopilot if this company should keep moving on its own.',
+    });
+  }
+
+  if (ageMinutes !== null && ageMinutes > 90) {
+    alerts.push({
+      severity: 'warning',
+      title: 'Visible activity looks stale',
+      detail: `Last visible movement was ${formatAgeLabel(events?.[0]?.timestamp || executionState.lastActivityAt)}. Run a cycle or ask the company for a fresh move.`,
+    });
+  }
+
+  if (!artifacts?.length) {
+    alerts.push({
+      severity: 'info',
+      title: 'No generated artifacts yet',
+      detail: 'Artifact proof will become stronger once the company has produced a cycle, autopilot run, or downloaded bundle.',
+    });
+  }
+
+  if (!alerts.length) {
+    alerts.push({
+      severity: 'ok',
+      title: 'No immediate operator alerts',
+      detail: 'The company has visible execution proof, recent activity, and no obvious recovery action needed right now.',
+    });
+  }
+
+  return alerts;
+}
+
+function renderAlerts(alerts) {
+  return alerts.map((alert) => `
+    <div class="route-card alert-card alert-${escapeHtml(alert.severity)}">
+      <small>${escapeHtml(alert.severity.toUpperCase())}</small>
+      <strong>${escapeHtml(alert.title)}</strong>
+      <p>${escapeHtml(alert.detail)}</p>
+    </div>
+  `).join('');
+}
+
+function renderRoutingHistory(events) {
+  const interesting = (events || [])
+    .filter((event) => ['execution-cycle', 'autopilot-cycle', 'operator-ask', 'autopilot-configured'].includes(event.kind))
+    .slice(0, 6);
+
+  if (!interesting.length) {
+    return '<div class="route-card"><strong>No routing history yet</strong><p>Execution and operator signals will appear here once the company starts moving.</p></div>';
+  }
+
+  return interesting.map((event) => `
+    <div class="route-card">
+      <small>${escapeHtml(event.kind)}</small>
+      <strong>${escapeHtml(event.title)}</strong>
+      <p>${escapeHtml(event.detail)}</p>
+      <small>${escapeHtml(event.timestamp)} • ${escapeHtml(formatAgeLabel(event.timestamp))}</small>
     </div>
   `).join('');
 }
@@ -376,11 +504,14 @@ async function loadCompany() {
     soulEl.innerHTML = renderSoul(company.companySoul);
     routingEl.innerHTML = renderRouting(company.routing);
     contactSurfacesEl.innerHTML = renderContactSurfaces(company.contactSurfaces);
+    if (activityNowEl) activityNowEl.innerHTML = renderActivityNow(company, events);
+    if (alertsEl) alertsEl.innerHTML = renderAlerts(deriveAlerts(company, events, artifacts));
     topologyEl.innerHTML = renderTopology(company.roles);
     rolesEl.innerHTML = renderRoles(company.roles);
     missionsEl.innerHTML = renderMissions(company.missions);
     nextStepsEl.innerHTML = renderNextSteps(company.nextSteps || []);
     if (eventsEl) eventsEl.innerHTML = renderEvents(events);
+    if (routingHistoryEl) routingHistoryEl.innerHTML = renderRoutingHistory(events);
     artifactsEl.innerHTML = renderArtifacts(artifacts);
   } catch (error) {
     console.error(error);
